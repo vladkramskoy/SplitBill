@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SplitBill.swift
 //  SplitBill
 //
 //  Created by Vladislav Kramskoy on 21.05.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct SplitBill: View {
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -20,5 +20,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    SplitBill()
 }
