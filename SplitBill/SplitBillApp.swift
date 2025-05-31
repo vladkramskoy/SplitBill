@@ -11,7 +11,7 @@ import SwiftUI
 struct SplitBillApp: App {
     var body: some Scene {
         WindowGroup {
-            SplitBill()
+            HomeView()
         }
     }
 }
