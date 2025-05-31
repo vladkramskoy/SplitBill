@@ -8,10 +8,20 @@
 import SwiftUI
 
 struct TipPercentageView: View {
+    
+    @StateObject var viewModel = TipPercentageViewViewModel()
+    
     var body: some View {
         VStack {
-            Text("Slider (TipPercentage)")
-            NavigationLink("Next step", destination: CalculationView())
+            Spacer()
+            
+            Text("Чаевые \(viewModel.tipPercent, specifier: "%.0f")%")
+            Slider(value: $viewModel.tipPercent, in: 0...30, step: 1)
+                .padding()
+            Spacer()
+            
+            NavigationLink("Далее", destination: CalculationView())
+                .padding(.bottom, 125)
         }
         .navigationTitle("Чаевые")
     }
