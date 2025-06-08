@@ -15,13 +15,13 @@ final class HomeViewViewModel: ObservableObject {
     
     init() {
         self.participants = (0..<minParticipants).map { _ in
-            Participant.create()
+            Participant()
         }
     }
     
     func addParticipant() {
         guard participants.count < maxParticipants else { return }
-        participants.append(Participant.create())
+        participants.append(Participant())
     }
     
     func removeParticipant() {
