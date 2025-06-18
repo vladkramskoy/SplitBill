@@ -8,12 +8,6 @@
 import Foundation
 
 struct Participant: Identifiable {
-    
     let id = UUID()
-    let individualShare: Double
-    
-    static func create() -> Participant {
-        let participant = Participant(individualShare: 0.0)
-        return participant
-    }
+    let share: [Double] = []
 }
