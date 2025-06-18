@@ -1,5 +1,5 @@
 //
-//  HomeViewViewModel.swift
+//  SharedData.swift
 //  SplitBill
 //
 //  Created by Vladislav Kramskoy on 22.05.2025.
@@ -7,8 +7,10 @@
 
 import Foundation
 
-final class HomeViewViewModel: ObservableObject {
+final class SharedData: ObservableObject {
+    
     @Published var participants: [Participant]
+    @Published var tipPercentage: Double = 10
     
     let minParticipants = 2
     let maxParticipants = 8

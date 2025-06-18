@@ -1,5 +1,5 @@
 //
-//  HomeView.swift
+//  ParticipantView.swift
 //  SplitBill
 //
 //  Created by Vladislav Kramskoy on 21.05.2025.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct ParticipantView: View {
     
-    @StateObject var viewModel = HomeViewViewModel()
+    @EnvironmentObject var data: SharedData
     
     var body: some View {
         NavigationStack {
@@ -18,24 +18,24 @@ struct HomeView: View {
                 
                 HStack {
                     Button(action: {
-                        viewModel.removeParticipant()
+                        data.removeParticipant()
                     }) {
                         Image(systemName: "minus.circle.fill")
                     }
-                    .disabled(viewModel.participants.count <= viewModel.minParticipants)
+                    .disabled(data.participants.count <= data.minParticipants)
                     
-                    Text("Делим счёт на \(viewModel.participants.count) человек")
+                    Text("Делим счёт на \(data.participants.count) человек")
                     
                     Button(action: {
-                        viewModel.addParticipant()
+                        data.addParticipant()
                     }) {
                         Image(systemName: "plus.circle.fill")
                     }
-                    .disabled(viewModel.participants.count >= viewModel.maxParticipants)
+                    .disabled(data.participants.count >= data.maxParticipants)
                 }
                 Spacer()
                 
-                NavigationLink("Далее", destination: TipPercentageView())
+                NavigationLink("Далее", destination: TipSelectionView())
                     .padding(.bottom, 125)
             }
             .navigationTitle("Участники")
@@ -44,5 +44,8 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    let sharedData = SharedData()
+    
+    ParticipantView()
+        .environmentObject(sharedData)
 }

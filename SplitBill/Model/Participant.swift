@@ -9,5 +9,5 @@ import Foundation
 
 struct Participant: Identifiable {
     let id = UUID()
-    let share: [Double] = []
+    var share: [Double] = []
 }

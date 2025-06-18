@@ -1,5 +1,5 @@
 //
-//  TipPercentageView.swift
+//  TipSelectionView.swift
 //  SplitBill
 //
 //  Created by Vladislav Kramskoy on 26.05.2025.
@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-struct TipPercentageView: View {
+struct TipSelectionView: View {
     
-    @StateObject var viewModel = TipPercentageViewViewModel()
+    @EnvironmentObject var data: SharedData
     
     var body: some View {
         VStack {
             Spacer()
             
-            Text("Чаевые \(viewModel.tipPercent, specifier: "%.0f")%")
-            Slider(value: $viewModel.tipPercent, in: 0...30, step: 1)
+            Text("Чаевые \(data.tipPercentage, specifier: "%.0f")%")
+            Slider(value: $data.tipPercentage, in: 0...30, step: 1)
                 .padding()
             Spacer()
             
@@ -27,6 +27,9 @@ struct TipPercentageView: View {
     }
 }
 
-#Preview { 
-    TipPercentageView()
+#Preview {
+    let sharedData = SharedData()
+    
+    TipSelectionView()
+        .environmentObject(sharedData)
 }

@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct SplitBillApp: App {
+    
+    @StateObject var data = SharedData()
+    
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            ParticipantView()
+                .environmentObject(data)
         }
     }
 }
