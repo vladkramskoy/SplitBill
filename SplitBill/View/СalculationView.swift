@@ -15,6 +15,7 @@ struct CalculationView: View {
     private var pickerOptions: [String] {
         ["На всех"] + data.participants.indices.map { "Уч. \($0 + 1)" }
     }
+    private var maxCharacters = 7
     
     var body: some View {
         
@@ -53,6 +54,11 @@ struct CalculationView: View {
             
             HStack {
                 TextField("Стоимость блюда", text: $currentAmount)
+                    .onChange(of: currentAmount) { _, newValue in
+                        if newValue.count > maxCharacters {
+                            currentAmount = String(newValue.prefix(maxCharacters))
+                        }
+                    }
                     .keyboardType(.decimalPad)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
@@ -68,14 +74,40 @@ struct CalculationView: View {
             }
             
             Button("Добавить") {
-                guard let amount = Int(currentAmount) else { return }
-                data.participants[0].share.append(amount)
-                currentAmount = ""
+                addAmount()
             }
             .buttonStyle(.borderedProminent)
             .disabled(currentAmount.isEmpty)
             .padding()
         }
+    }
+    
+    private func addAmount() {
+        guard let amount = Int(currentAmount), amount > 0 else { return }
+        
+        if selectedParticipantIndex == 0 {
+            guard !data.participants.isEmpty else { return }
+            
+            let totalAmount = data.tipPercentage > 0 ?
+            amount + (amount * Int(data.tipPercentage) / 100) :
+            amount
+            
+            let sharePerPerson = totalAmount/data.participants.count
+            
+            for i in 0..<data.participants.count {
+                data.participants[i].share.append(sharePerPerson)
+            }
+        } else {
+            let participantIndex = selectedParticipantIndex - 1
+            if participantIndex < data.participants.count {
+                let amountToAdd = data.tipPercentage > 0 ?
+                amount + (amount * Int(data.tipPercentage) / 100) :
+                amount
+                data.participants[participantIndex].share.append(amountToAdd)
+            }
+        }
+        
+        currentAmount = ""
     }
 }
 
