@@ -9,16 +9,16 @@ import SwiftUI
 
 struct CalculationView: View {
     
+    @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
-    @Environment(\.dismiss) private var dismiss
     @State private var currentAmount: String = ""
     @State private var selectedParticipantIndex = 0
     @State private var showAlert = false
     private var pickerOptions: [String] {
         ["На всех"] + data.participants.indices.map { "Уч. \($0 + 1)" }
     }
-    private var maxCharacters = 7
-        
+    var maxCharacters = 7
+    
     var body: some View {
         
         VStack {
@@ -85,10 +85,10 @@ struct CalculationView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    if data.participants.contains(where: { !$0.share.isEmpty }) {
+                    if data.containsAmounts {
                         showAlert = true
                     } else {
-                        dismiss()
+                        path.removeLast()
                     }
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -99,7 +99,7 @@ struct CalculationView: View {
                     Button("Сбросить чеки", role: .destructive) {
                         withAnimation {
                             data.resetToInitialState()
-                            dismiss()
+                            path = NavigationPath()
                         }
                     }
                 }
@@ -137,8 +137,13 @@ struct CalculationView: View {
 }
 
 #Preview {
-    let sharedData = SharedData()
-    
-    CalculationView()
-        .environmentObject(sharedData)
+    struct MockView: View {
+        @State private var path = NavigationPath()
+        
+        var body: some View {
+             CalculationView(path: $path)
+                .environmentObject(SharedData())
+        }
+    }
+    return MockView()
 }

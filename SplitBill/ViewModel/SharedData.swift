@@ -15,6 +15,10 @@ final class SharedData: ObservableObject {
     let minParticipants = 2
     let maxParticipants = 8
     
+    var containsAmounts: Bool {
+        participants.contains { !$0.share.isEmpty }
+    }
+    
     init() {
         self.participants = (0..<minParticipants).map { _ in
             Participant()

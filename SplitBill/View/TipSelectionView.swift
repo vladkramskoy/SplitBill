@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TipSelectionView: View {
     
+    @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
     
     var body: some View {
@@ -20,16 +21,23 @@ struct TipSelectionView: View {
                 .padding()
             Spacer()
             
-            NavigationLink("Далее", destination: CalculationView())
-                .padding(.bottom, 125)
+            Button("Рассчитать") {
+                path.append(Route.calculation)
+            }
+            .padding(.bottom, 125)
         }
         .navigationTitle("Чаевые")
     }
 }
 
 #Preview {
-    let sharedData = SharedData()
-    
-    TipSelectionView()
-        .environmentObject(sharedData)
+    struct MockView: View {
+        @State private var path = NavigationPath()
+        
+        var body: some View {
+             TipSelectionView(path: $path)
+                .environmentObject(SharedData())
+        }
+    }
+    return MockView()
 }
