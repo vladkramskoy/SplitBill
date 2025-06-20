@@ -30,4 +30,11 @@ final class SharedData: ObservableObject {
         guard participants.count > minParticipants else { return }
         participants.removeLast()
     }
+    
+    func resetToInitialState() {
+        participants = (0..<minParticipants).map { _ in
+            Participant()
+        }
+        tipPercentage = 10
+    }
 }
