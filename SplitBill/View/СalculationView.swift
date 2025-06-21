@@ -26,9 +26,9 @@ struct CalculationView: View {
                 ForEach(data.participants.indices, id: \.self) { index in
                     
                     let participant = data.participants[index]
-                    let amount = participant.share.reduce(0, +)
+                    let amount = calculateTotalWithTip(for: participant)
                     
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 40)
                         .frame(height: 75)
                     
                         .foregroundStyle(Color.blue.gradient)
@@ -126,6 +126,20 @@ struct CalculationView: View {
         }
         
         currentAmount = ""
+    }
+    
+    private func calculateTotalWithTip(for participant: Participant) -> Int {
+        let baseAmount = participant.share.reduce(0, +)
+        
+        if data.tipPercentage > 0 {
+            let totalBaseAmount = data.participants.reduce(0) { $0 + $1.share.reduce(0, +) }
+            
+            let totalTip = Int(ceil(Double(totalBaseAmount) * Double(data.tipPercentage) / 100.0))
+            
+            return baseAmount + Int(ceil(Double(totalTip) / Double(data.participants.count)))
+        } else {
+            return baseAmount
+        }
     }
 }
 
