@@ -113,22 +113,15 @@ struct CalculationView: View {
         if selectedParticipantIndex == 0 {
             guard !data.participants.isEmpty else { return }
             
-            let totalAmount = data.tipPercentage > 0 ?
-            amount + (amount * Int(data.tipPercentage) / 100) :
-            amount
-            
-            let sharePerPerson = totalAmount/data.participants.count
+            let perPerson = Int(ceil(Double(amount) / Double(data.participants.count)))
             
             for i in 0..<data.participants.count {
-                data.participants[i].share.append(sharePerPerson)
+                data.participants[i].share.append(perPerson)
             }
         } else {
-            let participantIndex = selectedParticipantIndex - 1
-            if participantIndex < data.participants.count {
-                let amountToAdd = data.tipPercentage > 0 ?
-                amount + (amount * Int(data.tipPercentage) / 100) :
-                amount
-                data.participants[participantIndex].share.append(amountToAdd)
+            let index = selectedParticipantIndex - 1
+            if index < data.participants.count {
+                data.participants[index].share.append(amount)
             }
         }
         
