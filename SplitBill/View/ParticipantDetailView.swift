@@ -14,7 +14,7 @@ struct ParticipantDetailView: View {
     
     var body: some View {
         List {
-            ForEach(participant.share, id: \.self) { amount in
+            ForEach(participant.baseShares, id: \.self) { amount in
                 Text("\(amount) ₽")
             }
         }
@@ -26,5 +26,5 @@ struct ParticipantDetailView: View {
 }
 
 #Preview {
-    ParticipantDetailView(participant: .constant(Participant(share: [100])), dismiss: {})
+    ParticipantDetailView(participant: .constant(Participant(baseShares: [100])), dismiss: {})
 }

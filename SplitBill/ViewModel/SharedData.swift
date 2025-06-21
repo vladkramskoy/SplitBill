@@ -16,7 +16,7 @@ final class SharedData: ObservableObject {
     let maxParticipants = 8
     
     var containsAmounts: Bool {
-        participants.contains { !$0.share.isEmpty }
+        participants.contains { !$0.baseShares.isEmpty }
     }
     
     init() {

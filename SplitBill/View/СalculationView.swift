@@ -17,34 +17,36 @@ struct CalculationView: View {
     private var pickerOptions: [String] {
         ["На всех"] + data.participants.indices.map { "Уч. \($0 + 1)" }
     }
-    var maxCharacters = 7
+    var maxCharacters = 6
     
     var body: some View {
         
         VStack {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
                 ForEach(data.participants.indices, id: \.self) { index in
-                    
                     let participant = data.participants[index]
-                    let amount = calculateTotalWithTip(for: participant)
                     
-                    RoundedRectangle(cornerRadius: 40)
+                    RoundedRectangle(cornerRadius: 10)
                         .frame(height: 75)
-                    
                         .foregroundStyle(Color.blue.gradient)
-                    
                         .overlay(
                             VStack {
                                 Text("Участник \(index + 1)")
-                                    .foregroundStyle(Color(UIColor { traitCollection in
-                                        traitCollection.userInterfaceStyle == .dark ? .black : .white
-                                    }))
+                                    .foregroundStyle(Color.white)
                                     .font(.system(size: 20))
-                                Text("\(amount) ₽")
-                                    .foregroundStyle(Color(UIColor { traitCollection in
-                                        traitCollection.userInterfaceStyle == .dark ? .black : .white
-                                    }))
+                                
+                                Text("\(participant.total) ₽")
+                                    .foregroundStyle(Color.white)
+                                    .font(.system(size: 18, weight: .bold))
+                                
+                                if data.tipPercentage > 0 {
+                                    let base = participant.baseShares.reduce(0, +)
+                                    Text("\(base) ₽ + \(participant.tipShare) ₽ чаевых")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Color.white.opacity(0.8))
+                                }
                             }
+                                .padding(5)
                         )
                 }
             }
@@ -116,29 +118,33 @@ struct CalculationView: View {
             let perPerson = Int(ceil(Double(amount) / Double(data.participants.count)))
             
             for i in 0..<data.participants.count {
-                data.participants[i].share.append(perPerson)
+                data.participants[i].baseShares.append(perPerson)
             }
         } else {
             let index = selectedParticipantIndex - 1
             if index < data.participants.count {
-                data.participants[index].share.append(amount)
+                data.participants[index].baseShares.append(amount)
             }
         }
         
+        calculateTips()
         currentAmount = ""
     }
     
-    private func calculateTotalWithTip(for participant: Participant) -> Int {
-        let baseAmount = participant.share.reduce(0, +)
+    private func calculateTips() {
+        guard data.tipPercentage > 0 else {
+            for i in data.participants.indices {
+                data.participants[i].tipShare = 0
+            }
+            return
+        }
         
-        if data.tipPercentage > 0 {
-            let totalBaseAmount = data.participants.reduce(0) { $0 + $1.share.reduce(0, +) }
-            
-            let totalTip = Int(ceil(Double(totalBaseAmount) * Double(data.tipPercentage) / 100.0))
-            
-            return baseAmount + Int(ceil(Double(totalTip) / Double(data.participants.count)))
-        } else {
-            return baseAmount
+        let totalBaseAmount = data.participants.reduce(0) { $0 + $1.baseShares.reduce(0, +) }
+        let totalTip = Int(ceil(Double(totalBaseAmount) * Double(data.tipPercentage) / 100.0))
+        let tipPerPerson = Int(ceil(Double(totalTip) / Double(data.participants.count)))
+        
+        for i in data.participants.indices {
+            data.participants[i].tipShare = tipPerPerson
         }
     }
 }
@@ -148,7 +154,7 @@ struct CalculationView: View {
         @State private var path = NavigationPath()
         
         var body: some View {
-             CalculationView(path: $path)
+            CalculationView(path: $path)
                 .environmentObject(SharedData())
         }
     }

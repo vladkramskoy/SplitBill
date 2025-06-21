@@ -9,5 +9,10 @@ import Foundation
 
 struct Participant: Identifiable {
     let id = UUID()
-    var share: [Int] = []
+    var baseShares: [Int] = []
+    var tipShare: Int = 0
+    
+    var total: Int {
+        baseShares.reduce(0, +) + tipShare
+    }
 }
