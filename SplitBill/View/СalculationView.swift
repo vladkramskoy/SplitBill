@@ -14,6 +14,7 @@ struct CalculationView: View {
     @State private var currentAmount: String = ""
     @State private var selectedParticipantIndex = 0
     @State private var showAlert = false
+    @State private var isExpanded = false
     private var pickerOptions: [String] {
         ["На всех"] + data.participants.indices.map { "Уч. \($0 + 1)" }
     }
@@ -26,7 +27,7 @@ struct CalculationView: View {
                 ForEach(data.participants.indices, id: \.self) { index in
                     let participant = data.participants[index]
                     
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 12)
                         .frame(height: 75)
                         .foregroundStyle(Color.blue.gradient)
                         .overlay(
@@ -51,6 +52,44 @@ struct CalculationView: View {
                 }
             }
             .padding()
+            
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Общая сумма")
+                        .font(.headline)
+                    
+                    Spacer()
+                    
+                    HStack(alignment: .lastTextBaseline, spacing: 4) {
+                        Text("\(data.totalAmount) ₽")
+                            .fontWeight(.bold)
+                        
+                        Image(systemName: "chevron.down")
+                            .font(.caption.weight(.medium))
+                            .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    }
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        isExpanded.toggle()
+                    }
+                }
+                
+                if isExpanded {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Divider()
+                        
+                        DetailRow(title: "Чаевые", value: data.totalTipAmount)
+                        DetailRow(title: "Без чаевых", value: data.totalBaseAmount)
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(12)
+            .padding(.horizontal)
             
             Spacer()
             
@@ -139,9 +178,7 @@ struct CalculationView: View {
             return
         }
         
-        let totalBaseAmount = data.participants.reduce(0) { $0 + $1.baseShares.reduce(0, +) }
-        let totalTip = Int(ceil(Double(totalBaseAmount) * Double(data.tipPercentage) / 100.0))
-        let tipPerPerson = Int(ceil(Double(totalTip) / Double(data.participants.count)))
+        let tipPerPerson = Int(ceil(Double(data.totalTipAmount) / Double(data.participants.count)))
         
         for i in data.participants.indices {
             data.participants[i].tipShare = tipPerPerson

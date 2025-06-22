@@ -15,6 +15,19 @@ final class SharedData: ObservableObject {
     let minParticipants = 2
     let maxParticipants = 8
     
+    var totalBaseAmount: Int {
+        participants.reduce(0) { $0 + $1.baseShares.reduce(0, +) }
+    }
+    
+    var totalTipAmount: Int {
+        guard tipPercentage > 0 else { return 0 }
+        return Int(ceil(Double(totalBaseAmount) * Double(tipPercentage) / 100.0))
+    }
+    
+    var totalAmount: Int {
+        totalBaseAmount + totalTipAmount
+    }
+    
     var containsAmounts: Bool {
         participants.contains { !$0.baseShares.isEmpty }
     }
