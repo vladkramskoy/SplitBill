@@ -20,8 +20,12 @@ final class SharedData: ObservableObject {
     }
     
     var totalTipAmount: Int {
-        guard tipPercentage > 0 else { return 0 }
-        return Int(ceil(Double(totalBaseAmount) * Double(tipPercentage) / 100.0))
+        var sum = 0
+        for tips in participants {
+            sum += tips.tipShares.reduce(0, +)
+        }
+        
+        return sum
     }
     
     var totalAmount: Int {

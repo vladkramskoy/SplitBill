@@ -42,7 +42,7 @@ struct CalculationView: View {
                                 
                                 if data.tipPercentage > 0 {
                                     let base = participant.baseShares.reduce(0, +)
-                                    Text("\(base) ₽ + \(participant.tipShare) ₽ чаевых")
+                                    Text("\(base) ₽ + \(participant.tipShares.reduce(0, +)) ₽ чаевых")
                                         .font(.system(size: 12))
                                         .foregroundStyle(Color.white.opacity(0.8))
                                 }
@@ -82,6 +82,11 @@ struct CalculationView: View {
                         
                         DetailRow(title: "Чаевые", value: data.totalTipAmount)
                         DetailRow(title: "Без чаевых", value: data.totalBaseAmount)
+                        Divider()
+                        
+                        Text("Суммы округлены для удобства. Возможна небольшая погрешность.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
@@ -169,19 +174,20 @@ struct CalculationView: View {
         calculateTips()
         currentAmount = ""
     }
-    
+
     private func calculateTips() {
         guard data.tipPercentage > 0 else {
             for i in data.participants.indices {
-                data.participants[i].tipShare = 0
+                data.participants[i].tipShares = Array(repeating: 0, count: data.participants[i].baseShares.count)
             }
             return
         }
         
-        let tipPerPerson = Int(ceil(Double(data.totalTipAmount) / Double(data.participants.count)))
-        
         for i in data.participants.indices {
-            data.participants[i].tipShare = tipPerPerson
+            data.participants[i].tipShares = data.participants[i].baseShares.map { base in
+                let tip = Int(ceil(Double(base) * data.tipPercentage / 100.0))
+                return tip
+            }
         }
     }
 }
