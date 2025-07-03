@@ -15,9 +15,12 @@ struct CalculationView: View {
     @State private var selectedParticipantIndex = 0
     @State private var showAlert = false
     @State private var isExpanded = false
+    @FocusState private var isTextFieldFocused: Bool
+    
     private var pickerOptions: [String] {
         ["На всех"] + data.participants.indices.map { "Уч. \($0 + 1)" }
     }
+    
     var maxCharacters = 6
     
     var body: some View {
@@ -105,8 +108,9 @@ struct CalculationView: View {
                             currentAmount = String(newValue.prefix(maxCharacters))
                         }
                     }
-                    .keyboardType(.decimalPad)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .focused($isTextFieldFocused)
+                    .keyboardType(.numberPad)
+                    .textFieldStyle(.roundedBorder)
                     .padding()
                 
                 Picker("", selection: $selectedParticipantIndex) {
@@ -148,6 +152,15 @@ struct CalculationView: View {
                             path = NavigationPath()
                         }
                     }
+                }
+            }
+            
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button {
+                    isTextFieldFocused = false
+                } label: {
+                    Image(systemName: "keyboard.chevron.compact.down")
                 }
             }
         }
