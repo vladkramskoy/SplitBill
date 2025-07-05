@@ -34,13 +34,21 @@ struct ParticipantView: View {
                 .disabled(data.participants.count >= data.maxParticipants)
             }
             Spacer()
-            
-            Button("Далее") {
+
+            Button(action: {
                 path.append(Route.tipSelection)
+            }) {
+                Text("Далее")
+                    .font(.title2)
+                    .padding()
+                    .frame(maxWidth: .infinity)
             }
-            .padding(.bottom, 125)
+            .buttonStyle(.borderedProminent)
+            .tint(.blue)
+            .clipShape(RoundedRectangle(cornerRadius: 40))
+            .padding()
         }
-        .navigationTitle("Участники")
+        .navigationTitle("Шаг 1 из 3")
     }
 }
 

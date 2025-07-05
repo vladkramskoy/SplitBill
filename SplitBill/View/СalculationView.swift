@@ -147,7 +147,7 @@ struct CalculationView: View {
             )
             .padding(.bottom)
         }
-        .navigationTitle("Доли")
+        .navigationTitle("Шаг 3 из 3")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

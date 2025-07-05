@@ -21,12 +21,20 @@ struct TipSelectionView: View {
                 .padding()
             Spacer()
             
-            Button("Рассчитать") {
+            Button(action: {
                 path.append(Route.calculation)
+            }) {
+                Text("Далее")
+                    .font(.title2)
+                    .padding()
+                    .frame(maxWidth: .infinity)
             }
-            .padding(.bottom, 125)
+            .buttonStyle(.borderedProminent)
+            .tint(.blue)
+            .clipShape(RoundedRectangle(cornerRadius: 40))
+            .padding()
         }
-        .navigationTitle("Чаевые")
+        .navigationTitle("Шаг 2 из 3")
     }
 }
 
