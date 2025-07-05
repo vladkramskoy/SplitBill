@@ -102,15 +102,21 @@ struct CalculationView: View {
             Spacer()
             
             HStack {
-                TextField("Стоимость блюда", text: $currentAmount)
+                TextField("0₽", text: $currentAmount)
                     .onChange(of: currentAmount) { _, newValue in
                         if newValue.count > maxCharacters {
                             currentAmount = String(newValue.prefix(maxCharacters))
                         }
                     }
+                
+                    .font(.system(size: 28, weight: .medium))
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(40)
                     .focused($isTextFieldFocused)
                     .keyboardType(.numberPad)
-                    .textFieldStyle(.roundedBorder)
                     .padding()
                 
                 Picker("", selection: $selectedParticipantIndex) {
@@ -119,18 +125,29 @@ struct CalculationView: View {
                     }
                 }
                 .pickerStyle(WheelPickerStyle())
-                .frame(height: 150)
+                .frame(height: 100)
                 .clipped()
+                
+                Button(action: {
+                    addAmount()
+                }) {
+                    Image(systemName: "arrow.up")
+                }
+                .disabled(currentAmount.isEmpty)
+                .font(.title)
+                .foregroundColor(currentAmount.isEmpty ? .gray : .white)
+                .frame(width: 50, height: 50)
+                .background(currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
+                .clipShape(Circle())
+                .padding()
             }
-            
-            Button("Добавить") {
-                addAmount()
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(currentAmount.isEmpty)
-            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 40, style: .continuous)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .padding(.bottom)
         }
-        .navigationTitle("Шаг 3 из 3")
+        .navigationTitle("Доли")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -156,12 +173,12 @@ struct CalculationView: View {
             }
             
             ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
                 Button {
                     isTextFieldFocused = false
                 } label: {
                     Image(systemName: "keyboard.chevron.compact.down")
                 }
+                Spacer()
             }
         }
     }
