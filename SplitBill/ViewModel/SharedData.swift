@@ -10,7 +10,8 @@ import Foundation
 final class SharedData: ObservableObject {
     
     @Published var participants: [Participant]
-    @Published var tipPercentage: Double = 10
+    @Published var tipPercentage = 15.0
+    @Published var isTipEnable = false
     
     let minParticipants = 2
     let maxParticipants = 8
@@ -56,6 +57,7 @@ final class SharedData: ObservableObject {
         participants = (0..<minParticipants).map { _ in
             Participant()
         }
-        tipPercentage = 10
+        tipPercentage = 15.0
+        isTipEnable = false
     }
 }

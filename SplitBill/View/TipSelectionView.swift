@@ -9,17 +9,49 @@ import SwiftUI
 
 struct TipSelectionView: View {
     
+    @State private var billAmount = ""
     @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
     
+    private var totalAmount: Double {
+        guard let amount = Double(billAmount) else { return 0 }
+        let tip = data.isTipEnable ? amount * data.tipPercentage / 100 : 0
+        return amount + tip
+    }
+    
     var body: some View {
         VStack {
-            Spacer()
-            
-            Text("Чаевые \(data.tipPercentage, specifier: "%.0f")%")
-            Slider(value: $data.tipPercentage, in: 0...30, step: 1)
-                .padding()
-            Spacer()
+            Form {
+                Section {
+                    TextField("Сумма счёта", text: $billAmount)
+                        .keyboardType(.decimalPad)
+                } header: {
+                    Text("Сумма счёта")
+                }
+                
+                Section {
+                    Toggle("Добавить чаевые", isOn: $data.isTipEnable)
+                    
+                    if data.isTipEnable {
+                        HStack {
+                            Text("Процент:")
+                            Slider(value: $data.tipPercentage, in: 0...30, step: 1)
+                            Text("\(Int(data.tipPercentage))%")
+                                .frame(width: 40, alignment: .trailing)
+                        }
+                        
+                        HStack {
+                            Text("Сумма с чаевыми:")
+                            Spacer()
+                            Text(totalAmount, format: .currency(code: "RUB"))
+                        }
+                    }
+                } header: {
+                    Text("Чаевые")
+                }
+            }
+            .scrollDisabled(true)
+            .padding()
             
             Button(action: {
                 path.append(Route.calculation)
