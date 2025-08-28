@@ -7,7 +7,7 @@
 
 enum TipCalculationType: String, CaseIterable {
     case percentage = "Процент"
-    case fixedAmount = "Фиксированная сумма"
+    case fixedAmount = "Cумма"
     
     var id: String { self.rawValue }
 }

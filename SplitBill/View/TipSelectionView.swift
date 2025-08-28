@@ -31,7 +31,8 @@ struct TipSelectionView: View {
             
             return amount * data.tipPercentage / 100
         } else {
-            return Double(data.tipAmount) ?? 0
+            guard let tipAmount = numberFormatter.number(from: data.tipAmount)?.doubleValue else { return 0 }
+            return tipAmount
         }
     }
     
