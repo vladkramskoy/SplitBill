@@ -13,8 +13,23 @@ struct TipSelectionView: View {
     @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
     
+    private let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        formatter.minimum = 0
+        formatter.locale = Locale.current
+        return formatter
+    }()
+    
     private var totalAmount: Double {
-        guard let amount = Double(billAmount) else { return 0 }
+        let amount: Double
+        if let number = numberFormatter.number(from: billAmount) {
+            amount = number.doubleValue
+        } else {
+            return 0
+        }
+        
         let tip = data.isTipEnable ? amount * data.tipPercentage / 100 : 0
         return amount + tip
     }
