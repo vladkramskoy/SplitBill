@@ -11,6 +11,7 @@ final class SharedData: ObservableObject {
     
     @Published var participants: [Participant]
     @Published var tipPercentage = 15.0
+    @Published var tipAmount = ""
     @Published var isTipEnable = false
     
     let minParticipants = 2
@@ -58,6 +59,7 @@ final class SharedData: ObservableObject {
             Participant()
         }
         tipPercentage = 15.0
+        tipAmount = ""
         isTipEnable = false
     }
 }
