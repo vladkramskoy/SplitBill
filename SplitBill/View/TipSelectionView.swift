@@ -9,17 +9,86 @@ import SwiftUI
 
 struct TipSelectionView: View {
     
+    @State private var billAmount = ""
+    @State private var tipCalculationType: TipCalculationType = .percentage
     @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
     
+    private let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        formatter.minimum = 0
+        formatter.locale = Locale.current
+        return formatter
+    }()
+    
+    private var calculatedTip: Double {
+        guard data.isTipEnable else { return 0 }
+        
+        if tipCalculationType == .percentage {
+            guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
+            
+            return amount * data.tipPercentage / 100
+        } else {
+            guard let tipAmount = numberFormatter.number(from: data.tipAmount)?.doubleValue else { return 0 }
+            return tipAmount
+        }
+    }
+    
+    private var totalAmount: Double {
+        guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
+        return amount + calculatedTip
+    }
+    
     var body: some View {
         VStack {
-            Spacer()
-            
-            Text("Чаевые \(data.tipPercentage, specifier: "%.0f")%")
-            Slider(value: $data.tipPercentage, in: 0...30, step: 1)
-                .padding()
-            Spacer()
+            Form {
+                Section {
+                    TextField("Сумма счёта", text: $billAmount)
+                        .keyboardType(.decimalPad)
+                } header: {
+                    Text("Сумма счёта")
+                }
+                
+                Section {
+                    Toggle("Добавить чаевые", isOn: $data.isTipEnable)
+                    
+                    if data.isTipEnable {
+                        Picker("Способ расчета", selection: $tipCalculationType) {
+                            ForEach(TipCalculationType.allCases, id: \.self) { type in
+                                Text(type.rawValue).tag(type)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        
+                        if tipCalculationType == .percentage {
+                            HStack {
+                                Text("Процент:")
+                                Slider(value: $data.tipPercentage, in: 0...30, step: 1)
+                                Text("\(Int(data.tipPercentage))%")
+                                    .frame(width: 40, alignment: .trailing)
+                            }
+                        } else {
+                            HStack {
+                                Text("Сумма:")
+                                TextField("0.00", text: $data.tipAmount)
+                                    .keyboardType(.decimalPad)
+                                    .multilineTextAlignment(.trailing)
+                            }
+                        }
+
+                        HStack {
+                            Text("Сумма с чаевыми:")
+                            Spacer()
+                            Text(totalAmount, format: .currency(code: "RUB"))
+                        }
+                    }
+                } header: {
+                    Text("Чаевые")
+                }
+            }
+            .padding()
             
             Button(action: {
                 path.append(Route.calculation)

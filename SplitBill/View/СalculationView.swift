@@ -43,7 +43,7 @@ struct CalculationView: View {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 18, weight: .bold))
                                 
-                                if data.tipPercentage > 0 {
+                                if data.isTipEnable && data.tipPercentage > 0 {
                                     let base = participant.baseShares.reduce(0, +)
                                     Text("\(base) ₽ + \(participant.tipShares.reduce(0, +)) ₽ чаевых")
                                         .font(.system(size: 12))
@@ -201,7 +201,10 @@ struct CalculationView: View {
             }
         }
         
-        calculateTips()
+        if data.isTipEnable {
+            calculateTips()
+        }
+        
         currentAmount = ""
     }
 
