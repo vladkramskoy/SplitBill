@@ -13,7 +13,19 @@ struct ParticipantView: View {
     @EnvironmentObject var data: SharedData
     
     var body: some View {
-        VStack {
+        VStack(spacing: 30) {
+            Spacer()
+            
+            Text("Раздели счет!")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            
+            Text("Выберите количество участников")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
             Spacer()
             
             HStack {
@@ -33,22 +45,25 @@ struct ParticipantView: View {
                 }
                 .disabled(data.participants.count >= data.maxParticipants)
             }
+            
             Spacer()
-
+            
             Button(action: {
                 path.append(Route.tipSelection)
             }) {
-                Text("Далее")
-                    .font(.title2)
-                    .padding()
-                    .frame(maxWidth: .infinity)
+                Text("Начать")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(Color.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.blue)
-            .clipShape(RoundedRectangle(cornerRadius: 40))
             .padding()
+            
+            Spacer()
         }
-        .navigationTitle("Шаг 1 из 3")
+        .navigationTitle("Главная")
+        .toolbar(.hidden)
     }
 }
 
