@@ -11,8 +11,8 @@ struct TipSelectionView: View {
     
     @State private var billAmount = ""
     @State private var tipCalculationType: TipCalculationType = .percentage
-    @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
+    @EnvironmentObject private var coordinator: Coordinator
     
     private let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -91,7 +91,7 @@ struct TipSelectionView: View {
             .padding()
             
             Button(action: {
-                path.append(Route.calculation)
+                coordinator.push(Route.calculation)
             }) {
                 Text("Далее")
                     .font(.title2)
@@ -112,7 +112,7 @@ struct TipSelectionView: View {
         @State private var path = NavigationPath()
         
         var body: some View {
-             TipSelectionView(path: $path)
+             TipSelectionView()
                 .environmentObject(SharedData())
         }
     }

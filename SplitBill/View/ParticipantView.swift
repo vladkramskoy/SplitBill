@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ParticipantView: View {
     
-    @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
+    @EnvironmentObject private var coordinator: Coordinator
     
     var body: some View {
         VStack(spacing: 30) {
@@ -49,7 +49,7 @@ struct ParticipantView: View {
             Spacer()
             
             Button(action: {
-                path.append(Route.tipSelection)
+                coordinator.push(Route.tipSelection)
             }) {
                 Text("Начать")
                     .font(.headline)
@@ -72,7 +72,7 @@ struct ParticipantView: View {
         @State private var path = NavigationPath()
         
         var body: some View {
-            ParticipantView(path: $path)
+            ParticipantView()
                 .environmentObject(SharedData())
         }
     }

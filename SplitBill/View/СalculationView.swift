@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CalculationView: View {
     
-    @Binding var path: NavigationPath
     @EnvironmentObject var data: SharedData
+    @EnvironmentObject private var coordinator: Coordinator
     @State private var currentAmount: String = ""
     @State private var selectedParticipantIndex = 0
     @State private var showAlert = false
@@ -155,7 +155,7 @@ struct CalculationView: View {
                     if data.containsAmounts {
                         showAlert = true
                     } else {
-                        path.removeLast()
+                        coordinator.pop()
                     }
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -166,7 +166,7 @@ struct CalculationView: View {
                     Button("Сбросить чеки", role: .destructive) {
                         withAnimation {
                             data.resetToInitialState()
-                            path = NavigationPath()
+                            coordinator.popToRoot()
                         }
                     }
                 }
@@ -230,7 +230,7 @@ struct CalculationView: View {
         @State private var path = NavigationPath()
         
         var body: some View {
-            CalculationView(path: $path)
+            CalculationView()
                 .environmentObject(SharedData())
         }
     }
