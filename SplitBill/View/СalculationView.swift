@@ -9,17 +9,14 @@ import SwiftUI
 
 struct CalculationView: View {
     
-    @EnvironmentObject var data: SharedData
     @EnvironmentObject private var coordinator: Coordinator
     @ObservedObject var calculationViewModel: CalculationViewModel
-    @State private var currentAmount: String = ""
-    @State private var selectedParticipantIndex = 0
     @State private var showAlert = false
     @State private var isExpanded = false
     @FocusState private var isTextFieldFocused: Bool
     
     private var pickerOptions: [String] {
-        ["На всех"] + data.participants.indices.map { "Уч. \($0 + 1)" }
+        ["На всех"] + calculationViewModel.shareData.participants.indices.map { "Уч. \($0 + 1)" }
     }
     
     var maxCharacters = 6
@@ -28,8 +25,8 @@ struct CalculationView: View {
         
         VStack {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                ForEach(data.participants.indices, id: \.self) { index in
-                    let participant = data.participants[index]
+                ForEach(calculationViewModel.shareData.participants.indices, id: \.self) { index in
+                    let participant = calculationViewModel.shareData.participants[index]
                     
                     RoundedRectangle(cornerRadius: 12)
                         .frame(height: 75)
@@ -44,7 +41,7 @@ struct CalculationView: View {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 18, weight: .bold))
                                 
-                                if data.isTipEnable && data.tipPercentage > 0 {
+                                if calculationViewModel.shareData.isTipEnable && calculationViewModel.shareData.tipPercentage > 0 {
                                     let base = participant.baseShares.reduce(0, +)
                                     Text("\(base) ₽ + \(participant.tipShares.reduce(0, +)) ₽ чаевых")
                                         .font(.system(size: 12))
@@ -65,7 +62,7 @@ struct CalculationView: View {
                     Spacer()
                     
                     HStack(alignment: .lastTextBaseline, spacing: 4) {
-                        Text("\(data.totalAmount) ₽")
+                        Text("\(calculationViewModel.shareData.totalAmount) ₽")
                             .fontWeight(.bold)
                         
                         Image(systemName: "chevron.down")
@@ -84,8 +81,8 @@ struct CalculationView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Divider()
                         
-                        DetailRow(title: "Чаевые", value: data.totalTipAmount)
-                        DetailRow(title: "Без чаевых", value: data.totalBaseAmount)
+                        DetailRow(title: "Чаевые", value: calculationViewModel.shareData.totalTipAmount)
+                        DetailRow(title: "Без чаевых", value: calculationViewModel.shareData.totalBaseAmount)
                         Divider()
                         
                         Text("Суммы округлены для удобства. Возможна небольшая погрешность.")
@@ -103,10 +100,10 @@ struct CalculationView: View {
             Spacer()
             
             HStack {
-                TextField("0₽", text: $currentAmount)
-                    .onChange(of: currentAmount) { _, newValue in
+                TextField("0₽", text: $calculationViewModel.currentAmount)
+                    .onChange(of: calculationViewModel.currentAmount) { _, newValue in
                         if newValue.count > maxCharacters {
-                            currentAmount = String(newValue.prefix(maxCharacters))
+                            calculationViewModel.currentAmount = String(newValue.prefix(maxCharacters))
                         }
                     }
                 
@@ -120,7 +117,7 @@ struct CalculationView: View {
                     .keyboardType(.numberPad)
                     .padding()
                 
-                Picker("", selection: $selectedParticipantIndex) {
+                Picker("", selection: $calculationViewModel.selectedParticipantIndex) {
                     ForEach(0..<pickerOptions.count, id: \.self) { index in
                         Text(pickerOptions[index]).tag(index)
                     }
@@ -130,15 +127,15 @@ struct CalculationView: View {
                 .clipped()
                 
                 Button(action: {
-                    addAmount()
+                    calculationViewModel.addAmount()
                 }) {
                     Image(systemName: "arrow.up")
                 }
-                .disabled(currentAmount.isEmpty)
+                .disabled(calculationViewModel.currentAmount.isEmpty)
                 .font(.title)
-                .foregroundColor(currentAmount.isEmpty ? .gray : .white)
+                .foregroundColor(calculationViewModel.currentAmount.isEmpty ? .gray : .white)
                 .frame(width: 50, height: 50)
-                .background(currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
+                .background(calculationViewModel.currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
                 .clipShape(Circle())
                 .padding()
             }
@@ -153,7 +150,7 @@ struct CalculationView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    if data.containsAmounts {
+                    if calculationViewModel.shareData.containsAmounts {
                         showAlert = true
                     } else {
                         coordinator.pop()
@@ -166,7 +163,7 @@ struct CalculationView: View {
                     Button("Отмена", role: .cancel) {}
                     Button("Сбросить чеки", role: .destructive) {
                         withAnimation {
-                            data.resetToInitialState()
+                            calculationViewModel.shareData.resetToInitialState()
                             coordinator.popToRoot()
                         }
                     }
@@ -180,47 +177,6 @@ struct CalculationView: View {
                     Image(systemName: "keyboard.chevron.compact.down")
                 }
                 Spacer()
-            }
-        }
-    }
-    
-    private func addAmount() {
-        guard let amount = Int(currentAmount), amount > 0 else { return }
-        
-        if selectedParticipantIndex == 0 {
-            guard !data.participants.isEmpty else { return }
-            
-            let perPerson = Int(ceil(Double(amount) / Double(data.participants.count)))
-            
-            for i in 0..<data.participants.count {
-                data.participants[i].baseShares.append(perPerson)
-            }
-        } else {
-            let index = selectedParticipantIndex - 1
-            if index < data.participants.count {
-                data.participants[index].baseShares.append(amount)
-            }
-        }
-        
-        if data.isTipEnable {
-            calculateTips()
-        }
-        
-        currentAmount = ""
-    }
-
-    private func calculateTips() {
-        guard data.tipPercentage > 0 else {
-            for i in data.participants.indices {
-                data.participants[i].tipShares = Array(repeating: 0, count: data.participants[i].baseShares.count)
-            }
-            return
-        }
-        
-        for i in data.participants.indices {
-            data.participants[i].tipShares = data.participants[i].baseShares.map { base in
-                let tip = Int(ceil(Double(base) * data.tipPercentage / 100.0))
-                return tip
             }
         }
     }
