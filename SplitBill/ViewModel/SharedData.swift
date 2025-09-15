@@ -9,13 +9,12 @@ import Foundation
 
 final class SharedData: ObservableObject {
     
-    @Published var participants: [Participant]
+    @Published var participants: [Participant] = []
     @Published var tipPercentage = 15.0
     @Published var tipAmount = ""
     @Published var isTipEnable = false
     
     let minParticipants = 2
-    let maxParticipants = 8
     
     var totalBaseAmount: Int {
         participants.reduce(0) { $0 + $1.baseShares.reduce(0, +) }
@@ -39,25 +38,16 @@ final class SharedData: ObservableObject {
     }
     
     init() {
-        self.participants = (0..<minParticipants).map { _ in
+        participants = (0..<minParticipants).map { _ in
             Participant()
         }
-    }
-    
-    func addParticipant() {
-        guard participants.count < maxParticipants else { return }
-        participants.append(Participant())
-    }
-    
-    func removeParticipant() {
-        guard participants.count > minParticipants else { return }
-        participants.removeLast()
     }
     
     func resetToInitialState() {
         participants = (0..<minParticipants).map { _ in
             Participant()
         }
+        
         tipPercentage = 15.0
         tipAmount = ""
         isTipEnable = false

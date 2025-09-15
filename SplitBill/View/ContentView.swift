@@ -13,14 +13,9 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            ParticipantView()
+            ParticipantView(participantViewModel: ParticipantViewModel(sharedData: sharedData))
                 .navigationDestination(for: Route.self) { route in
-                    switch route {
-                    case .tipSelection:
-                        TipSelectionView()
-                    case .calculation:
-                        CalculationView()
-                    }
+                    ViewFactory.makeView(for: route, sharedData: sharedData)
                 }
         }
         .environmentObject(sharedData)

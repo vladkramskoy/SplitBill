@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ParticipantView: View {
     
-    @EnvironmentObject var data: SharedData
     @EnvironmentObject private var coordinator: Coordinator
+    @ObservedObject var participantViewModel: ParticipantViewModel
     
     var body: some View {
         VStack(spacing: 30) {
@@ -30,20 +30,20 @@ struct ParticipantView: View {
             
             HStack {
                 Button(action: {
-                    data.removeParticipant()
+                    participantViewModel.removeParticipant()
                 }) {
                     Image(systemName: "minus.circle.fill")
                 }
-                .disabled(data.participants.count <= data.minParticipants)
+                .disabled(participantViewModel.shareData.participants.count <= participantViewModel.minParticipants)
                 
-                Text("Делим счёт на \(data.participants.count) человек")
+                Text("Делим счёт на \(participantViewModel.shareData.participants.count) человек")
                 
                 Button(action: {
-                    data.addParticipant()
+                    participantViewModel.addParticipant()
                 }) {
                     Image(systemName: "plus.circle.fill")
                 }
-                .disabled(data.participants.count >= data.maxParticipants)
+                .disabled(participantViewModel.shareData.participants.count >= participantViewModel.maxParticipants)
             }
             
             Spacer()
@@ -69,11 +69,11 @@ struct ParticipantView: View {
 
 #Preview {
     struct MockView: View {
-        @State private var path = NavigationPath()
+        let sharedData = SharedData()
         
         var body: some View {
-            ParticipantView()
-                .environmentObject(SharedData())
+            ParticipantView(participantViewModel: ParticipantViewModel(sharedData: sharedData))
+                .environmentObject(sharedData)
         }
     }
     return MockView()
