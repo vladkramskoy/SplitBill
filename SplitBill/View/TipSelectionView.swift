@@ -11,8 +11,8 @@ struct TipSelectionView: View {
     
     @State private var billAmount = ""
     @State private var tipCalculationType: TipCalculationType = .percentage
-    @EnvironmentObject var data: SharedData
     @EnvironmentObject private var coordinator: Coordinator
+    @ObservedObject var tipSelectionViewModel: TipSelectionViewModel
     
     private let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -24,14 +24,14 @@ struct TipSelectionView: View {
     }()
     
     private var calculatedTip: Double {
-        guard data.isTipEnable else { return 0 }
+        guard tipSelectionViewModel.shareData.isTipEnable else { return 0 }
         
         if tipCalculationType == .percentage {
             guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
             
-            return amount * data.tipPercentage / 100
+            return amount * tipSelectionViewModel.shareData.tipPercentage / 100
         } else {
-            guard let tipAmount = numberFormatter.number(from: data.tipAmount)?.doubleValue else { return 0 }
+            guard let tipAmount = numberFormatter.number(from: tipSelectionViewModel.shareData.tipAmount)?.doubleValue else { return 0 }
             return tipAmount
         }
     }
@@ -52,9 +52,9 @@ struct TipSelectionView: View {
                 }
                 
                 Section {
-                    Toggle("Добавить чаевые", isOn: $data.isTipEnable)
+                    Toggle("Добавить чаевые", isOn: $tipSelectionViewModel.shareData.isTipEnable)
                     
-                    if data.isTipEnable {
+                    if tipSelectionViewModel.shareData.isTipEnable {
                         Picker("Способ расчета", selection: $tipCalculationType) {
                             ForEach(TipCalculationType.allCases, id: \.self) { type in
                                 Text(type.rawValue).tag(type)
@@ -65,14 +65,14 @@ struct TipSelectionView: View {
                         if tipCalculationType == .percentage {
                             HStack {
                                 Text("Процент:")
-                                Slider(value: $data.tipPercentage, in: 0...30, step: 1)
-                                Text("\(Int(data.tipPercentage))%")
+                                Slider(value: $tipSelectionViewModel.shareData.tipPercentage, in: 0...30, step: 1)
+                                Text("\(Int(tipSelectionViewModel.shareData.tipPercentage))%")
                                     .frame(width: 40, alignment: .trailing)
                             }
                         } else {
                             HStack {
                                 Text("Сумма:")
-                                TextField("0.00", text: $data.tipAmount)
+                                TextField("0.00", text: $tipSelectionViewModel.shareData.tipAmount)
                                     .keyboardType(.decimalPad)
                                     .multilineTextAlignment(.trailing)
                             }
@@ -108,13 +108,10 @@ struct TipSelectionView: View {
 }
 
 #Preview {
-    struct MockView: View {
-        @State private var path = NavigationPath()
-        
-        var body: some View {
-             TipSelectionView()
-                .environmentObject(SharedData())
-        }
-    }
-    return MockView()
+    @Previewable @StateObject var sharedData = SharedData()
+    @Previewable @StateObject var coordinator = Coordinator()
+    
+    TipSelectionView(tipSelectionViewModel: TipSelectionViewModel(sharedData: sharedData))
+        .environmentObject(sharedData)
+        .environmentObject(coordinator)
 }

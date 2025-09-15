@@ -68,14 +68,10 @@ struct ParticipantView: View {
 }
 
 #Preview {
-    struct MockView: View {
-        let sharedData = SharedData()
-        
-        var body: some View {
-            ParticipantView(participantViewModel: ParticipantViewModel(sharedData: sharedData))
-                .environmentObject(sharedData)
-        }
-    }
-    return MockView()
+    @Previewable @StateObject var sharedData = SharedData()
+    @Previewable @StateObject var coordinator = Coordinator()
+    
+    ParticipantView(participantViewModel: ParticipantViewModel(sharedData: sharedData))
+        .environmentObject(sharedData)
+        .environmentObject(coordinator)
 }
-

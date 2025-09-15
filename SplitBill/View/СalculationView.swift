@@ -11,6 +11,7 @@ struct CalculationView: View {
     
     @EnvironmentObject var data: SharedData
     @EnvironmentObject private var coordinator: Coordinator
+    @ObservedObject var calculationViewModel: CalculationViewModel
     @State private var currentAmount: String = ""
     @State private var selectedParticipantIndex = 0
     @State private var showAlert = false
@@ -226,13 +227,10 @@ struct CalculationView: View {
 }
 
 #Preview {
-    struct MockView: View {
-        @State private var path = NavigationPath()
-        
-        var body: some View {
-            CalculationView()
-                .environmentObject(SharedData())
-        }
-    }
-    return MockView()
+    @Previewable @StateObject var sharedData = SharedData()
+    @Previewable @StateObject var coordinator = Coordinator()
+    
+    CalculationView(calculationViewModel: CalculationViewModel(sharedData: sharedData))
+        .environmentObject(sharedData)
+        .environmentObject(coordinator)
 }
