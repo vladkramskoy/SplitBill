@@ -10,6 +10,7 @@ import Foundation
 final class SharedData: ObservableObject {
     
     @Published var participants: [Participant] = []
+    @Published var billAmount = ""
     @Published var tipPercentage = 15.0
     @Published var tipAmount = ""
     @Published var isTipEnable = false

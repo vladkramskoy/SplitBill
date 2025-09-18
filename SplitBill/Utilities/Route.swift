@@ -8,6 +8,6 @@
 import Foundation
 
 enum Route: Hashable {
-    case tipSelection
+    case billAmount
     case calculation
 }
