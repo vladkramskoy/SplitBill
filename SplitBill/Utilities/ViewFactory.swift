@@ -12,9 +12,9 @@ struct ViewFactory {
     
     static func makeView(for route: Route, sharedData: SharedData) -> some View {
         switch route {
-        case .tipSelection:
-            let tipSelectionViewModel = TipSelectionViewModel(sharedData: sharedData)
-            TipSelectionView(tipSelectionViewModel: tipSelectionViewModel)
+        case .billAmount:
+            let billAmountViewModel = BillAmountViewModel(sharedData: sharedData)
+            BillAmountView(billAmountViewModel: billAmountViewModel)
         case .calculation:
             let calculationViewModel = CalculationViewModel(sharedData: sharedData)
             CalculationView(calculationViewModel: calculationViewModel)

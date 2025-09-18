@@ -49,7 +49,7 @@ struct ParticipantView: View {
             Spacer()
             
             Button(action: {
-                coordinator.push(Route.tipSelection)
+                coordinator.push(Route.billAmount)
             }) {
                 Text("Начать")
                     .font(.headline)

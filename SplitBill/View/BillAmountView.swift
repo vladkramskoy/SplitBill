@@ -1,5 +1,5 @@
 //
-//  TipSelectionView.swift
+//  BillAmountView.swift
 //  SplitBill
 //
 //  Created by Vladislav Kramskoy on 26.05.2025.
@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct TipSelectionView: View {
+struct BillAmountView: View {
     @State private var tipCalculationType: TipCalculationType = .percentage
     @EnvironmentObject private var coordinator: Coordinator
-    @ObservedObject var tipSelectionViewModel: TipSelectionViewModel
+    @ObservedObject var billAmountViewModel: BillAmountViewModel
     
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
@@ -25,28 +25,28 @@ struct TipSelectionView: View {
     }()
     
     private var calculatedTip: Double {
-        guard tipSelectionViewModel.shareData.isTipEnable else { return 0 }
+        guard billAmountViewModel.shareData.isTipEnable else { return 0 }
         
         if tipCalculationType == .percentage {
-            guard let amount = numberFormatter.number(from: tipSelectionViewModel.shareData.billAmount)?.doubleValue else { return 0 }
+            guard let amount = numberFormatter.number(from: billAmountViewModel.shareData.billAmount)?.doubleValue else { return 0 }
             
-            return amount * tipSelectionViewModel.shareData.tipPercentage / 100
+            return amount * billAmountViewModel.shareData.tipPercentage / 100
         } else {
-            guard let tipAmount = numberFormatter.number(from: tipSelectionViewModel.shareData.tipAmount)?.doubleValue else { return 0 }
+            guard let tipAmount = numberFormatter.number(from: billAmountViewModel.shareData.tipAmount)?.doubleValue else { return 0 }
             return tipAmount
         }
     }
     
     private var totalAmount: Double {
-        guard let amount = numberFormatter.number(from: tipSelectionViewModel.shareData.billAmount)?.doubleValue else { return 0 }
+        guard let amount = numberFormatter.number(from: billAmountViewModel.shareData.billAmount)?.doubleValue else { return 0 }
         return amount + calculatedTip
     }
     
     private var isValidAmount: Bool {
-        if tipSelectionViewModel.shareData.billAmount.isEmpty {
+        if billAmountViewModel.shareData.billAmount.isEmpty {
             return false
         }
-        guard let number = numberFormatter.number(from: tipSelectionViewModel.shareData.billAmount)?.doubleValue else { return false }
+        guard let number = numberFormatter.number(from: billAmountViewModel.shareData.billAmount)?.doubleValue else { return false }
         return number >= 10
     }
 
@@ -88,25 +88,25 @@ struct TipSelectionView: View {
                     .font(.headline)
                     .foregroundStyle(.gray)
                 
-                TextField("0 ₽", text: $tipSelectionViewModel.shareData.billAmount)
+                TextField("0 ₽", text: $billAmountViewModel.shareData.billAmount)
                     .font(.system(size: 40, weight: .bold))
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.center)
                     .focused($isAmountFocused)
                     .foregroundStyle(isValidAmount ? Color.green : Color.red)
-                    .onChange(of: tipSelectionViewModel.shareData.billAmount) { oldValue, newValue in
+                    .onChange(of: billAmountViewModel.shareData.billAmount) { oldValue, newValue in
                         let formatted = formatBillAmount(newValue)
                         if formatted != newValue {
-                            tipSelectionViewModel.shareData.billAmount = formatted
+                            billAmountViewModel.shareData.billAmount = formatted
                         }
                     }
             }
             .padding(.horizontal)
             .padding(.top, 30)
             
-            Toggle("Добавить чаевые", isOn: $tipSelectionViewModel.shareData.isTipEnable)
+            Toggle("Добавить чаевые", isOn: $billAmountViewModel.shareData.isTipEnable)
                 .padding(.horizontal)
-                .onChange(of: tipSelectionViewModel.shareData.isTipEnable) { _, isOn in
+                .onChange(of: billAmountViewModel.shareData.isTipEnable) { _, isOn in
                     if isOn {
                         if tipCalculationType == .fixedAmount {
                             isTipFocused = true
@@ -116,7 +116,7 @@ struct TipSelectionView: View {
                     }
                 }
             
-            if tipSelectionViewModel.shareData.isTipEnable {
+            if billAmountViewModel.shareData.isTipEnable {
                 Picker("Способ расчета", selection: $tipCalculationType) {
                     ForEach(TipCalculationType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(type)
@@ -135,25 +135,25 @@ struct TipSelectionView: View {
                 if tipCalculationType == .percentage {
                     HStack {
                         Text("Процент:")
-                        Slider(value: $tipSelectionViewModel.shareData.tipPercentage, in: 0...30, step: 1)
-                            .onChange(of: tipSelectionViewModel.shareData.tipPercentage) { _, newValue in
-                                tipSelectionViewModel.shareData.tipPercentage = round(newValue)
+                        Slider(value: $billAmountViewModel.shareData.tipPercentage, in: 0...30, step: 1)
+                            .onChange(of: billAmountViewModel.shareData.tipPercentage) { _, newValue in
+                                billAmountViewModel.shareData.tipPercentage = round(newValue)
                             }
-                        Text("\(Int(tipSelectionViewModel.shareData.tipPercentage))%")
+                        Text("\(Int(billAmountViewModel.shareData.tipPercentage))%")
                             .frame(width: 40, alignment: .trailing)
                     }
                     .padding(.horizontal)
                 } else {
                     HStack {
                         Text("Сумма:")
-                        TextField("0.00", text: $tipSelectionViewModel.shareData.tipAmount)
+                        TextField("0.00", text: $billAmountViewModel.shareData.tipAmount)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .focused($isTipFocused)
-                            .onChange(of: tipSelectionViewModel.shareData.tipAmount) { oldValue, newValue in
+                            .onChange(of: billAmountViewModel.shareData.tipAmount) { oldValue, newValue in
                                 let formatted = formatBillAmount(newValue)
                                 if formatted != newValue {
-                                    tipSelectionViewModel.shareData.tipAmount = formatted
+                                    billAmountViewModel.shareData.tipAmount = formatted
                                 }
                             }
                     }
@@ -195,7 +195,7 @@ struct TipSelectionView: View {
     @Previewable @StateObject var sharedData = SharedData()
     @Previewable @StateObject var coordinator = Coordinator()
     
-    TipSelectionView(tipSelectionViewModel: TipSelectionViewModel(sharedData: sharedData))
+    BillAmountView(billAmountViewModel: BillAmountViewModel(sharedData: sharedData))
         .environmentObject(sharedData)
         .environmentObject(coordinator)
 }
