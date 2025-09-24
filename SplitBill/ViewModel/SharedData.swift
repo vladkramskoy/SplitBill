@@ -16,6 +16,7 @@ final class SharedData: ObservableObject {
     @Published var isTipEnable = false
     
     let minParticipants = 2
+    let maxParticipants = 8
     
     var totalBaseAmount: Int {
         participants.reduce(0) { $0 + $1.baseShares.reduce(0, +) }
@@ -42,6 +43,16 @@ final class SharedData: ObservableObject {
         participants = (0..<minParticipants).map { _ in
             Participant()
         }
+    }
+    
+    func addParticipant() {
+        guard participants.count < maxParticipants else { return }
+        participants.append(Participant())
+    }
+    
+    func removeParticipant() {
+        guard participants.count > minParticipants else { return }
+        participants.removeLast()
     }
     
     func resetToInitialState() {

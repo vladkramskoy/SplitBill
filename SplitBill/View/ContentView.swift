@@ -13,7 +13,7 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            ParticipantView(participantViewModel: ParticipantViewModel(sharedData: sharedData))
+            ParticipantView()
                 .navigationDestination(for: Route.self) { route in
                     ViewFactory.makeView(for: route, sharedData: sharedData)
                 }
