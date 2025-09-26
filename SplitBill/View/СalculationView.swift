@@ -10,13 +10,13 @@ import SwiftUI
 struct CalculationView: View {
     
     @EnvironmentObject private var coordinator: Coordinator
-    @ObservedObject var calculationViewModel: CalculationViewModel
+    @EnvironmentObject private var sharedData: SharedData
     @State private var showAlert = false
     @State private var isExpanded = false
     @FocusState private var isTextFieldFocused: Bool
     
     private var pickerOptions: [String] {
-        ["На всех"] + calculationViewModel.shareData.participants.indices.map { "Уч. \($0 + 1)" }
+        ["На всех"] + sharedData.participants.indices.map { "Уч. \($0 + 1)" }
     }
     
     var maxCharacters = 6
@@ -25,8 +25,8 @@ struct CalculationView: View {
         
         VStack {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                ForEach(calculationViewModel.shareData.participants.indices, id: \.self) { index in
-                    let participant = calculationViewModel.shareData.participants[index]
+                ForEach(sharedData.participants.indices, id: \.self) { index in
+                    let participant = sharedData.participants[index]
                     
                     RoundedRectangle(cornerRadius: 12)
                         .frame(height: 75)
@@ -41,7 +41,7 @@ struct CalculationView: View {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 18, weight: .bold))
                                 
-                                if calculationViewModel.shareData.isTipEnable && calculationViewModel.shareData.tipPercentage > 0 {
+                                if sharedData.isTipEnable && sharedData.tipPercentage > 0 {
                                     let base = participant.baseShares.reduce(0, +)
                                     Text("\(base) ₽ + \(participant.tipShares.reduce(0, +)) ₽ чаевых")
                                         .font(.system(size: 12))
@@ -62,7 +62,7 @@ struct CalculationView: View {
                     Spacer()
                     
                     HStack(alignment: .lastTextBaseline, spacing: 4) {
-                        Text("\(calculationViewModel.shareData.calculationTotalAmount) ₽")
+                        Text("\(sharedData.calculationTotalAmount) ₽")
                             .fontWeight(.bold)
                         
                         Image(systemName: "chevron.down")
@@ -81,8 +81,8 @@ struct CalculationView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Divider()
                         
-                        DetailRow(title: "Чаевые", value: calculationViewModel.shareData.calculationTotalTipAmount)
-                        DetailRow(title: "Без чаевых", value: calculationViewModel.shareData.calculationTotalBaseAmount)
+                        DetailRow(title: "Чаевые", value: sharedData.calculationTotalTipAmount)
+                        DetailRow(title: "Без чаевых", value: sharedData.calculationTotalBaseAmount)
                         Divider()
                         
                         Text("Суммы округлены для удобства. Возможна небольшая погрешность.")
@@ -100,10 +100,10 @@ struct CalculationView: View {
             Spacer()
             
             HStack {
-                TextField("0₽", text: $calculationViewModel.currentAmount)
-                    .onChange(of: calculationViewModel.currentAmount) { _, newValue in
+                TextField("0₽", text: $sharedData.currentAmount)
+                    .onChange(of: sharedData.currentAmount) { _, newValue in
                         if newValue.count > maxCharacters {
-                            calculationViewModel.currentAmount = String(newValue.prefix(maxCharacters))
+                            sharedData.currentAmount = String(newValue.prefix(maxCharacters))
                         }
                     }
                 
@@ -117,7 +117,7 @@ struct CalculationView: View {
                     .keyboardType(.numberPad)
                     .padding()
                 
-                Picker("", selection: $calculationViewModel.selectedParticipantIndex) {
+                Picker("", selection: $sharedData.selectedParticipantIndex) {
                     ForEach(0..<pickerOptions.count, id: \.self) { index in
                         Text(pickerOptions[index]).tag(index)
                     }
@@ -127,15 +127,15 @@ struct CalculationView: View {
                 .clipped()
                 
                 Button(action: {
-                    calculationViewModel.addAmount()
+                    sharedData.addAmount()
                 }) {
                     Image(systemName: "arrow.up")
                 }
-                .disabled(calculationViewModel.currentAmount.isEmpty)
+                .disabled(sharedData.currentAmount.isEmpty)
                 .font(.title)
-                .foregroundColor(calculationViewModel.currentAmount.isEmpty ? .gray : .white)
+                .foregroundColor(sharedData.currentAmount.isEmpty ? .gray : .white)
                 .frame(width: 50, height: 50)
-                .background(calculationViewModel.currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
+                .background(sharedData.currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
                 .clipShape(Circle())
                 .padding()
             }
@@ -150,7 +150,7 @@ struct CalculationView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    if calculationViewModel.shareData.containsAmounts {
+                    if sharedData.containsAmounts {
                         showAlert = true
                     } else {
                         coordinator.pop()
@@ -163,7 +163,7 @@ struct CalculationView: View {
                     Button("Отмена", role: .cancel) {}
                     Button("Сбросить чеки", role: .destructive) {
                         withAnimation {
-                            calculationViewModel.shareData.resetToInitialState()
+                            sharedData.resetToInitialState()
                             coordinator.popToRoot()
                         }
                     }
@@ -186,7 +186,7 @@ struct CalculationView: View {
     @Previewable @StateObject var sharedData = SharedData()
     @Previewable @StateObject var coordinator = Coordinator()
     
-    CalculationView(calculationViewModel: CalculationViewModel(sharedData: sharedData))
+    CalculationView()
         .environmentObject(sharedData)
         .environmentObject(coordinator)
 }

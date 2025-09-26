@@ -15,8 +15,7 @@ struct ViewFactory {
         case .billAmount:
             BillAmountView()
         case .calculation:
-            let calculationViewModel = CalculationViewModel(sharedData: sharedData)
-            CalculationView(calculationViewModel: calculationViewModel)
+            CalculationView()
         }
     }
 }

@@ -14,6 +14,8 @@ final class SharedData: ObservableObject {
     @Published var tipPercentage = 15.0
     @Published var tipAmount = ""
     @Published var isTipEnable = false
+    @Published var currentAmount: String = ""
+    @Published var selectedParticipantIndex = 0
     
     let minParticipants = 2
     let maxParticipants = 8
@@ -119,6 +121,47 @@ final class SharedData: ObservableObject {
         }
         
         return normalized
+    }
+    
+    func addAmount() {
+        guard let amount = Int(currentAmount), amount > 0 else { return }
+        
+        if selectedParticipantIndex == 0 {
+            guard !participants.isEmpty else { return }
+            
+            let perPerson = Int(ceil(Double(amount) / Double(participants.count)))
+            
+            for i in 0..<participants.count {
+                participants[i].baseShares.append(perPerson)
+            }
+        } else {
+            let index = selectedParticipantIndex - 1
+            if index < participants.count {
+                participants[index].baseShares.append(amount)
+            }
+        }
+        
+        if isTipEnable {
+            calculateTips()
+        }
+        
+        currentAmount = ""
+    }
+
+    func calculateTips() {
+        guard tipPercentage > 0 else {
+            for i in participants.indices {
+                participants[i].tipShares = Array(repeating: 0, count: participants[i].baseShares.count)
+            }
+            return
+        }
+        
+        for i in participants.indices {
+            participants[i].tipShares = participants[i].baseShares.map { base in
+                let tip = Int(ceil(Double(base) * tipPercentage / 100.0))
+                return tip
+            }
+        }
     }
     
     func resetToInitialState() {
