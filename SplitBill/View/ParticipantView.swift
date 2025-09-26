@@ -8,8 +8,14 @@
 import SwiftUI
 
 struct ParticipantView: View {
-    @EnvironmentObject private var coordinator: Coordinator
     @EnvironmentObject private var sharedData: SharedData
+    @Environment(Router.self) private var router
+    
+    let id = UUID()
+    
+    init() {
+        print("\(Self.self) \(id)")
+    }
     
     var body: some View {
         VStack(spacing: 30) {
@@ -48,7 +54,8 @@ struct ParticipantView: View {
             Spacer()
             
             Button(action: {
-                coordinator.push(Route.billAmount)
+                router.navigateToBillAmount()
+                print(id)
             }) {
                 Text("Начать")
                     .font(.headline)
@@ -68,9 +75,8 @@ struct ParticipantView: View {
 
 #Preview {
     @Previewable @StateObject var sharedData = SharedData()
-    @Previewable @StateObject var coordinator = Coordinator()
     
     ParticipantView()
         .environmentObject(sharedData)
-        .environmentObject(coordinator)
+        .withRouter()
 }

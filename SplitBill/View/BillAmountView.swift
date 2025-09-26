@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BillAmountView: View {
-    @EnvironmentObject private var coordinator: Coordinator
+    @Environment(Router.self) private var router
     @EnvironmentObject private var sharedData: SharedData
     
     @FocusState private var isAmountFocused: Bool
@@ -103,7 +103,7 @@ struct BillAmountView: View {
             }
             
             Button(action: {
-                coordinator.push(Route.calculation)
+                router.navigateToCalculation()
             }) {
                 Text("Продолжить")
                     .font(.headline)
@@ -127,9 +127,8 @@ struct BillAmountView: View {
 
 #Preview {
     @Previewable @StateObject var sharedData = SharedData()
-    @Previewable @StateObject var coordinator = Coordinator()
     
     BillAmountView()
         .environmentObject(sharedData)
-        .environmentObject(coordinator)
+        .withRouter()
 }

@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct CalculationView: View {
-    
-    @EnvironmentObject private var coordinator: Coordinator
+    @Environment(Router.self) private var router
     @EnvironmentObject private var sharedData: SharedData
     @State private var showAlert = false
     @State private var isExpanded = false
@@ -153,7 +152,7 @@ struct CalculationView: View {
                     if sharedData.containsAmounts {
                         showAlert = true
                     } else {
-                        coordinator.pop()
+                        router.pop()
                     }
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -164,7 +163,7 @@ struct CalculationView: View {
                     Button("Сбросить чеки", role: .destructive) {
                         withAnimation {
                             sharedData.resetToInitialState()
-                            coordinator.popToRoot()
+                            router.popToRoot()
                         }
                     }
                 }
@@ -184,9 +183,8 @@ struct CalculationView: View {
 
 #Preview {
     @Previewable @StateObject var sharedData = SharedData()
-    @Previewable @StateObject var coordinator = Coordinator()
     
     CalculationView()
         .environmentObject(sharedData)
-        .environmentObject(coordinator)
+        .withRouter()
 }
