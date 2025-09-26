@@ -62,7 +62,7 @@ struct CalculationView: View {
                     Spacer()
                     
                     HStack(alignment: .lastTextBaseline, spacing: 4) {
-                        Text("\(calculationViewModel.shareData.totalAmount) ₽")
+                        Text("\(calculationViewModel.shareData.calculationTotalAmount) ₽")
                             .fontWeight(.bold)
                         
                         Image(systemName: "chevron.down")
@@ -81,8 +81,8 @@ struct CalculationView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Divider()
                         
-                        DetailRow(title: "Чаевые", value: calculationViewModel.shareData.totalTipAmount)
-                        DetailRow(title: "Без чаевых", value: calculationViewModel.shareData.totalBaseAmount)
+                        DetailRow(title: "Чаевые", value: calculationViewModel.shareData.calculationTotalTipAmount)
+                        DetailRow(title: "Без чаевых", value: calculationViewModel.shareData.calculationTotalBaseAmount)
                         Divider()
                         
                         Text("Суммы округлены для удобства. Возможна небольшая погрешность.")

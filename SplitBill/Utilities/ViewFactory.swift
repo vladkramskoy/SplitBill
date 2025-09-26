@@ -13,8 +13,7 @@ struct ViewFactory {
     static func makeView(for route: Route, sharedData: SharedData) -> some View {
         switch route {
         case .billAmount:
-            let billAmountViewModel = BillAmountViewModel(sharedData: sharedData)
-            BillAmountView(billAmountViewModel: billAmountViewModel)
+            BillAmountView()
         case .calculation:
             let calculationViewModel = CalculationViewModel(sharedData: sharedData)
             CalculationView(calculationViewModel: calculationViewModel)
