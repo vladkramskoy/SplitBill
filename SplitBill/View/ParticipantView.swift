@@ -10,42 +10,43 @@ import SwiftUI
 struct ParticipantView: View {
     @EnvironmentObject private var sharedData: SharedData
     @Environment(Router.self) private var router
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
-        VStack(spacing: 30) {
-            Spacer()
-            
-            Text("Раздели счет!")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
-            Text("Выберите количество участников")
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            Spacer()
-            
-            HStack {
-                Button(action: {
-                    sharedData.removeParticipant()
-                }) {
-                    Image(systemName: "minus.circle.fill")
+        VStack(spacing: 0) {
+            Form {
+                Section {
+                    HStack {
+                        TextField("Введите имя", text: $sharedData.nameInput)
+                            .focused($isTextFieldFocused)
+                        
+                        Button(action: {
+                            sharedData.addParticipant(for: sharedData.nameInput)
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(sharedData.nameInput.isEmpty ? .gray : .blue)
+                        }
+                        .disabled(sharedData.nameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    List {
+                        ForEach(sharedData.participants) { item in
+                            Text(item.name)
+                        }
+                        .onDelete(perform: sharedData.removeParticipant(at:))
+                    }
+                } header: {
+                    Text("Участники")
                 }
-                .disabled(sharedData.participants.count <= sharedData.minParticipants)
-                
-                Text("Делим счёт на \(sharedData.participants.count) человек")
-                
-                Button(action: {
-                    sharedData.addParticipant()
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                }
-                .disabled(sharedData.participants.count >= sharedData.maxParticipants)
             }
-            
-            Spacer()
+            .overlay(alignment: .bottom) {
+                LinearGradient(
+                    colors: [.clear, Color(.systemBackground)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 15)
+                .allowsHitTesting(false)
+            }
             
             Button(action: {
                 router.navigateToBillAmount()
@@ -58,11 +59,19 @@ struct ParticipantView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .padding()
-            
-            Spacer()
         }
-        .navigationTitle("Главная")
-        .toolbar(.hidden)
+        .navigationTitle("Разделить счет")
+        .ignoresSafeArea(.keyboard)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button {
+                    isTextFieldFocused = false
+                } label: {
+                    Image(systemName: "chevron.down")
+                }
+            }
+        }
     }
 }
 

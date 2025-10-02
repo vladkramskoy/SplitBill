@@ -9,6 +9,7 @@ import Foundation
 
 struct Participant: Identifiable {
     let id = UUID()
+    let name: String
     var baseShares: [Int] = []
     var tipShares: [Int] = []
     

@@ -16,10 +16,8 @@ final class SharedData: ObservableObject {
     @Published var isTipEnable = false
     @Published var currentAmount: String = ""
     @Published var selectedParticipantIndex = 0
-    
-    let minParticipants = 2
-    let maxParticipants = 8
-    
+    @Published var nameInput: String = ""
+
     private let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -76,20 +74,14 @@ final class SharedData: ObservableObject {
         participants.contains { !$0.baseShares.isEmpty }
     }
     
-    init() {
-        participants = (0..<minParticipants).map { _ in
-            Participant()
-        }
+    func addParticipant(for name: String) {
+        let participant = Participant(name: name)
+        participants.append(participant)
+        nameInput = ""
     }
     
-    func addParticipant() {
-        guard participants.count < maxParticipants else { return }
-        participants.append(Participant())
-    }
-    
-    func removeParticipant() {
-        guard participants.count > minParticipants else { return }
-        participants.removeLast()
+    func removeParticipant(at offsets: IndexSet) {
+        participants.remove(atOffsets: offsets)
     }
     
     func formatBillAmount(_ imput: String) -> String {
@@ -165,10 +157,8 @@ final class SharedData: ObservableObject {
     }
     
     func resetToInitialState() {
-        participants = (0..<minParticipants).map { _ in
-            Participant()
-        }
-        
+        participants = []
+        billAmount = ""
         tipPercentage = 15.0
         tipAmount = ""
         isTipEnable = false
