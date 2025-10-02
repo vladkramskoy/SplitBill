@@ -11,12 +11,6 @@ struct ParticipantView: View {
     @EnvironmentObject private var sharedData: SharedData
     @Environment(Router.self) private var router
     
-    let id = UUID()
-    
-    init() {
-        print("\(Self.self) \(id)")
-    }
-    
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
@@ -55,7 +49,6 @@ struct ParticipantView: View {
             
             Button(action: {
                 router.navigateToBillAmount()
-                print(id)
             }) {
                 Text("Начать")
                     .font(.headline)

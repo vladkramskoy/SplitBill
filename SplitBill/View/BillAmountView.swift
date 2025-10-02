@@ -11,6 +11,7 @@ struct BillAmountView: View {
     @Environment(Router.self) private var router
     @EnvironmentObject private var sharedData: SharedData
     
+    @State private var textColor: Color = .red
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
     
@@ -26,13 +27,17 @@ struct BillAmountView: View {
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.center)
                     .focused($isAmountFocused)
-                // TODO: fix a bug with text color update
-                    .foregroundStyle(sharedData.isValidAmount ? Color.green : Color.red)
+                    .foregroundStyle(textColor)
                     .onChange(of: sharedData.billAmount) { oldValue, newValue in
                         let formatted = sharedData.formatBillAmount(newValue)
                         if formatted != newValue {
                             sharedData.billAmount = formatted
                         }
+                        
+                        textColor = sharedData.isValidAmount ? .green : .red
+                    }
+                    .onAppear {
+                        textColor = sharedData.isValidAmount ? .green : .red
                     }
             }
             .padding(.horizontal)
