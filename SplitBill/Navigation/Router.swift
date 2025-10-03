@@ -15,8 +15,8 @@ final class Router {
         path.append(Route.billAmount)
     }
     
-    func navigateToCalculation() {
-        path.append(Route.calculation)
+    func navigateToSplitMethod() {
+        path.append(Route.splitMethod)
     }
     
     func pop() {
@@ -30,5 +30,5 @@ final class Router {
 
 enum Route: Hashable {
     case billAmount
-    case calculation
+    case splitMethod
 }

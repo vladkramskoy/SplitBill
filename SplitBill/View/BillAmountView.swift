@@ -108,7 +108,7 @@ struct BillAmountView: View {
             }
             
             Button(action: {
-                router.navigateToCalculation()
+                router.navigateToSplitMethod()
             }) {
                 Text("Продолжить")
                     .font(.headline)

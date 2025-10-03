@@ -1,5 +1,5 @@
 //
-//  СalculationView.swift
+//  CustomSplitView.swift
 //  SplitBill
 //
 //  Created by Vladislav Kramskoy on 31.05.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CalculationView: View {
+struct CustomSplitView: View {
     @Environment(Router.self) private var router
     @EnvironmentObject private var sharedData: SharedData
     @State private var showAlert = false
@@ -184,7 +184,7 @@ struct CalculationView: View {
 #Preview {
     @Previewable @StateObject var sharedData = SharedData()
     
-    CalculationView()
+    CustomSplitView()
         .environmentObject(sharedData)
         .withRouter()
 }

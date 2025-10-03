@@ -15,8 +15,8 @@ struct RouterViewModifier: ViewModifier {
             switch route {
             case .billAmount:
                 BillAmountView()
-            case .calculation:
-                CalculationView()
+            case .splitMethod:
+                SplitMethodView()
             }
         }
         .environment(router)
