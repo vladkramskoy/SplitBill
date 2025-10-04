@@ -9,20 +9,25 @@ import SwiftUI
 
 struct DetailRow: View {
     let title: String
-    let value: Int
+    let value: Double
+    let isTotal: Bool
     
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(isTotal ? .primary : .secondary)
+            
             Spacer()
-            Text("\(value) ₽")
-                .foregroundStyle(.primary)
+            
+            Text("₽\(value, specifier: "%.2f")")
+                .fontWeight(isTotal ? .bold : .regular)
+                .foregroundStyle(isTotal ? .blue : .secondary)
         }
-        .font(.subheadline)
+        .font(isTotal ? .headline : .body)
     }
 }
 
 #Preview {
-    DetailRow(title: "Чаевые", value: 50)
+    DetailRow(title: "Чаевые", value: 50, isTotal: false)
+    DetailRow(title: "Чаевые", value: 50, isTotal: true)
 }

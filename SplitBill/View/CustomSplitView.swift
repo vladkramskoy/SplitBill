@@ -80,8 +80,8 @@ struct CustomSplitView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Divider()
                         
-                        DetailRow(title: "Чаевые", value: sharedData.calculationTotalTipAmount)
-                        DetailRow(title: "Без чаевых", value: sharedData.calculationTotalBaseAmount)
+                        DetailRow(title: "Чаевые", value: Double(sharedData.calculationTotalTipAmount), isTotal: false)
+                        DetailRow(title: "Без чаевых", value: Double(sharedData.calculationTotalBaseAmount), isTotal: false)
                         Divider()
                         
                         Text("Суммы округлены для удобства. Возможна небольшая погрешность.")

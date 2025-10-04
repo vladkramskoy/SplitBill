@@ -27,7 +27,12 @@ final class SharedData: ObservableObject {
         return formatter
     }()
     
-    private var calculatedTip: Double {
+    var billAmountConvertInDouble: Double {
+        guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
+        return amount
+    }
+    
+    var calculatedTip: Double {
         guard isTipEnable else { return 0 }
         
         if tipCalculationType == .percentage {
@@ -51,6 +56,11 @@ final class SharedData: ObservableObject {
         }
         guard let number = numberFormatter.number(from: billAmount)?.doubleValue else { return false }
         return number >= 10
+    }
+    
+    var amountPerPerson: Double {
+        guard !participants.isEmpty else { return 0 }
+        return totalAmount / Double(participants.count)
     }
     
     var calculationTotalBaseAmount: Int {
