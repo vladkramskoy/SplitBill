@@ -11,7 +11,6 @@ struct CustomSplitView: View {
     @Environment(Router.self) private var router
     @EnvironmentObject private var sharedData: SharedData
     @State private var showAlert = false
-    @State private var isExpanded = false
     @FocusState private var isTextFieldFocused: Bool
     
     private var pickerOptions: [String] {
@@ -21,139 +20,170 @@ struct CustomSplitView: View {
     var maxCharacters = 6
     
     var body: some View {
-        
-        VStack {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                ForEach(sharedData.participants.indices, id: \.self) { index in
-                    let participant = sharedData.participants[index]
-                    
-                    RoundedRectangle(cornerRadius: 12)
-                        .frame(height: 75)
-                        .foregroundStyle(Color.blue.gradient)
-                        .overlay(
-                            VStack {
-                                Text("Участник \(index + 1)")
-                                    .foregroundStyle(Color.white)
-                                    .font(.system(size: 20))
-                                
-                                Text("\(participant.total) ₽")
-                                    .foregroundStyle(Color.white)
-                                    .font(.system(size: 18, weight: .bold))
-                                
-                                if sharedData.isTipEnable && sharedData.tipPercentage > 0 {
-                                    let base = participant.baseShares.reduce(0, +)
-                                    Text("\(base) ₽ + \(participant.tipShares.reduce(0, +)) ₽ чаевых")
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(Color.white.opacity(0.8))
-                                }
-                            }
-                                .padding(5)
-                        )
-                }
-            }
-            .padding()
-            
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Общая сумма")
-                        .font(.headline)
-                    
-                    Spacer()
-                    
-                    HStack(alignment: .lastTextBaseline, spacing: 4) {
-                        Text("\(sharedData.calculationTotalAmount) ₽")
-                            .fontWeight(.bold)
+        ZStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    VStack(spacing: 16) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "hand.point.right.fill")
+                                .foregroundStyle(.blue)
+                                .font(.title2)
+                            
+                            Text("Режим «Вручную»")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                        }
                         
-                        Image(systemName: "chevron.down")
-                            .font(.caption.weight(.medium))
-                            .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                    }
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        isExpanded.toggle()
-                    }
-                }
-                
-                if isExpanded {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Divider()
-                        
-                        DetailRow(title: "Чаевые", value: Double(sharedData.calculationTotalTipAmount), isTotal: false)
-                        DetailRow(title: "Без чаевых", value: Double(sharedData.calculationTotalBaseAmount), isTotal: false)
-                        Divider()
-                        
-                        Text("Суммы округлены для удобства. Возможна небольшая погрешность.")
-                            .font(.footnote)
+                        Text("Когда суммы вносятся произвольно (например, Вася платит за алкоголь, Петя за еду).")
+                            .font(.body)
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                }
-            }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(12)
-            .padding(.horizontal)
-            
-            Spacer()
-            
-            HStack {
-                TextField("0₽", text: $sharedData.currentAmount)
-                    .onChange(of: sharedData.currentAmount) { _, newValue in
-                        if newValue.count > maxCharacters {
-                            sharedData.currentAmount = String(newValue.prefix(maxCharacters))
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    
+                    VStack(spacing: 12) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Сумма чека")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                
+                                Text("\(sharedData.billAmount) ₽")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.primary)
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 4) {
+                                Text("Осталось распределить")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                
+                                Text("2 500")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                        
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                Rectangle()
+                                    .fill(Color(.systemGray5))
+                                    .frame(height: 6)
+                                
+                                Rectangle()
+                                    .fill(Color.orange)
+                                    .frame(width: geometry.size.width * 0.5, height: 6)
+                            }
+                        }
+                        .frame(height: 6)
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Участники")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            Text("\(sharedData.participants.count) чел.")
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue.opacity(0.1))
+                                .foregroundStyle(.blue)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        
+                        LazyVStack(spacing: 12) {
+                            ForEach(sharedData.participants) { participant in
+                                ParticipantRow(name: participant.name, amount: sharedData.amountPerPerson)
+                            }
                         }
                     }
-                
-                    .font(.system(size: 28, weight: .medium))
-                    .foregroundColor(.primary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(40)
-                    .focused($isTextFieldFocused)
-                    .keyboardType(.numberPad)
                     .padding()
-                
-                Picker("", selection: $sharedData.selectedParticipantIndex) {
-                    ForEach(0..<pickerOptions.count, id: \.self) { index in
-                        Text(pickerOptions[index]).tag(index)
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    
+                    HStack {
+                        TextField("0₽", text: $sharedData.currentAmount)
+                            .onChange(of: sharedData.currentAmount) { _, newValue in
+                                if newValue.count > maxCharacters {
+                                    sharedData.currentAmount = String(newValue.prefix(maxCharacters))
+                                }
+                            }
+                        
+                            .font(.system(size: 28, weight: .medium))
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(40)
+                            .focused($isTextFieldFocused)
+                            .keyboardType(.numberPad)
+                            .padding()
+                        
+                        Picker("", selection: $sharedData.selectedParticipantIndex) {
+                            ForEach(0..<pickerOptions.count, id: \.self) { index in
+                                Text(pickerOptions[index]).tag(index)
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                        .frame(height: 100)
+                        .clipped()
+                        
+                        Button(action: {
+                            // TODO: process code
+                        }) {
+                            Image(systemName: "arrow.up")
+                        }
+                        .disabled(sharedData.currentAmount.isEmpty)
+                        .font(.title)
+                        .foregroundColor(sharedData.currentAmount.isEmpty ? .gray : .white)
+                        .frame(width: 50, height: 50)
+                        .background(sharedData.currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
+                        .clipShape(Circle())
+                        .padding()
                     }
+                    .background(
+                        RoundedRectangle(cornerRadius: 40, style: .continuous)
+                            .fill(Color(.secondarySystemBackground))
+                    )
+                    .padding(.bottom)
                 }
-                .pickerStyle(WheelPickerStyle())
-                .frame(height: 100)
-                .clipped()
-                
-                Button(action: {
-                    sharedData.addAmount()
-                }) {
-                    Image(systemName: "arrow.up")
-                }
-                .disabled(sharedData.currentAmount.isEmpty)
-                .font(.title)
-                .foregroundColor(sharedData.currentAmount.isEmpty ? .gray : .white)
-                .frame(width: 50, height: 50)
-                .background(sharedData.currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
-                .clipShape(Circle())
-                .padding()
+                .padding(.horizontal)
             }
-            .background(
-                RoundedRectangle(cornerRadius: 40, style: .continuous)
-                    .fill(Color(.secondarySystemBackground))
-            )
-            .padding(.bottom)
         }
-        .navigationTitle("Шаг 3 из 3")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("По деньгам")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    if sharedData.containsAmounts {
-                        showAlert = true
-                    } else {
-                        router.pop()
-                    }
+                    
+                    // TODO: process refactor
+                    
+//                    if sharedData.containsAmounts {
+//                        showAlert = true
+//                    } else {
+//                        router.pop()
+//                    }
                 } label: {
                     Image(systemName: "chevron.backward")
                     Text("Назад")
@@ -182,9 +212,17 @@ struct CustomSplitView: View {
 }
 
 #Preview {
-    @Previewable @StateObject var sharedData = SharedData()
+    let sharedData = SharedData()
+    sharedData.participants = [
+        Participant(name: "Оля"),
+        Participant(name: "Маша"),
+        Participant(name: "Даша")
+    ]
+    sharedData.billAmount = "5000"
     
-    CustomSplitView()
-        .environmentObject(sharedData)
-        .withRouter()
+    return NavigationStack {
+        CustomSplitView()
+            .environmentObject(sharedData)
+            .withRouter()
+    }
 }

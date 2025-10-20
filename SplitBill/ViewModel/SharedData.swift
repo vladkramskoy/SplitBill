@@ -63,26 +63,11 @@ final class SharedData: ObservableObject {
         return totalAmount / Double(participants.count)
     }
     
-    var calculationTotalBaseAmount: Int {
-        participants.reduce(0) { $0 + $1.baseShares.reduce(0, +) }
-    }
+    // TODO: process refactor
     
-    var calculationTotalTipAmount: Int {
-        var sum = 0
-        for tips in participants {
-            sum += tips.tipShares.reduce(0, +)
-        }
-        
-        return sum
-    }
-    
-    var calculationTotalAmount: Int {
-        calculationTotalBaseAmount + calculationTotalTipAmount
-    }
-    
-    var containsAmounts: Bool {
-        participants.contains { !$0.baseShares.isEmpty }
-    }
+//    var containsAmounts: Bool {
+//        participants.contains { !$0.baseShares.isEmpty }
+//    }
     
     func addParticipant(for name: String) {
         let participant = Participant(name: name)
@@ -123,47 +108,6 @@ final class SharedData: ObservableObject {
         }
         
         return normalized
-    }
-    
-    func addAmount() {
-        guard let amount = Int(currentAmount), amount > 0 else { return }
-        
-        if selectedParticipantIndex == 0 {
-            guard !participants.isEmpty else { return }
-            
-            let perPerson = Int(ceil(Double(amount) / Double(participants.count)))
-            
-            for i in 0..<participants.count {
-                participants[i].baseShares.append(perPerson)
-            }
-        } else {
-            let index = selectedParticipantIndex - 1
-            if index < participants.count {
-                participants[index].baseShares.append(amount)
-            }
-        }
-        
-        if isTipEnable {
-            calculateTips()
-        }
-        
-        currentAmount = ""
-    }
-
-    func calculateTips() {
-        guard tipPercentage > 0 else {
-            for i in participants.indices {
-                participants[i].tipShares = Array(repeating: 0, count: participants[i].baseShares.count)
-            }
-            return
-        }
-        
-        for i in participants.indices {
-            participants[i].tipShares = participants[i].baseShares.map { base in
-                let tip = Int(ceil(Double(base) * tipPercentage / 100.0))
-                return tip
-            }
-        }
     }
     
     func resetToInitialState() {

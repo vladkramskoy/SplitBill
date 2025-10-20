@@ -128,8 +128,13 @@ struct EqualSplitView: View {
 }
 
 #Preview {
-    @Previewable @StateObject var sharedData = SharedData()
+    let sharedData = SharedData()
+    sharedData.participants = [
+        Participant(name: "Оля"),
+        Participant(name: "Маша"),
+        Participant(name: "Даша")
+    ]
     
-    EqualSplitView()
+    return EqualSplitView()
         .environmentObject(sharedData)
 }
