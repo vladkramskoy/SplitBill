@@ -9,6 +9,10 @@ import SwiftUI
 
 struct SplitMethodView: View {
     @State private var selectedTab = 0
+    @State private var isPopupPresented = false
+    @State private var popupTitle = ""
+    @State private var popupMessage = ""
+    @State private var popupIcon = ""
     
     var body: some View {
         VStack {
@@ -18,19 +22,38 @@ struct SplitMethodView: View {
                 Text("По деньгам").tag(2)
             }
             .pickerStyle(.segmented)
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 16)
             
             TabView(selection: $selectedTab) {
                 EqualSplitView().tag(0)
                 ItemizedSplitView().tag(1)
-                CustomSplitView().tag(2)
+                CustomSplitView(
+                    showPopup: {
+                        popupTitle = "Режим «Вручную»"
+                        popupMessage = "Суммы вносятся произвольно. Например: первый участник платит за алкоголь, второй за еду."
+                        popupIcon = "slider.horizontal.3"
+                        isPopupPresented = true
+                    }
+                ).tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+        .overlay {
+            Group {
+                if isPopupPresented {
+                    PopupView(isShowingPopup: $isPopupPresented, popupTitle: popupTitle, popupMessage: popupMessage, popupIcon: popupIcon)
+                }
+            }
         }
         .navigationTitle("Как делить?")
     }
 }
 
 #Preview {
+    let sharedData = SharedData()
+    
     SplitMethodView()
+        .withRouter()
+        .environmentObject(sharedData)
 }

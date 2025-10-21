@@ -14,8 +14,6 @@ final class SharedData: ObservableObject {
     @Published var tipPercentage = 15.0
     @Published var tipAmount = ""
     @Published var isTipEnable = false
-    @Published var currentAmount: String = ""
-    @Published var selectedParticipantIndex = 0
     @Published var nameInput: String = ""
 
     private let numberFormatter: NumberFormatter = {

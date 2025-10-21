@@ -13,41 +13,13 @@ struct CustomSplitView: View {
     @State private var showAlert = false
     @FocusState private var isTextFieldFocused: Bool
     
-    private var pickerOptions: [String] {
-        ["На всех"] + sharedData.participants.indices.map { "Уч. \($0 + 1)" }
-    }
-    
     var maxCharacters = 6
+    var showPopup: () -> Void
     
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    VStack(spacing: 16) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "hand.point.right.fill")
-                                .foregroundStyle(.blue)
-                                .font(.title2)
-                            
-                            Text("Режим «Вручную»")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            
-                            Spacer()
-                        }
-                        
-                        Text("Когда суммы вносятся произвольно (например, Вася платит за алкоголь, Петя за еду).")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.leading)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-                    
                     VStack(spacing: 12) {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -120,54 +92,9 @@ struct CustomSplitView: View {
                     .background(Color(.systemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-                    
-                    HStack {
-                        TextField("0₽", text: $sharedData.currentAmount)
-                            .onChange(of: sharedData.currentAmount) { _, newValue in
-                                if newValue.count > maxCharacters {
-                                    sharedData.currentAmount = String(newValue.prefix(maxCharacters))
-                                }
-                            }
-                        
-                            .font(.system(size: 28, weight: .medium))
-                            .foregroundColor(.primary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(40)
-                            .focused($isTextFieldFocused)
-                            .keyboardType(.numberPad)
-                            .padding()
-                        
-                        Picker("", selection: $sharedData.selectedParticipantIndex) {
-                            ForEach(0..<pickerOptions.count, id: \.self) { index in
-                                Text(pickerOptions[index]).tag(index)
-                            }
-                        }
-                        .pickerStyle(WheelPickerStyle())
-                        .frame(height: 100)
-                        .clipped()
-                        
-                        Button(action: {
-                            // TODO: process code
-                        }) {
-                            Image(systemName: "arrow.up")
-                        }
-                        .disabled(sharedData.currentAmount.isEmpty)
-                        .font(.title)
-                        .foregroundColor(sharedData.currentAmount.isEmpty ? .gray : .white)
-                        .frame(width: 50, height: 50)
-                        .background(sharedData.currentAmount.isEmpty ? .gray.opacity(0.2) : .blue)
-                        .clipShape(Circle())
-                        .padding()
-                    }
-                    .background(
-                        RoundedRectangle(cornerRadius: 40, style: .continuous)
-                            .fill(Color(.secondarySystemBackground))
-                    )
-                    .padding(.bottom)
                 }
                 .padding(.horizontal)
+                .padding(.vertical, 20)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -199,6 +126,14 @@ struct CustomSplitView: View {
                 }
             }
             
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showPopup()
+                } label: {
+                    Image(systemName: "info.circle")
+                }
+            }
+            
             ToolbarItemGroup(placement: .keyboard) {
                 Button {
                     isTextFieldFocused = false
@@ -220,8 +155,8 @@ struct CustomSplitView: View {
     ]
     sharedData.billAmount = "5000"
     
-    return NavigationStack {
-        CustomSplitView()
+    return NavigationStack() {
+        CustomSplitView(showPopup: {})
             .environmentObject(sharedData)
             .withRouter()
     }
