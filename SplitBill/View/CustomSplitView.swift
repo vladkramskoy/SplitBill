@@ -10,7 +10,9 @@ import SwiftUI
 struct CustomSplitView: View {
     @Environment(Router.self) private var router
     @EnvironmentObject private var sharedData: SharedData
+    @StateObject private var viewModel = CustomSplitViewModel()
     @State private var showAlert = false
+    @State private var showInputModal = false
     @FocusState private var isTextFieldFocused: Bool
     
     var maxCharacters = 6
@@ -96,6 +98,8 @@ struct CustomSplitView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 20)
             }
+            
+            floatingAddButton
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("По деньгам")
@@ -133,18 +137,136 @@ struct CustomSplitView: View {
                     Image(systemName: "info.circle")
                 }
             }
-            
-            ToolbarItemGroup(placement: .keyboard) {
-                Button {
-                    isTextFieldFocused = false
-                } label: {
-                    Image(systemName: "keyboard.chevron.compact.down")
-                }
+        }
+        .sheet(isPresented: $showInputModal) {
+            inputModal
+        }
+    }
+    
+    // MARK: - Floating Add Button
+
+    private var floatingAddButton: some View {
+        VStack {
+            Spacer()
+            HStack {
                 Spacer()
+                Button(action: {
+                    showInputModal = true
+                }) {
+                    HStack {
+                        Image(systemName: "plus")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("Добавить")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(Color.green)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+                }
+                .padding(.trailing, 16)
+                .padding(.bottom, 16)
             }
         }
     }
+
+    // MARK: - Input Modal Window
+    
+    private var inputModal: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button("Отмена") {
+                    showInputModal = false
+                }
+                .foregroundStyle(.secondary)
+                
+                Spacer()
+                
+                Text("Новый платеж")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    
+                Spacer()
+                
+                Button("Готово") {
+                    // TODO: Add action
+                }
+                .fontWeight(.semibold)
+                .foregroundStyle(viewModel.amountPaymentInput.isEmpty ? .gray : .blue)
+                .disabled(viewModel.amountPaymentInput.isEmpty)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            
+            Divider()
+            
+            VStack(spacing: 20) {
+                
+                VStack(spacing: 8) {
+                    Text("Сумма")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    HStack {
+                        TextField("0", text: $viewModel.amountPaymentInput)
+                            .keyboardType(.decimalPad)
+                            .font(.system(size: 28, weight: .semibold))
+                            .multilineTextAlignment(.center)
+                            
+                        Text("₽")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.top, 8)
+                
+                VStack(spacing: 8) {
+                    Text("Кто платит")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(0..<sharedData.participants.count, id: \.self) { index in
+                                Button(action: {
+                                    viewModel.selectedPersonIndex = index
+                                }) {
+                                    VStack(spacing: 8) {
+                                        Circle()
+                                            .fill(viewModel.selectedPersonIndex == index ? Color.blue : Color(.systemGray5))
+                                            .frame(width: 50, height: 50)
+                                            .overlay {
+                                                Text(String(sharedData.participants[index].name.prefix(1)))
+                                                    .font(.system(size: 18, weight: .semibold))
+                                                    .foregroundStyle(viewModel.selectedPersonIndex == index ? .white : .primary)
+                                            }
+                                        
+                                        Text(sharedData.participants[index].name)
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .foregroundStyle(viewModel.selectedPersonIndex == index ? .blue : .primary)
+                                            
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 4)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+            
+            Spacer()
+        }
+        .presentationDetents([.height(280)])
+        .presentationDragIndicator(.visible)
+    }
 }
+
+// MARK: - Preview
 
 #Preview {
     let sharedData = SharedData()
