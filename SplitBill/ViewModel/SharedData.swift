@@ -21,7 +21,7 @@ final class SharedData: ObservableObject {
     
     private var formatter: DecimalFormatting
     
-    init(formatter: DecimalFormatter = DecimalFormatter()) {
+    init(formatter: DecimalFormatting = DecimalFormatter()) {
         self.formatter = formatter
     }
     
