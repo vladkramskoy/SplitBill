@@ -60,7 +60,7 @@ struct EqualSplitView: View {
                             DetailRow(title: "Сумма счета", value: sharedData.billAmountConvertInDouble, isTotal: false)
                             DetailRow(title: "Чаевые", value: sharedData.calculatedTip, isTotal: false)
                             Divider()
-                            DetailRow(title: "Итого к оплате", value: sharedData.totalAmount, isTotal: true)
+                            DetailRow(title: "Итого к оплате", value: sharedData.amountWithTips, isTotal: true)
                         }
                     }
                     .padding()
@@ -126,6 +126,8 @@ struct EqualSplitView: View {
         // TODO: implement it later
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     let sharedData = SharedData()

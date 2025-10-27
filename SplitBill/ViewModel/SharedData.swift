@@ -8,6 +8,9 @@
 import Foundation
 
 final class SharedData: ObservableObject {
+
+    // MARK: - Properties
+    
     @Published var participants: [Participant] = []
     @Published var billAmount = ""
     @Published var tipCalculationType: TipCalculationType = .percentage
@@ -15,18 +18,17 @@ final class SharedData: ObservableObject {
     @Published var tipAmount = ""
     @Published var isTipEnable = false
     @Published var nameInput: String = ""
-
-    private let numberFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
-        formatter.minimum = 0
-        formatter.locale = Locale.current
-        return formatter
-    }()
+    
+    private var formatter: DecimalFormatting
+    
+    init(formatter: DecimalFormatter = DecimalFormatter()) {
+        self.formatter = formatter
+    }
+    
+    // MARK: - Computed Properties
     
     var billAmountConvertInDouble: Double {
-        guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
+        guard let amount = formatter.parse(billAmount) else { return 0 }
         return amount
     }
     
@@ -34,17 +36,17 @@ final class SharedData: ObservableObject {
         guard isTipEnable else { return 0 }
         
         if tipCalculationType == .percentage {
-            guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
+            guard let amount = formatter.parse(billAmount) else { return 0 }
             
             return amount * tipPercentage / 100
         } else {
-            guard let tipAmount = numberFormatter.number(from: tipAmount)?.doubleValue else { return 0 }
+            guard let tipAmount = formatter.parse(tipAmount) else { return 0 }
             return tipAmount
         }
     }
     
-    var totalAmount: Double {
-        guard let amount = numberFormatter.number(from: billAmount)?.doubleValue else { return 0 }
+    var amountWithTips: Double {
+        guard let amount = formatter.parse(billAmount) else { return 0 }
         return amount + calculatedTip
     }
     
@@ -52,13 +54,13 @@ final class SharedData: ObservableObject {
         if billAmount.isEmpty {
             return false
         }
-        guard let number = numberFormatter.number(from: billAmount)?.doubleValue else { return false }
+        guard let number = formatter.parse(billAmount) else { return false }
         return number >= 10
     }
     
     var amountPerPerson: Double {
         guard !participants.isEmpty else { return 0 }
-        return totalAmount / Double(participants.count)
+        return amountWithTips / Double(participants.count)
     }
     
     // TODO: process refactor
@@ -66,6 +68,8 @@ final class SharedData: ObservableObject {
 //    var containsAmounts: Bool {
 //        participants.contains { !$0.baseShares.isEmpty }
 //    }
+    
+    // MARK: - Methods
     
     func addParticipant(for name: String) {
         let participant = Participant(name: name)

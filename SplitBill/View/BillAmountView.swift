@@ -102,7 +102,7 @@ struct BillAmountView: View {
                 HStack {
                     Text("Сумма с чаевыми:")
                     Spacer()
-                    Text(sharedData.totalAmount, format: .currency(code: "RUB"))
+                    Text(sharedData.amountWithTips, format: .currency(code: "RUB"))
                 }
                 .padding(.horizontal)
             }
@@ -129,6 +129,8 @@ struct BillAmountView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     @Previewable @StateObject var sharedData = SharedData()
