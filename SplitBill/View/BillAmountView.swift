@@ -29,7 +29,7 @@ struct BillAmountView: View {
                     .focused($isAmountFocused)
                     .foregroundStyle(textColor)
                     .onChange(of: sharedData.billAmount) { oldValue, newValue in
-                        let formatted = sharedData.formatBillAmount(newValue)
+                        let formatted = InputValidator.formatCurrencyInput(newValue)
                         if formatted != newValue {
                             sharedData.billAmount = formatted
                         }
@@ -90,7 +90,7 @@ struct BillAmountView: View {
                             .multilineTextAlignment(.trailing)
                             .focused($isTipFocused)
                             .onChange(of: sharedData.tipAmount) { oldValue, newValue in
-                                let formatted = sharedData.formatBillAmount(newValue)
+                                let formatted = InputValidator.formatCurrencyInput(newValue)
                                 if formatted != newValue {
                                     sharedData.tipAmount = formatted
                                 }

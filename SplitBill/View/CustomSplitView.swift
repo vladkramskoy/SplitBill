@@ -62,7 +62,7 @@ struct CustomSplitView: View {
                                             startPoint: .leading,
                                             endPoint: .trailing)
                                     )
-                                    .frame(width: geometry.size.width * sharedData.progressForDestributedAmount, height: 6)
+                                    .frame(width: geometry.size.width * min(1, sharedData.progressForDestributedAmount), height: 6)
                             }
                         }
                         .frame(height: 6)
@@ -221,6 +221,12 @@ struct CustomSplitView: View {
                             .keyboardType(.decimalPad)
                             .font(.system(size: 28, weight: .semibold))
                             .multilineTextAlignment(.center)
+                            .onChange(of: sharedData.amountPaymentInput) { oldValue, newValue in
+                                let formatted = InputValidator.formatCurrencyInput(newValue)
+                                if formatted != newValue {
+                                    sharedData.amountPaymentInput = formatted
+                                }
+                            }
                             
                         Text("₽")
                             .font(.system(size: 24, weight: .medium))
