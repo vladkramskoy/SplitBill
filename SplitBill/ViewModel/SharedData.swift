@@ -19,6 +19,28 @@ final class SharedData: ObservableObject {
     @Published var isTipEnable = false
     @Published var nameInput: String = ""
     
+    // TODO: move to CustomSplit viewModel
+    @Published var amountPaymentInput = ""
+    @Published var selectedPersonIndex = 0
+    
+    var destributedAmount: Double {
+        var amount = 0.0
+        
+        for i in participants {
+            amount += i.mustPayAll
+        }
+        
+        return amount
+    }
+    
+    var remainingAmount: Double {
+        amountWithTips - destributedAmount
+    }
+    
+    var progressForDestributedAmount: Double {
+        destributedAmount / amountWithTips
+    }
+    
     private var formatter: DecimalFormatting
     
     init(formatter: DecimalFormatting = DecimalFormatter()) {
@@ -30,6 +52,14 @@ final class SharedData: ObservableObject {
     var billAmountConvertInDouble: Double {
         guard let amount = formatter.parse(billAmount) else { return 0 }
         return amount
+    }
+    
+    var destributedAmountInString: String {
+        formatter.format(destributedAmount)
+    }
+    
+    var remainingAmountInString: String {
+        formatter.format(remainingAmount)
     }
     
     var calculatedTip: Double {
@@ -79,6 +109,18 @@ final class SharedData: ObservableObject {
     
     func removeParticipant(at offsets: IndexSet) {
         participants.remove(atOffsets: offsets)
+    }
+    
+    func addPaymentSharesForCustomSplit() {
+        guard let share = formatter.parse(amountPaymentInput) else { return }
+        
+        for i in 0..<participants.count {
+            
+            if i == selectedPersonIndex {
+                participants[i].paymentShares.append(share)
+                print("\(participants[i].name) получил долю \(share), всего должен \(participants[i].mustPayAll)")
+            }
+        }
     }
     
     func formatBillAmount(_ imput: String) -> String {

@@ -8,6 +8,9 @@
 import Foundation
 
 final class CustomSplitViewModel: ObservableObject {
-    @Published var amountPaymentInput = ""
-    @Published var selectedPersonIndex = 0
+    
+    // TODO: process code
+    
+//    @Published var amountPaymentInput = ""
+//    @Published var selectedPersonIndex = 0
 }

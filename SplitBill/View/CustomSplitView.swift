@@ -25,11 +25,11 @@ struct CustomSplitView: View {
                     VStack(spacing: 12) {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Сумма чека")
+                                Text("Распределено")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                 
-                                Text("\(sharedData.billAmount) ₽")
+                                Text("\(sharedData.destributedAmountInString) ₽")
                                     .font(.title2)
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.primary)
@@ -38,14 +38,14 @@ struct CustomSplitView: View {
                             Spacer()
                             
                             VStack(alignment: .trailing, spacing: 4) {
-                                Text("Осталось распределить")
+                                Text("Осталось")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                 
-                                Text("2 500")
+                                Text("\(sharedData.remainingAmountInString) ₽")
                                     .font(.title2)
                                     .fontWeight(.semibold)
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(sharedData.remainingAmount > 0 ? .orange : .green)
                             }
                         }
                         
@@ -56,8 +56,13 @@ struct CustomSplitView: View {
                                     .frame(height: 6)
                                 
                                 Rectangle()
-                                    .fill(Color.orange)
-                                    .frame(width: geometry.size.width * 0.5, height: 6)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: sharedData.progressForDestributedAmount >= 1 ? [.green] : [.blue],
+                                            startPoint: .leading,
+                                            endPoint: .trailing)
+                                    )
+                                    .frame(width: geometry.size.width * sharedData.progressForDestributedAmount, height: 6)
                             }
                         }
                         .frame(height: 6)
@@ -86,7 +91,7 @@ struct CustomSplitView: View {
                         
                         LazyVStack(spacing: 12) {
                             ForEach(sharedData.participants) { participant in
-                                ParticipantRow(name: participant.name, amount: sharedData.amountPerPerson)
+                                ParticipantRow(name: participant.name, amount: participant.mustPayAll)
                             }
                         }
                     }
@@ -151,6 +156,7 @@ struct CustomSplitView: View {
             HStack {
                 Spacer()
                 Button(action: {
+                    sharedData.amountPaymentInput = ""
                     showInputModal = true
                 }) {
                     HStack {
@@ -191,11 +197,12 @@ struct CustomSplitView: View {
                 Spacer()
                 
                 Button("Готово") {
-                    // TODO: Add action
+                    sharedData.addPaymentSharesForCustomSplit()
+                    showInputModal = false
                 }
                 .fontWeight(.semibold)
-                .foregroundStyle(viewModel.amountPaymentInput.isEmpty ? .gray : .blue)
-                .disabled(viewModel.amountPaymentInput.isEmpty)
+                .foregroundStyle(sharedData.amountPaymentInput.isEmpty ? .gray : .blue)
+                .disabled(sharedData.amountPaymentInput.isEmpty)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -210,7 +217,7 @@ struct CustomSplitView: View {
                         .foregroundStyle(.secondary)
                     
                     HStack {
-                        TextField("0", text: $viewModel.amountPaymentInput)
+                        TextField("0", text: $sharedData.amountPaymentInput)
                             .keyboardType(.decimalPad)
                             .font(.system(size: 28, weight: .semibold))
                             .multilineTextAlignment(.center)
@@ -231,22 +238,22 @@ struct CustomSplitView: View {
                         HStack(spacing: 12) {
                             ForEach(0..<sharedData.participants.count, id: \.self) { index in
                                 Button(action: {
-                                    viewModel.selectedPersonIndex = index
+                                    sharedData.selectedPersonIndex = index
                                 }) {
                                     VStack(spacing: 8) {
                                         Circle()
-                                            .fill(viewModel.selectedPersonIndex == index ? Color.blue : Color(.systemGray5))
+                                            .fill(sharedData.selectedPersonIndex == index ? Color.blue : Color(.systemGray5))
                                             .frame(width: 50, height: 50)
                                             .overlay {
                                                 Text(String(sharedData.participants[index].name.prefix(1)))
                                                     .font(.system(size: 18, weight: .semibold))
-                                                    .foregroundStyle(viewModel.selectedPersonIndex == index ? .white : .primary)
+                                                    .foregroundStyle(sharedData.selectedPersonIndex == index ? .white : .primary)
                                             }
                                         
                                         Text(sharedData.participants[index].name)
                                             .font(.caption)
                                             .fontWeight(.medium)
-                                            .foregroundStyle(viewModel.selectedPersonIndex == index ? .blue : .primary)
+                                            .foregroundStyle(sharedData.selectedPersonIndex == index ? .blue : .primary)
                                             
                                     }
                                 }
