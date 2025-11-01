@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var sharedData = SharedData()
+    @State private var session = BillSession()
     
     var body: some View {
         ParticipantView()
             .withRouter()
-            .environmentObject(sharedData)
+            .environment(session)
     }
 }
 

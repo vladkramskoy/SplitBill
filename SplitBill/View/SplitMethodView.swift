@@ -51,9 +51,9 @@ struct SplitMethodView: View {
 }
 
 #Preview {
-    let sharedData = SharedData()
+    @Previewable @State var session = BillSession()
     
     SplitMethodView()
         .withRouter()
-        .environmentObject(sharedData)
+        .environment(session)
 }

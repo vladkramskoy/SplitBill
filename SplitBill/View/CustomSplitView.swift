@@ -9,96 +9,20 @@ import SwiftUI
 
 struct CustomSplitView: View {
     @Environment(Router.self) private var router
-    @EnvironmentObject private var sharedData: SharedData
+    @Environment(BillSession.self) private var session
     @StateObject private var viewModel = CustomSplitViewModel()
     @State private var showAlert = false
     @State private var showInputModal = false
     @FocusState private var isTextFieldFocused: Bool
     
-    var maxCharacters = 6
     var showPopup: () -> Void
     
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    VStack(spacing: 12) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Распределено")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                
-                                Text("\(sharedData.destributedAmountInString) ₽")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.primary)
-                            }
-                            
-                            Spacer()
-                            
-                            VStack(alignment: .trailing, spacing: 4) {
-                                Text("Осталось")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                
-                                Text("\(sharedData.remainingAmountInString) ₽")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(sharedData.remainingAmount > 0 ? .orange : .green)
-                            }
-                        }
-                        
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-                                Rectangle()
-                                    .fill(Color(.systemGray5))
-                                    .frame(height: 6)
-                                
-                                Rectangle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: sharedData.progressForDestributedAmount >= 1 ? [.green] : [.blue],
-                                            startPoint: .leading,
-                                            endPoint: .trailing)
-                                    )
-                                    .frame(width: geometry.size.width * min(1, sharedData.progressForDestributedAmount), height: 6)
-                            }
-                        }
-                        .frame(height: 6)
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-                    
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Text("Участники")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            Spacer()
-                            
-                            Text("\(sharedData.participants.count) чел.")
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.blue.opacity(0.1))
-                                .foregroundStyle(.blue)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-                        
-                        LazyVStack(spacing: 12) {
-                            ForEach(sharedData.participants) { participant in
-                                ParticipantRow(name: participant.name, amount: participant.mustPayAll)
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    progressSection
+                    participantSection
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
@@ -111,28 +35,7 @@ struct CustomSplitView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    
-                    // TODO: process refactor
-                    
-//                    if sharedData.containsAmounts {
-//                        showAlert = true
-//                    } else {
-//                        router.pop()
-//                    }
-                } label: {
-                    Image(systemName: "chevron.backward")
-                    Text("Назад")
-                }
-                .alert("Вернуться?", isPresented: $showAlert) {
-                    Button("Отмена", role: .cancel) {}
-                    Button("Сбросить чеки", role: .destructive) {
-                        withAnimation {
-                            sharedData.resetToInitialState()
-                            router.popToRoot()
-                        }
-                    }
-                }
+                backButton
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -148,6 +51,118 @@ struct CustomSplitView: View {
         }
     }
     
+    // MARK: - Progress Section
+    
+    private var progressSection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Распределено")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text(distributed.currencyFormatted)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Осталось")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text(remaining.currencyFormatted)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(remaining > 0 ? .orange : .green)
+                }
+            }
+            
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(Color(.systemGray5))
+                        .frame(height: 6)
+                    
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: progress >= 1 ? [.green] : [.blue],
+                                startPoint: .leading,
+                                endPoint: .trailing)
+                        )
+                        .frame(width: geometry.size.width * min(1, progress), height: 6)
+                }
+            }
+            .frame(height: 6)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    // MARK: - Participants Section
+    
+    private var participantSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Участники")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                Text("\(session.participants.count) чел.")
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.1))
+                    .foregroundStyle(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            
+            LazyVStack(spacing: 12) {
+                ForEach(session.participants) { participant in
+                    ParticipantRow(name: participant.name, amount: participant.mustPayAll)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    // MARK: Back Button
+    
+    private var backButton: some View {
+        Button {
+            if hasDistributedAmounts {
+                showAlert = true
+            } else {
+                router.pop()
+            }
+        } label: {
+            Image(systemName: "chevron.backward")
+            Text("Назад")
+        }
+        .alert("Вернуться?", isPresented: $showAlert) {
+            Button("Отмена", role: .cancel) {}
+            Button("Сбросить чеки", role: .destructive) {
+                withAnimation {
+                    session.reset()
+                    router.popToRoot()
+                }
+            }
+        } message: {
+            Text("Все введенные данные будут потеряны")
+        }
+    }
+    
     // MARK: - Floating Add Button
 
     private var floatingAddButton: some View {
@@ -156,7 +171,7 @@ struct CustomSplitView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    sharedData.amountPaymentInput = ""
+                    viewModel.amountPaymentInput = ""
                     showInputModal = true
                 }) {
                     HStack {
@@ -177,7 +192,7 @@ struct CustomSplitView: View {
             }
         }
     }
-
+    
     // MARK: - Input Modal Window
     
     private var inputModal: some View {
@@ -197,12 +212,12 @@ struct CustomSplitView: View {
                 Spacer()
                 
                 Button("Готово") {
-                    sharedData.addPaymentSharesForCustomSplit()
+                    viewModel.addPaymentShare(to: &session.participants)
                     showInputModal = false
                 }
                 .fontWeight(.semibold)
-                .foregroundStyle(sharedData.amountPaymentInput.isEmpty ? .gray : .blue)
-                .disabled(sharedData.amountPaymentInput.isEmpty)
+                .foregroundStyle(viewModel.amountPaymentInput.isEmpty ? .gray : .blue)
+                .disabled(viewModel.amountPaymentInput.isEmpty)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -217,14 +232,14 @@ struct CustomSplitView: View {
                         .foregroundStyle(.secondary)
                     
                     HStack {
-                        TextField("0", text: $sharedData.amountPaymentInput)
+                        TextField("0", text: $viewModel.amountPaymentInput)
                             .keyboardType(.decimalPad)
                             .font(.system(size: 28, weight: .semibold))
                             .multilineTextAlignment(.center)
-                            .onChange(of: sharedData.amountPaymentInput) { oldValue, newValue in
+                            .onChange(of: viewModel.amountPaymentInput) { oldValue, newValue in
                                 let formatted = InputValidator.formatCurrencyInput(newValue)
                                 if formatted != newValue {
-                                    sharedData.amountPaymentInput = formatted
+                                    viewModel.amountPaymentInput = formatted
                                 }
                             }
                             
@@ -242,27 +257,8 @@ struct CustomSplitView: View {
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(0..<sharedData.participants.count, id: \.self) { index in
-                                Button(action: {
-                                    sharedData.selectedPersonIndex = index
-                                }) {
-                                    VStack(spacing: 8) {
-                                        Circle()
-                                            .fill(sharedData.selectedPersonIndex == index ? Color.blue : Color(.systemGray5))
-                                            .frame(width: 50, height: 50)
-                                            .overlay {
-                                                Text(String(sharedData.participants[index].name.prefix(1)))
-                                                    .font(.system(size: 18, weight: .semibold))
-                                                    .foregroundStyle(sharedData.selectedPersonIndex == index ? .white : .primary)
-                                            }
-                                        
-                                        Text(sharedData.participants[index].name)
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                            .foregroundStyle(sharedData.selectedPersonIndex == index ? .blue : .primary)
-                                            
-                                    }
-                                }
+                            ForEach(0..<session.participants.count, id: \.self) { index in
+                                personButton(for: index)
                             }
                         }
                         .padding(.horizontal, 4)
@@ -277,22 +273,65 @@ struct CustomSplitView: View {
         .presentationDetents([.height(280)])
         .presentationDragIndicator(.visible)
     }
+    
+    // MARK: Person Button
+    
+    private func personButton(for index: Int) -> some View {
+        Button(action: {
+            viewModel.selectedPersonIndex = index
+        }) {
+            VStack(spacing: 8) {
+                Circle()
+                    .fill(viewModel.selectedPersonIndex == index ? Color.blue : Color(.systemGray5))
+                    .frame(width: 50, height: 50)
+                    .overlay {
+                        Text(String(session.participants[index].name.prefix(1)))
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(viewModel.selectedPersonIndex == index ? .white : .primary)
+                    }
+                
+                Text(session.participants[index].name)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(viewModel.selectedPersonIndex == index ? .blue : .primary)
+                
+            }
+        }
+    }
+    
+    // MARK: - Computed Properties
+    
+    private var distributed: Double {
+        viewModel.distributedAmount(from: session.participants)
+    }
+    
+    private var remaining: Double {
+        viewModel.remainingAmount(total: session.totalAmount, participants: session.participants)
+    }
+    
+    private var progress: Double {
+        viewModel.distributionProgress(total: session.totalAmount, participants: session.participants)
+    }
+    
+    var hasDistributedAmounts: Bool {
+        session.participants.contains { !$0.paymentShares.isEmpty }
+    }
 }
 
 // MARK: - Preview
 
 #Preview {
-    let sharedData = SharedData()
-    sharedData.participants = [
+    @Previewable @State var session = BillSession()
+    session.participants = [
         Participant(name: "Оля"),
         Participant(name: "Маша"),
         Participant(name: "Даша")
     ]
-    sharedData.billAmount = "5000"
+    session.totalAmount = 5000
     
-    return NavigationStack() {
+    return NavigationStack {
         CustomSplitView(showPopup: {})
-            .environmentObject(sharedData)
+            .environment(session)
             .withRouter()
     }
 }

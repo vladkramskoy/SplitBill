@@ -9,8 +9,8 @@ import SwiftUI
 
 struct BillAmountView: View {
     @Environment(Router.self) private var router
-    @EnvironmentObject private var sharedData: SharedData
-    
+    @Environment(BillSession.self) private var session
+    @StateObject private var viewModel = BillAmountViewModel()
     @State private var textColor: Color = .red
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
@@ -22,32 +22,32 @@ struct BillAmountView: View {
                     .font(.headline)
                     .foregroundStyle(.gray)
                 
-                TextField("0 ₽", text: $sharedData.billAmount)
+                TextField("0 ₽", text: $viewModel.billAmount)
                     .font(.system(size: 40, weight: .bold))
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.center)
                     .focused($isAmountFocused)
                     .foregroundStyle(textColor)
-                    .onChange(of: sharedData.billAmount) { oldValue, newValue in
+                    .onChange(of: viewModel.billAmount) { oldValue, newValue in
                         let formatted = InputValidator.formatCurrencyInput(newValue)
                         if formatted != newValue {
-                            sharedData.billAmount = formatted
+                            viewModel.billAmount = formatted
                         }
                         
-                        textColor = sharedData.isValidAmount ? .green : .red
+                        textColor = viewModel.isValidAmount ? .green : .red
                     }
                     .onAppear {
-                        textColor = sharedData.isValidAmount ? .green : .red
+                        textColor = viewModel.isValidAmount ? .green : .red
                     }
             }
             .padding(.horizontal)
             .padding(.top, 30)
             
-            Toggle("Добавить чаевые", isOn: $sharedData.isTipEnable)
+            Toggle("Добавить чаевые", isOn: $viewModel.isTipEnable)
                 .padding(.horizontal)
-                .onChange(of: sharedData.isTipEnable) { _, isOn in
+                .onChange(of: viewModel.isTipEnable) { _, isOn in
                     if isOn {
-                        if sharedData.tipCalculationType == .fixedAmount {
+                        if viewModel.tipCalculationType == .fixedAmount {
                             isTipFocused = true
                         }
                     } else {
@@ -55,15 +55,15 @@ struct BillAmountView: View {
                     }
                 }
             
-            if sharedData.isTipEnable {
-                Picker("Способ расчета", selection: $sharedData.tipCalculationType) {
+            if viewModel.isTipEnable {
+                Picker("Способ расчета", selection: $viewModel.tipCalculationType) {
                     ForEach(TipCalculationType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(type)
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(.horizontal)
-                .onChange(of: sharedData.tipCalculationType) { _, newValue in
+                .onChange(of: viewModel.tipCalculationType) { _, newValue in
                     if newValue == .percentage {
                         isAmountFocused = true
                     } else {
@@ -71,28 +71,28 @@ struct BillAmountView: View {
                     }
                 }
                 
-                if sharedData.tipCalculationType == .percentage {
+                if viewModel.tipCalculationType == .percentage {
                     HStack {
                         Text("Процент:")
-                        Slider(value: $sharedData.tipPercentage, in: 0...30, step: 1)
-                            .onChange(of: sharedData.tipPercentage) { _, newValue in
-                                sharedData.tipPercentage = round(newValue)
+                        Slider(value: $viewModel.tipPercentage, in: 0...30, step: 1)
+                            .onChange(of: viewModel.tipPercentage) { _, newValue in
+                                viewModel.tipPercentage = round(newValue)
                             }
-                        Text("\(Int(sharedData.tipPercentage))%")
+                        Text("\(Int(viewModel.tipPercentage))%")
                             .frame(width: 40, alignment: .trailing)
                     }
                     .padding(.horizontal)
                 } else {
                     HStack {
                         Text("Сумма:")
-                        TextField("0.00", text: $sharedData.tipAmount)
+                        TextField("0.00", text: $viewModel.tipAmount)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .focused($isTipFocused)
-                            .onChange(of: sharedData.tipAmount) { oldValue, newValue in
+                            .onChange(of: viewModel.tipAmount) { oldValue, newValue in
                                 let formatted = InputValidator.formatCurrencyInput(newValue)
                                 if formatted != newValue {
-                                    sharedData.tipAmount = formatted
+                                    viewModel.tipAmount = formatted
                                 }
                             }
                     }
@@ -102,22 +102,25 @@ struct BillAmountView: View {
                 HStack {
                     Text("Сумма с чаевыми:")
                     Spacer()
-                    Text(sharedData.amountWithTips, format: .currency(code: "RUB"))
+                    Text(viewModel.totalAmount, format: .currency(code: "RUB"))
                 }
                 .padding(.horizontal)
             }
             
             Button(action: {
+                session.billAmount = viewModel.billAmountValue
+                session.tipAmount = viewModel.calculatedTip
+                session.totalAmount = viewModel.totalAmount
                 router.navigateToSplitMethod()
             }) {
                 Text("Продолжить")
                     .font(.headline)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, minHeight: 44)
-                    .background(sharedData.isValidAmount ? Color.blue : Color.gray)
+                    .background(viewModel.isValidAmount ? Color.blue : Color.gray)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .disabled(!sharedData.isValidAmount)
+            .disabled(!viewModel.isValidAmount)
             .padding()
             
             Spacer()
@@ -133,9 +136,9 @@ struct BillAmountView: View {
 // MARK: - Preview
 
 #Preview {
-    @Previewable @StateObject var sharedData = SharedData()
+    @Previewable @State var session = BillSession()
     
     BillAmountView()
-        .environmentObject(sharedData)
+        .environment(session)
         .withRouter()
 }

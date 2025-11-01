@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EqualSplitView: View {
-    @EnvironmentObject private var sharedData: SharedData
+    @Environment(BillSession.self) private var session
     
     var body: some View {
         ZStack {
@@ -31,7 +31,7 @@ struct EqualSplitView: View {
                             HStack {
                                 Text("На человека:")
                                 Spacer()
-                                Text("₽\(sharedData.amountPerPerson, specifier: "%.2f")")
+                                Text("₽\(session.amountPerPerson(), specifier: "%.2f")")
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(.blue)
@@ -40,7 +40,7 @@ struct EqualSplitView: View {
                             HStack {
                                 Text("Всего участников")
                                 Spacer()
-                                Text("\(sharedData.participants.count)")
+                                Text("\(session.participants.count)")
                                     .fontWeight(.semibold)
                             }
                             .foregroundStyle(.secondary)
@@ -57,10 +57,10 @@ struct EqualSplitView: View {
                             .fontWeight(.semibold)
                         
                         VStack(spacing: 12) {
-                            DetailRow(title: "Сумма счета", value: sharedData.billAmountConvertInDouble, isTotal: false)
-                            DetailRow(title: "Чаевые", value: sharedData.calculatedTip, isTotal: false)
+                            DetailRow(title: "Сумма счета", value: session.billAmount, isTotal: false)
+                            DetailRow(title: "Чаевые", value: session.tipAmount, isTotal: false)
                             Divider()
-                            DetailRow(title: "Итого к оплате", value: sharedData.amountWithTips, isTotal: true)
+                            DetailRow(title: "Итого к оплате", value: session.totalAmount, isTotal: true)
                         }
                     }
                     .padding()
@@ -76,7 +76,7 @@ struct EqualSplitView: View {
                             
                             Spacer()
                             
-                            Text("\(sharedData.participants.count) чел.")
+                            Text("\(session.participants.count) чел.")
                                 .font(.caption)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -86,8 +86,8 @@ struct EqualSplitView: View {
                         }
                         
                         LazyVStack(spacing: 12) {
-                            ForEach(sharedData.participants) { participant in
-                                ParticipantRow(name: participant.name, amount: sharedData.amountPerPerson)
+                            ForEach(session.participants) { participant in
+                                ParticipantRow(name: participant.name, amount: session.amountPerPerson())
                             }
                         }
                     }
@@ -130,13 +130,13 @@ struct EqualSplitView: View {
 // MARK: - Preview
 
 #Preview {
-    let sharedData = SharedData()
-    sharedData.participants = [
+    @Previewable @State var session = BillSession()
+    session.participants = [
         Participant(name: "Оля"),
         Participant(name: "Маша"),
         Participant(name: "Даша")
     ]
     
     return EqualSplitView()
-        .environmentObject(sharedData)
+        .environment(session)
 }
