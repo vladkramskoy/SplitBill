@@ -29,6 +29,23 @@ final class CustomSplitViewModel: ObservableObject {
         participants.reduce(0) { $0 + $1.mustPayAll }
     }
     
+    func distributeRemaining(total: Double, participants: inout [Participant]) {
+        guard participants.count > 0 else { return }
+        
+        let remaining = remainingAmount(total: total, participants: participants)
+        let share = remaining / Double(participants.count)
+        
+        for index in participants.indices {
+            participants[index].paymentShares.append(share)
+        }
+    }
+    
+    func resetAll(from participants: inout [Participant]) {
+        for index in participants.indices {
+            participants[index].paymentShares = []
+        }
+    }
+    
     func remainingAmount(total: Double, participants: [Participant]) -> Double {
         total - distributedAmount(from: participants)
     }

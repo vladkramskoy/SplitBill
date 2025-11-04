@@ -20,12 +20,13 @@ struct CustomSplitView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     progressSection
                     participantSection
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
+                .padding(.bottom, 80)
             }
             
             floatingAddButton
@@ -58,11 +59,11 @@ struct CustomSplitView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Распределено")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                     
                     Text(distributed.currencyFormatted)
-                        .font(.title2)
+                        .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
                 }
@@ -71,11 +72,11 @@ struct CustomSplitView: View {
                 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("Осталось")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                     
                     Text(remaining.currencyFormatted)
-                        .font(.title2)
+                        .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundStyle(remaining > 0 ? .orange : .green)
                 }
@@ -85,7 +86,7 @@ struct CustomSplitView: View {
                 ZStack(alignment: .leading) {
                     Rectangle()
                         .fill(Color(.systemGray5))
-                        .frame(height: 6)
+                        .frame(height: 4)
                     
                     Rectangle()
                         .fill(
@@ -94,10 +95,12 @@ struct CustomSplitView: View {
                                 startPoint: .leading,
                                 endPoint: .trailing)
                         )
-                        .frame(width: geometry.size.width * min(1, progress), height: 6)
+                        .frame(width: geometry.size.width * min(1, progress), height: 4)
                 }
             }
-            .frame(height: 6)
+            .frame(height: 4)
+            
+            quickActionButtons
         }
         .padding()
         .background(Color(.systemBackground))
@@ -137,6 +140,47 @@ struct CustomSplitView: View {
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
+    // MARK: Quick Action Buttons
+    
+    private var quickActionButtons: some View {
+        HStack(spacing: 12) {
+            Button(action: {
+                viewModel.distributeRemaining(total: session.totalAmount, participants: &session.participants)
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "equal.circle")
+                        .font(.system(size: 14, weight: .medium))
+                    Text("Распределить остаток")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.blue.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            
+            Button(action: {
+                viewModel.resetAll(from: &session.participants)
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 14, weight: .medium))
+                    Text("Сбросить")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.red.opacity(0.1))
+                .foregroundStyle(.red)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            
+            Spacer()
+        }
+    }
+    
     // MARK: Back Button
     
     private var backButton: some View {
@@ -148,7 +192,6 @@ struct CustomSplitView: View {
             }
         } label: {
             Image(systemName: "chevron.backward")
-            Text("Назад")
         }
         .alert("Вернуться?", isPresented: $showAlert) {
             Button("Отмена", role: .cancel) {}
@@ -313,7 +356,7 @@ struct CustomSplitView: View {
         viewModel.distributionProgress(total: session.totalAmount, participants: session.participants)
     }
     
-    var hasDistributedAmounts: Bool {
+    private var hasDistributedAmounts: Bool {
         session.participants.contains { !$0.paymentShares.isEmpty }
     }
 }
