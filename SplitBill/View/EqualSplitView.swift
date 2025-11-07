@@ -31,7 +31,7 @@ struct EqualSplitView: View {
                             HStack {
                                 Text("На человека:")
                                 Spacer()
-                                Text("₽\(session.amountPerPerson(), specifier: "%.2f")")
+                                Text("₽\(session.equalAmountPerPerson(), specifier: "%.2f")")
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(.blue)
@@ -87,7 +87,7 @@ struct EqualSplitView: View {
                         
                         LazyVStack(spacing: 12) {
                             ForEach(session.participants) { participant in
-                                ParticipantRow(name: participant.name, amount: session.amountPerPerson())
+                                ParticipantRow(name: participant.name, amount: session.equalAmountPerPerson())
                             }
                         }
                     }

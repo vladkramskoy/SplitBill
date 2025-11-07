@@ -23,6 +23,7 @@ struct CustomSplitView: View {
                 VStack(spacing: 16) {
                     progressSection
                     participantSection
+                    recentTransactionsSection
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
@@ -130,7 +131,47 @@ struct CustomSplitView: View {
             
             LazyVStack(spacing: 12) {
                 ForEach(session.participants) { participant in
-                    ParticipantRow(name: participant.name, amount: participant.mustPayAll)
+                    ParticipantRow(name: participant.name,
+                                   amount: viewModel.amountFor(participantId: participant.id,
+                                                               paymentShares: session.paymentSharesCustomMode))
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    // MARK: Recent Transactions Section
+    
+    private var recentTransactionsSection: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text("Последние операции")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                Button("Очистить") {
+                    viewModel.resetAll(from: &session.paymentSharesCustomMode)
+                }
+                .font(.subheadline)
+                .foregroundStyle(Color.red)
+            }
+            
+            if distributed == 0 {
+                Text("Здесь будут отображаться последние операции")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
+            } else {
+                LazyVStack(spacing: 8) {
+                    ForEach(session.participants) { participant in
+                        // TODO: process code
+                    }
                 }
             }
         }
@@ -145,7 +186,9 @@ struct CustomSplitView: View {
     private var quickActionButtons: some View {
         HStack(spacing: 12) {
             Button(action: {
-                viewModel.distributeRemaining(total: session.totalAmount, participants: &session.participants)
+                viewModel.distributeRemaining(total: session.totalAmount,
+                                              participants: session.participants,
+                                              paymentShares: &session.paymentSharesCustomMode)
             }) {
                 HStack(spacing: 6) {
                     Image(systemName: "equal.circle")
@@ -161,7 +204,7 @@ struct CustomSplitView: View {
             }
             
             Button(action: {
-                viewModel.resetAll(from: &session.participants)
+                viewModel.resetAll(from: &session.paymentSharesCustomMode)
             }) {
                 HStack(spacing: 6) {
                     Image(systemName: "arrow.clockwise")
@@ -255,7 +298,7 @@ struct CustomSplitView: View {
                 Spacer()
                 
                 Button("Готово") {
-                    viewModel.addPaymentShare(to: &session.participants)
+                    viewModel.addPaymentShare(to: &session.paymentSharesCustomMode, for: session.participants)
                     showInputModal = false
                 }
                 .fontWeight(.semibold)
@@ -345,19 +388,19 @@ struct CustomSplitView: View {
     // MARK: - Computed Properties
     
     private var distributed: Double {
-        viewModel.distributedAmount(from: session.participants)
+        viewModel.distributedAmount(from: session.paymentSharesCustomMode)
     }
     
     private var remaining: Double {
-        viewModel.remainingAmount(total: session.totalAmount, participants: session.participants)
+        viewModel.remainingAmount(total: session.totalAmount, paymentShares: session.paymentSharesCustomMode)
     }
     
     private var progress: Double {
-        viewModel.distributionProgress(total: session.totalAmount, participants: session.participants)
+        viewModel.distributionProgress(total: session.totalAmount, paymentShares: session.paymentSharesCustomMode)
     }
     
     private var hasDistributedAmounts: Bool {
-        session.participants.contains { !$0.paymentShares.isEmpty }
+        !session.paymentSharesCustomMode.isEmpty
     }
 }
 

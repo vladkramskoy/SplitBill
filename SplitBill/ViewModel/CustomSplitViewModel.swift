@@ -17,41 +17,48 @@ final class CustomSplitViewModel: ObservableObject {
         self.formatter = formatter
     }
     
-    func addPaymentShare(to participants: inout [Participant]) {
-        guard let share = formatter.parse(amountPaymentInput) else { return }
+    func addPaymentShare(to paymentShares: inout [PaymentShare], for participants: [Participant]) {
+        guard let amount = formatter.parse(amountPaymentInput) else { return }
         
         if selectedPersonIndex < participants.count {
-            participants[selectedPersonIndex].paymentShares.append(share)
+            let participantId = participants[selectedPersonIndex].id
+            let newPaymentShare = PaymentShare(participantId: participantId, amount: amount)
+            paymentShares.append(newPaymentShare)
         }
     }
     
-    func distributedAmount(from participants: [Participant]) -> Double {
-        participants.reduce(0) { $0 + $1.mustPayAll }
+    func distributedAmount(from paymentShares: [PaymentShare]) -> Double {
+        paymentShares.reduce(0) { $0 + $1.amount }
     }
     
-    func distributeRemaining(total: Double, participants: inout [Participant]) {
+    func distributeRemaining(total: Double, participants: [Participant], paymentShares: inout [PaymentShare]) {
         guard participants.count > 0 else { return }
         
-        let remaining = remainingAmount(total: total, participants: participants)
+        let remaining = remainingAmount(total: total, paymentShares: paymentShares)
         let share = remaining / Double(participants.count)
         
-        for index in participants.indices {
-            participants[index].paymentShares.append(share)
+        for participant in participants {
+            let paymentShare = PaymentShare(participantId: participant.id, amount: share)
+            paymentShares.append(paymentShare)
         }
     }
     
-    func resetAll(from participants: inout [Participant]) {
-        for index in participants.indices {
-            participants[index].paymentShares = []
-        }
+    func resetAll(from paymentShares: inout [PaymentShare]) {
+        paymentShares = []
     }
     
-    func remainingAmount(total: Double, participants: [Participant]) -> Double {
-        total - distributedAmount(from: participants)
+    func remainingAmount(total: Double, paymentShares: [PaymentShare]) -> Double {
+        total - distributedAmount(from: paymentShares)
     }
     
-    func distributionProgress(total: Double, participants: [Participant]) -> Double {
+    func distributionProgress(total: Double, paymentShares: [PaymentShare]) -> Double {
         guard total > 0 else { return 0 }
-        return distributedAmount(from: participants) / total
+        return distributedAmount(from: paymentShares) / total
+    }
+    
+    func amountFor(participantId: UUID, paymentShares: [PaymentShare]) -> Double {
+        paymentShares
+            .filter { $0.participantId == participantId }
+            .reduce(0) { $0 + $1.amount }
     }
 }
