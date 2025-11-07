@@ -10,5 +10,6 @@ import Foundation
 struct PaymentShare {
     let id = UUID()
     let participantId: UUID
+    let name: String
     let amount: Double
 }

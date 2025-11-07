@@ -133,7 +133,7 @@ struct CustomSplitView: View {
                 ForEach(session.participants) { participant in
                     ParticipantRow(name: participant.name,
                                    amount: viewModel.amountFor(participantId: participant.id,
-                                                               paymentShares: session.paymentSharesCustomMode))
+                                                               paymentShares: session.customPaymentShares))
                 }
             }
         }
@@ -155,7 +155,7 @@ struct CustomSplitView: View {
                 Spacer()
                 
                 Button("Очистить") {
-                    viewModel.resetAll(from: &session.paymentSharesCustomMode)
+                    viewModel.resetAll(from: &session.customPaymentShares)
                 }
                 .font(.subheadline)
                 .foregroundStyle(Color.red)
@@ -169,8 +169,8 @@ struct CustomSplitView: View {
                     .padding(.vertical, 20)
             } else {
                 LazyVStack(spacing: 8) {
-                    ForEach(session.participants) { participant in
-                        // TODO: process code
+                    ForEach(session.customPaymentShares, id: \.id) { share in
+                        ParticipantRow(name: share.name, amount: share.amount)
                     }
                 }
             }
@@ -188,7 +188,7 @@ struct CustomSplitView: View {
             Button(action: {
                 viewModel.distributeRemaining(total: session.totalAmount,
                                               participants: session.participants,
-                                              paymentShares: &session.paymentSharesCustomMode)
+                                              paymentShares: &session.customPaymentShares)
             }) {
                 HStack(spacing: 6) {
                     Image(systemName: "equal.circle")
@@ -204,7 +204,7 @@ struct CustomSplitView: View {
             }
             
             Button(action: {
-                viewModel.resetAll(from: &session.paymentSharesCustomMode)
+                viewModel.resetAll(from: &session.customPaymentShares)
             }) {
                 HStack(spacing: 6) {
                     Image(systemName: "arrow.clockwise")
@@ -298,7 +298,7 @@ struct CustomSplitView: View {
                 Spacer()
                 
                 Button("Готово") {
-                    viewModel.addPaymentShare(to: &session.paymentSharesCustomMode, for: session.participants)
+                    viewModel.addPaymentShare(to: &session.customPaymentShares, for: session.participants)
                     showInputModal = false
                 }
                 .fontWeight(.semibold)
@@ -388,19 +388,19 @@ struct CustomSplitView: View {
     // MARK: - Computed Properties
     
     private var distributed: Double {
-        viewModel.distributedAmount(from: session.paymentSharesCustomMode)
+        viewModel.distributedAmount(from: session.customPaymentShares)
     }
     
     private var remaining: Double {
-        viewModel.remainingAmount(total: session.totalAmount, paymentShares: session.paymentSharesCustomMode)
+        viewModel.remainingAmount(total: session.totalAmount, paymentShares: session.customPaymentShares)
     }
     
     private var progress: Double {
-        viewModel.distributionProgress(total: session.totalAmount, paymentShares: session.paymentSharesCustomMode)
+        viewModel.distributionProgress(total: session.totalAmount, paymentShares: session.customPaymentShares)
     }
     
     private var hasDistributedAmounts: Bool {
-        !session.paymentSharesCustomMode.isEmpty
+        !session.customPaymentShares.isEmpty
     }
 }
 

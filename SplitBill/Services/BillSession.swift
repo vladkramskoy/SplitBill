@@ -10,14 +10,14 @@ import Foundation
 @Observable
 final class BillSession {
     var participants: [Participant] = []
-    var paymentSharesCustomMode: [PaymentShare] = []
+    var customPaymentShares: [PaymentShare] = []
     var billAmount: Double = 0
     var tipAmount: Double = 0
     var totalAmount: Double = 0
     
     func reset() {
         participants = []
-        paymentSharesCustomMode = []
+        customPaymentShares = []
         billAmount = 0
         tipAmount = 0
         totalAmount = 0

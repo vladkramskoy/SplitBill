@@ -22,7 +22,8 @@ final class CustomSplitViewModel: ObservableObject {
         
         if selectedPersonIndex < participants.count {
             let participantId = participants[selectedPersonIndex].id
-            let newPaymentShare = PaymentShare(participantId: participantId, amount: amount)
+            let participantName = participants[selectedPersonIndex].name
+            let newPaymentShare = PaymentShare(participantId: participantId, name: participantName, amount: amount)
             paymentShares.append(newPaymentShare)
         }
     }
@@ -38,7 +39,7 @@ final class CustomSplitViewModel: ObservableObject {
         let share = remaining / Double(participants.count)
         
         for participant in participants {
-            let paymentShare = PaymentShare(participantId: participant.id, amount: share)
+            let paymentShare = PaymentShare(participantId: participant.id, name: participant.name, amount: share)
             paymentShares.append(paymentShare)
         }
     }
