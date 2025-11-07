@@ -258,6 +258,7 @@ struct CustomSplitView: View {
                 Spacer()
                 Button(action: {
                     viewModel.amountPaymentInput = ""
+                    viewModel.selectedPersonIndices = []
                     showInputModal = true
                 }) {
                     HStack {
@@ -294,7 +295,7 @@ struct CustomSplitView: View {
                 Text("Новый платеж")
                     .font(.headline)
                     .fontWeight(.semibold)
-                    
+                
                 Spacer()
                 
                 Button("Готово") {
@@ -302,8 +303,10 @@ struct CustomSplitView: View {
                     showInputModal = false
                 }
                 .fontWeight(.semibold)
-                .foregroundStyle(viewModel.amountPaymentInput.isEmpty ? .gray : .blue)
-                .disabled(viewModel.amountPaymentInput.isEmpty)
+                .foregroundStyle(viewModel.amountPaymentInput.isEmpty ||
+                                 viewModel.selectedPersonIndices.isEmpty ? .gray : .blue)
+                .disabled(viewModel.amountPaymentInput.isEmpty ||
+                          viewModel.selectedPersonIndices.isEmpty)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -364,23 +367,22 @@ struct CustomSplitView: View {
     
     private func personButton(for index: Int) -> some View {
         Button(action: {
-            viewModel.selectedPersonIndex = index
+            viewModel.togglePersonSelection(at: index)
         }) {
             VStack(spacing: 8) {
                 Circle()
-                    .fill(viewModel.selectedPersonIndex == index ? Color.blue : Color(.systemGray5))
+                    .fill(viewModel.selectedPersonIndices.contains(index) ? Color.blue : Color(.systemGray5))
                     .frame(width: 50, height: 50)
                     .overlay {
                         Text(String(session.participants[index].name.prefix(1)))
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(viewModel.selectedPersonIndex == index ? .white : .primary)
+                            .foregroundStyle(viewModel.selectedPersonIndices.contains(index) ? .white : .primary)
                     }
                 
                 Text(session.participants[index].name)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(viewModel.selectedPersonIndex == index ? .blue : .primary)
-                
+                    .foregroundStyle(viewModel.selectedPersonIndices.contains(index) ? .blue : .primary)
             }
         }
     }

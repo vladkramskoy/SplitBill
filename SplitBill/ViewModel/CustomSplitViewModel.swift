@@ -9,7 +9,7 @@ import Foundation
 
 final class CustomSplitViewModel: ObservableObject {
     @Published var amountPaymentInput = ""
-    @Published var selectedPersonIndex = 0
+    @Published var selectedPersonIndices: [Int] = []
     
     private let formatter: DecimalFormatting
     
@@ -18,12 +18,16 @@ final class CustomSplitViewModel: ObservableObject {
     }
     
     func addPaymentShare(to paymentShares: inout [PaymentShare], for participants: [Participant]) {
-        guard let amount = formatter.parse(amountPaymentInput) else { return }
+        guard let amount = formatter.parse(amountPaymentInput), !selectedPersonIndices.isEmpty else { return }
         
-        if selectedPersonIndex < participants.count {
-            let participantId = participants[selectedPersonIndex].id
-            let participantName = participants[selectedPersonIndex].name
-            let newPaymentShare = PaymentShare(participantId: participantId, name: participantName, amount: amount)
+        let shareAmount = amount / Double(selectedPersonIndices.count)
+        
+        for index in selectedPersonIndices {
+            guard index < participants.count else { continue }
+            
+            let participantId = participants[index].id
+            let participantName = participants[index].name
+            let newPaymentShare = PaymentShare(participantId: participantId, name: participantName, amount: shareAmount)
             paymentShares.append(newPaymentShare)
         }
     }
@@ -61,5 +65,13 @@ final class CustomSplitViewModel: ObservableObject {
         paymentShares
             .filter { $0.participantId == participantId }
             .reduce(0) { $0 + $1.amount }
+    }
+    
+    func togglePersonSelection(at index: Int) {
+        if selectedPersonIndices.contains(index) {
+            selectedPersonIndices.removeAll { $0 == index }
+        } else {
+            selectedPersonIndices.append(index)
+        }
     }
 }
