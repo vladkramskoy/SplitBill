@@ -10,6 +10,7 @@ import Foundation
 @Observable
 final class BillSession {
     var participants: [Participant] = []
+    var receiptItems: [BillItem] = []
     var customPaymentShares: [PaymentShare] = []
     var billAmount: Double = 0
     var tipAmount: Double = 0
