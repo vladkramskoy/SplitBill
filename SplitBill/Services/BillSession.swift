@@ -18,6 +18,7 @@ final class BillSession {
     
     func reset() {
         participants = []
+        receiptItems = []
         customPaymentShares = []
         billAmount = 0
         tipAmount = 0

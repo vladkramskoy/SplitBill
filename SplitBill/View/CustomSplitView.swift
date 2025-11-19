@@ -228,7 +228,7 @@ struct CustomSplitView: View {
     
     private var backButton: some View {
         Button {
-            if hasDistributedAmounts {
+            if billDataProcess {
                 showAlert = true
             } else {
                 router.pop()
@@ -401,7 +401,8 @@ struct CustomSplitView: View {
         viewModel.distributionProgress(total: session.totalAmount, paymentShares: session.customPaymentShares)
     }
     
-    private var hasDistributedAmounts: Bool {
+    private var billDataProcess: Bool {
+        !session.receiptItems.isEmpty ||
         !session.customPaymentShares.isEmpty
     }
 }

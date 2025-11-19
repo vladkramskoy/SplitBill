@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ItemizedSplitView: View {
+    @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = ItemizedSplitViewModel()
+    @State private var showAlert = false
     @State private var showInputModal = false
     
     var body: some View {
@@ -31,6 +33,12 @@ struct ItemizedSplitView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("По блюдам")
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                backButton
+            }
+        }
         .sheet(isPresented: $showInputModal) {
             inputModal
         }
@@ -122,6 +130,31 @@ struct ItemizedSplitView: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    // MARK: Back Button
+    
+    private var backButton: some View {
+        Button {
+            if billDataProcess {
+                showAlert = true
+            } else {
+                router.pop()
+            }
+        } label: {
+            Image(systemName: "chevron.backward")
+        }
+        .alert("Вернуться?", isPresented: $showAlert) {
+            Button("Отмена", role: .cancel) {}
+            Button("Сбросить чеки", role: .destructive) {
+                withAnimation {
+                    session.reset()
+                    router.popToRoot()
+                }
+            }
+        } message: {
+            Text("Все введенные данные будут потеряны")
+        }
     }
     
     // MARK: - Floating Add Button
@@ -267,9 +300,10 @@ struct ItemizedSplitView: View {
         viewModel.distributionProgress(total: session.totalAmount, items: session.receiptItems)
     }
     
-    //private var hasDistributedAmounts: Bool {
-    //    !session.customPaymentShares.isEmpty
-    //}
+    private var billDataProcess: Bool {
+        !session.receiptItems.isEmpty ||
+        !session.customPaymentShares.isEmpty
+    }
 }
 
 // MARK: - Preview
