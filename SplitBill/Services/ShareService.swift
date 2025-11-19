@@ -1,0 +1,20 @@
+//
+//  ShareService.swift
+//  SplitBill
+//
+//  Created by Vlad Kramskoy on 19.11.2025.
+//
+
+import Foundation
+
+final class ShareService {
+    private init() {}
+    
+    static func formatFullBill(totalAmount: Double, distributedAmount: Double, participants: [Participant], participantAmount: [UUID: Double]) -> String {
+        let participantNames = participants.map { "\($0.name) - \(participantAmount[$0.id] ?? 0)₽" }.joined(separator: "\n")
+        
+        let messageText = "📊 Разделение счета\n\nОбщая сумма: \(totalAmount)₽\nРаспределено: \(distributedAmount)₽\n\n👥 Участники:\n\(participantNames)\n\nСоздано в SplitBill"
+        
+        return messageText
+    }
+}

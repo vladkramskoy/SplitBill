@@ -47,6 +47,14 @@ struct CustomSplitView: View {
                     Image(systemName: "info.circle")
                 }
             }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(item: viewModel.shareResult(totalAmount: session.totalAmount, participants: session.participants, paymentShares: session.customPaymentShares)) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
         }
         .sheet(isPresented: $showInputModal) {
             inputModal

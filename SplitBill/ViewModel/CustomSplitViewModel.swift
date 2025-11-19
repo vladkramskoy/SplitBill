@@ -74,4 +74,14 @@ final class CustomSplitViewModel: ObservableObject {
             selectedPersonIndices.append(index)
         }
     }
+    
+    func shareResult(totalAmount: Double, participants: [Participant], paymentShares: [PaymentShare]) -> String {
+        let amounts: [UUID : Double] = participants.reduce(into: [:]) { dict, participant in
+            dict[participant.id] = amountFor(participantId: participant.id, paymentShares: paymentShares)
+        }
+        
+        let shareText = ShareService.formatFullBill(totalAmount: totalAmount, distributedAmount: distributedAmount(from: paymentShares), participants: participants, participantAmount: amounts)
+
+        return shareText
+    }
 }

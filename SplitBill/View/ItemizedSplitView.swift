@@ -38,6 +38,14 @@ struct ItemizedSplitView: View {
             ToolbarItem(placement: .topBarLeading) {
                 backButton
             }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(item: viewModel.shareResult(totalAmount: session.totalAmount, participants: session.participants, receiptItems: session.receiptItems)) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
         }
         .sheet(isPresented: $showInputModal) {
             inputModal

@@ -75,4 +75,14 @@ final class ItemizedSplitViewModel: ObservableObject {
     func deleteItemCard(for item: BillItem, from items: inout [BillItem]) {
         items.removeAll { $0.id == item.id }
     }
+    
+    func shareResult(totalAmount: Double, participants: [Participant], receiptItems: [BillItem]) -> String {
+        let amounts: [UUID : Double] = participants.reduce(into: [:]) { dict, participant in
+            dict[participant.id] = amountFor(participantId: participant.id, receiptItems: receiptItems)
+        }
+        
+        let shareText = ShareService.formatFullBill(totalAmount: totalAmount, distributedAmount: distributedAmount(from: receiptItems), participants: participants, participantAmount: amounts)
+
+        return shareText
+    }
 }

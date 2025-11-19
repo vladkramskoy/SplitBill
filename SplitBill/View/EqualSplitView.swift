@@ -97,7 +97,7 @@ struct EqualSplitView: View {
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
                     
                     VStack(spacing: 12) {
-                        Button(action: shareResult) {
+                        ShareLink(item: shareResult()) {
                             HStack {
                                 Image(systemName: "square.and.arrow.up")
                                 Text("Поделиться результатами")
@@ -122,8 +122,14 @@ struct EqualSplitView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
     
-    private func shareResult() {
-        // TODO: implement it later
+    private func shareResult() -> String {
+        let amounts: [UUID : Double] = session.participants.reduce(into: [:]) { dict, participant in
+            dict[participant.id] = session.equalAmountPerPerson()
+        }
+        
+        let shareText = ShareService.formatFullBill(totalAmount: session.billAmount, distributedAmount: session.billAmount, participants: session.participants, participantAmount: amounts)
+        
+        return shareText
     }
 }
 
