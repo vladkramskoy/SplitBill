@@ -18,8 +18,14 @@ final class ItemizedSplitViewModel: ObservableObject {
         self.formatter = formatter
     }
     
-    func distributedAmount(from items: [BillItem]) -> Double {
-        items.reduce(0) { $0 + $1.totalPrice }
+    func distributedAmount(from receiptItems: [BillItem]) -> Double {
+        receiptItems
+            .flatMap { billItem in
+                billItem.units
+                    .filter { !$0.payers.isEmpty }
+                    .map { _ in billItem.pricePerUnit }
+            }
+            .reduce(0, +)
     }
     
     func remainingAmount(total: Double, items: [BillItem]) -> Double {
