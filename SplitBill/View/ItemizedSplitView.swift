@@ -128,9 +128,12 @@ struct ItemizedSplitView: View {
             
             LazyVStack(spacing: 12) {
                 ForEach(session.participants) { participant in
+                    let participantAmount = viewModel.amountFor(participantId: participant.id, receiptItems: session.receiptItems)
+                    
+                    let onShare = ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount)
+                    
                     ParticipantRow(name: participant.name,
-                                   amount: viewModel.amountFor(participantId: participant.id,
-                                                               receiptItems: session.receiptItems))
+                                   amount: participantAmount, onShare: { onShare })
                 }
             }
         }

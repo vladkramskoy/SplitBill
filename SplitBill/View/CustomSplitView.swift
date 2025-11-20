@@ -139,9 +139,11 @@ struct CustomSplitView: View {
             
             LazyVStack(spacing: 12) {
                 ForEach(session.participants) { participant in
-                    ParticipantRow(name: participant.name,
-                                   amount: viewModel.amountFor(participantId: participant.id,
-                                                               paymentShares: session.customPaymentShares))
+                    let participantAmount = viewModel.amountFor(participantId: participant.id, paymentShares: session.customPaymentShares)
+                    
+                    let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount) }
+                    
+                    ParticipantRow(name: participant.name, amount: participantAmount, onShare: onShare)
                 }
             }
         }
@@ -178,7 +180,7 @@ struct CustomSplitView: View {
             } else {
                 LazyVStack(spacing: 8) {
                     ForEach(session.customPaymentShares, id: \.id) { share in
-                        ParticipantRow(name: share.name, amount: share.amount)
+                        ParticipantRow(name: share.name, amount: share.amount, onShare: nil)
                     }
                 }
             }

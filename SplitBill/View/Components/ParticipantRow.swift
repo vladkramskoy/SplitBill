@@ -10,6 +10,7 @@ import SwiftUI
 struct ParticipantRow: View {
     let name: String
     let amount: Double
+    let onShare: (() -> String)?
     
     var body: some View {
         HStack {
@@ -39,6 +40,15 @@ struct ParticipantRow: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
+                
+            if let onShare = onShare {
+                ShareLink(item: onShare()) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(.blue)
+                    }
+                }
+            }
         }
         .padding(.horizontal, 8)
     }
@@ -51,6 +61,6 @@ struct ParticipantRow: View {
 }
 
 #Preview {
-    ParticipantRow(name: "Петр Сидоров", amount: 500)
-    ParticipantRow(name: "Мария Петрова", amount: 750)
+    ParticipantRow(name: "Петр Сидоров", amount: 500, onShare: { "" })
+    ParticipantRow(name: "Мария Петрова", amount: 750, onShare: { "" })
 }

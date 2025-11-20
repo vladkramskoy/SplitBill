@@ -87,7 +87,9 @@ struct EqualSplitView: View {
                         
                         LazyVStack(spacing: 12) {
                             ForEach(session.participants) { participant in
-                                ParticipantRow(name: participant.name, amount: session.equalAmountPerPerson())
+                                let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: session.equalAmountPerPerson(), totalAmount: session.totalAmount) }
+                                
+                                ParticipantRow(name: participant.name, amount: session.equalAmountPerPerson(), onShare: onShare)
                             }
                         }
                     }

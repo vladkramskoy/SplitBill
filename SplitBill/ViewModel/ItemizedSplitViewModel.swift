@@ -77,6 +77,10 @@ final class ItemizedSplitViewModel: ObservableObject {
     }
     
     func shareResult(totalAmount: Double, participants: [Participant], receiptItems: [BillItem]) -> String {
+        guard !participants.isEmpty else {
+            return "Нет участников для разделения счета"
+        }
+        
         let amounts: [UUID : Double] = participants.reduce(into: [:]) { dict, participant in
             dict[participant.id] = amountFor(participantId: participant.id, receiptItems: receiptItems)
         }
