@@ -71,14 +71,14 @@ struct ItemizedSplitView: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("Осталось")
+                    Text(remaining >= 0 ? "Осталось" : "Перебор")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
-                    Text(remaining.currencyFormatted)
+                    Text(abs(remaining).currencyFormatted)
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundStyle(remaining > 0 ? .orange : .green)
+                        .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
                 }
             }
             
@@ -91,7 +91,7 @@ struct ItemizedSplitView: View {
                     Rectangle()
                         .fill(
                             LinearGradient(
-                                colors: progress >= 1 ? [.green] : [.blue],
+                                colors: progress >= 1 ? (remaining < 0 ? [.red] : [.green]) : [.blue],
                                 startPoint: .leading,
                                 endPoint: .trailing)
                         )
