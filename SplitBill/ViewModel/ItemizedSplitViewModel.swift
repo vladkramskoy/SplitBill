@@ -62,7 +62,9 @@ final class ItemizedSplitViewModel: ObservableObject {
     
     func equalSplitPayers(for item: inout BillItem, participants: [Participant]) {
         for index in item.units.indices {
-            item.units[index].payers.append(contentsOf: participants.map { $0.id })
+            item.units[index].payers.append(
+                contentsOf: participants.map { $0.id }.filter { !item.units[index].payers.contains($0) }
+            )
         }
     }
     
