@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct ParticipantView: View {
-    @EnvironmentObject private var sharedData: SharedData
     @Environment(Router.self) private var router
+    @Environment(BillSession.self) private var session
+    @StateObject private var viewModel = ParticipantViewModel()
     @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
@@ -17,22 +18,22 @@ struct ParticipantView: View {
             Form {
                 Section {
                     HStack {
-                        TextField("Введите имя", text: $sharedData.nameInput)
+                        TextField("Введите имя", text: $viewModel.nameInput)
                             .focused($isTextFieldFocused)
                         
                         Button(action: {
-                            sharedData.addParticipant(for: sharedData.nameInput)
+                            viewModel.addParticipant(for: viewModel.nameInput)
                         }) {
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(sharedData.nameInput.isEmpty ? .gray : .blue)
+                                .foregroundStyle(viewModel.nameInput.isEmpty ? .gray : .blue)
                         }
-                        .disabled(sharedData.nameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(viewModel.nameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
                     List {
-                        ForEach(sharedData.participants) { item in
+                        ForEach(viewModel.participants) { item in
                             Text(item.name)
                         }
-                        .onDelete(perform: sharedData.removeParticipant(at:))
+                        .onDelete(perform: viewModel.removeParticipant)
                     }
                 } header: {
                     Text("Участники")
@@ -49,6 +50,7 @@ struct ParticipantView: View {
             }
             
             Button(action: {
+                session.participants = viewModel.participants
                 router.navigateToBillAmount()
             }) {
                 Text("Начать")
@@ -58,6 +60,7 @@ struct ParticipantView: View {
                     .background(Color.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            .disabled(!viewModel.canProceed)
             .padding()
         }
         .navigationTitle("Разделить счет")
@@ -75,10 +78,12 @@ struct ParticipantView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
-    @Previewable @StateObject var sharedData = SharedData()
+    @Previewable @State var session = BillSession()
     
     ParticipantView()
-        .environmentObject(sharedData)
+        .environment(session)
         .withRouter()
 }
