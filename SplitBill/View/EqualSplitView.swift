@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct EqualSplitView: View {
+    @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     
     var body: some View {
@@ -113,7 +114,8 @@ struct EqualSplitView: View {
                         }
                         
                         Button("Новый расчет") {
-                            // TODO: implement it later
+                            session.reset()
+                            router.popToRoot()
                         }
                     }
                 }
@@ -147,4 +149,5 @@ struct EqualSplitView: View {
     
     return EqualSplitView()
         .environment(session)
+        .withRouter()
 }
