@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		70ABDCE62EE1A1F300F34AE9 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 70ABDCE52EE1A1F300F34AE9 /* FirebaseAnalytics */; };
+		70ABDCE82EE1A1F300F34AE9 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 70ABDCE72EE1A1F300F34AE9 /* FirebaseCrashlytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		702194792EAFCAF100CF5650 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -46,6 +51,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				70ABDCE62EE1A1F300F34AE9 /* FirebaseAnalytics in Frameworks */,
+				70ABDCE82EE1A1F300F34AE9 /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +120,8 @@
 			);
 			name = SplitBill;
 			packageProductDependencies = (
+				70ABDCE52EE1A1F300F34AE9 /* FirebaseAnalytics */,
+				70ABDCE72EE1A1F300F34AE9 /* FirebaseCrashlytics */,
 			);
 			productName = SplitBill;
 			productReference = 8DA141F12DDE6A0B00F4CF78 /* SplitBill.app */;
@@ -146,6 +155,9 @@
 			);
 			mainGroup = 8DA141E82DDE6A0B00F4CF78;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				70ABDCE42EE1A1F300F34AE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8DA141F22DDE6A0B00F4CF78 /* Products */;
 			projectDirPath = "";
@@ -464,6 +476,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		70ABDCE42EE1A1F300F34AE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		70ABDCE52EE1A1F300F34AE9 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 70ABDCE42EE1A1F300F34AE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		70ABDCE72EE1A1F300F34AE9 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 70ABDCE42EE1A1F300F34AE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8DA141E92DDE6A0B00F4CF78 /* Project object */;
 }
