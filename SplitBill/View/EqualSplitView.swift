@@ -10,6 +10,7 @@ import SwiftUI
 struct EqualSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @State private var completionLoggedOnce = false
     
     var body: some View {
         ZStack {
@@ -112,9 +113,25 @@ struct EqualSplitView: View {
                             .background(Color.blue)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
+                        .simultaneousGesture(TapGesture().onEnded {
+                            if !completionLoggedOnce {
+                                AnalyticsService.logBillSplitCompleted(
+                                    method: .equal,
+                                    participants: session.participants.count,
+                                    items: 0,
+                                    totalAmount: session.totalAmount,
+                                    success: true
+                                )
+                                
+                                completionLoggedOnce = true
+                            }
+                            
+                            AnalyticsService.logShareResult(type: .participant, method: .equal, isFullyDistributed: true)
+                        })
                         
                         Button("Новый расчет") {
                             session.reset()
+                            AnalyticsService.logNewCalculation()
                             router.popToRoot()
                         }
                     }
@@ -124,6 +141,9 @@ struct EqualSplitView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            AnalyticsService.logScreen(name: "equal_split_result")
+        }
     }
     
     private func shareResult() -> String {

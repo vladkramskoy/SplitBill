@@ -111,6 +111,14 @@ struct BillAmountView: View {
                 session.billAmount = viewModel.billAmountValue
                 session.tipAmount = viewModel.calculatedTip
                 session.totalAmount = viewModel.totalAmount
+                
+                AnalyticsService.logBillAmountEntered(
+                    amount: viewModel.billAmountValue,
+                    tip: viewModel.calculatedTip,
+                    total: viewModel.totalAmount,
+                    tipType: viewModel.isTipEnable ? viewModel.tipCalculationType.rawValue : "none"
+                )
+                
                 router.navigateToSplitMethod()
             }) {
                 Text("Продолжить")
@@ -129,6 +137,7 @@ struct BillAmountView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             isAmountFocused = true
+            AnalyticsService.logScreen(name: "bill_amount_screen")
         }
     }
 }

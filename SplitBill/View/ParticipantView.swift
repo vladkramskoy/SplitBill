@@ -51,6 +51,7 @@ struct ParticipantView: View {
             
             Button(action: {
                 session.participants = viewModel.participants
+                session.startSession()
                 router.navigateToBillAmount()
             }) {
                 Text("Начать")
@@ -74,6 +75,9 @@ struct ParticipantView: View {
                     Image(systemName: "chevron.down")
                 }
             }
+        }
+        .onAppear {
+            AnalyticsService.logScreen(name: "participants_screen")
         }
     }
 }

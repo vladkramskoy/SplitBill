@@ -14,6 +14,9 @@ struct ContentView: View {
         ParticipantView()
             .withRouter()
             .environment(session)
+            .onAppear {
+                AnalyticsService.logSessionStarted(entryPoint: "app_launch")
+            }
     }
 }
 

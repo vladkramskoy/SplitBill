@@ -16,12 +16,18 @@ final class ParticipantViewModel: ObservableObject {
     }
     
     func addParticipant(for name: String) {
-        let participant = Participant(name: name)
-        participants.append(participant)
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+        
+        participants.append(Participant(name: trimmedName))
         nameInput = ""
+        
+        AnalyticsService.logParticipantAdded(total: participants.count)
     }
     
     func removeParticipant(at offsets: IndexSet) {
         participants.remove(atOffsets: offsets)
+        
+        AnalyticsService.logParticipantRemoved(total: participants.count)
     }
 }

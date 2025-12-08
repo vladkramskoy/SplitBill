@@ -30,6 +30,8 @@ final class CustomSplitViewModel: ObservableObject {
             let newPaymentShare = PaymentShare(participantId: participantId, name: participantName, amount: shareAmount)
             paymentShares.append(newPaymentShare)
         }
+        
+        AnalyticsService.logPaymentShareAdded(totalShares: paymentShares.count)
     }
     
     func distributedAmount(from paymentShares: [PaymentShare]) -> Double {
@@ -50,6 +52,8 @@ final class CustomSplitViewModel: ObservableObject {
     
     func resetAll(from paymentShares: inout [PaymentShare]) {
         paymentShares = []
+        
+        AnalyticsService.logPaymentSharesReset(totalShares: paymentShares.count)
     }
     
     func remainingAmount(total: Double, paymentShares: [PaymentShare]) -> Double {

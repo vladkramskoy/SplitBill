@@ -15,6 +15,11 @@ final class BillSession {
     var billAmount: Double = 0
     var tipAmount: Double = 0
     var totalAmount: Double = 0
+    var sessionStartTime: Date?
+    
+    func startSession() {
+        sessionStartTime = Date()
+    }
     
     func reset() {
         participants = []
@@ -23,10 +28,16 @@ final class BillSession {
         billAmount = 0
         tipAmount = 0
         totalAmount = 0
+        sessionStartTime = nil
     }
     
     func equalAmountPerPerson() -> Double {
         guard !participants.isEmpty else { return 0 }
         return totalAmount / Double(participants.count)
+    }
+    
+    func getSessionDuration() -> Int? {
+        guard let start = sessionStartTime else { return nil }
+        return Int(Date().timeIntervalSince(start))
     }
 }

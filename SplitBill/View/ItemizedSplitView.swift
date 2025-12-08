@@ -13,6 +13,7 @@ struct ItemizedSplitView: View {
     @StateObject private var viewModel = ItemizedSplitViewModel()
     @State private var showAlert = false
     @State private var showInputModal = false
+    @State private var completionLoggedOnce = false
     
     var body: some View {
         @Bindable var session = session
@@ -45,10 +46,32 @@ struct ItemizedSplitView: View {
                         Image(systemName: "square.and.arrow.up")
                     }
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    AnalyticsService.logShareResult(
+                        type: .fullBill,
+                        method: .itemized,
+                        isFullyDistributed: remaining == 0 ? true : false
+                    )
+                })
             }
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
+        }
+        .onAppear {
+            AnalyticsService.logScreen(name: "itemized_split_screen")
+        }
+        .onChange(of: remaining) { oldValue, newValue in
+            if !completionLoggedOnce && oldValue != 0 && newValue == 0 {
+                AnalyticsService.logBillSplitCompleted(
+                    method: .itemized,
+                    participants: session.participants.count,
+                    items: session.receiptItems.count,
+                    totalAmount: session.totalAmount,
+                    success: true
+                )
+                completionLoggedOnce = true
+            }
         }
     }
     
@@ -134,6 +157,13 @@ struct ItemizedSplitView: View {
                     
                     ParticipantRow(name: participant.name,
                                    amount: participantAmount, onShare: { onShare })
+                    .simultaneousGesture(TapGesture().onEnded {
+                        AnalyticsService.logShareResult(
+                            type: .participant,
+                            method: .itemized,
+                            isFullyDistributed: remaining == 0 ? true : false
+                        )
+                    })
                 }
             }
         }
@@ -148,6 +178,7 @@ struct ItemizedSplitView: View {
     private var backButton: some View {
         Button {
             if billDataProcess {
+                AnalyticsService.logBackAttemptWithUnsavedData(screen: "itemized_split_screen")
                 showAlert = true
             } else {
                 router.pop()

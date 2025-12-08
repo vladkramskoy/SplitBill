@@ -14,6 +14,7 @@ struct CustomSplitView: View {
     @State private var showAlert = false
     @State private var showInputModal = false
     @FocusState private var isTextFieldFocused: Bool
+    @State private var completionLoggedOnce = false
     
     var showPopup: () -> Void
     
@@ -42,6 +43,7 @@ struct CustomSplitView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    AnalyticsService.logOnboardingOpened(source: "helpButton")
                     showPopup()
                 } label: {
                     Image(systemName: "info.circle")
@@ -54,10 +56,33 @@ struct CustomSplitView: View {
                         Image(systemName: "square.and.arrow.up")
                     }
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    AnalyticsService.logShareResult(
+                        type: .fullBill,
+                        method: .custom,
+                        isFullyDistributed: remaining == 0 ? true : false
+                    )
+                })
             }
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
+        }
+        .onAppear {
+            AnalyticsService.logScreen(name: "custom_split_screen")
+        }
+        .onChange(of: remaining) { oldValue, newValue in
+            if !completionLoggedOnce && oldValue != 0 && newValue == 0 {
+                AnalyticsService.logBillSplitCompleted(
+                    method: .custom,
+                    participants: session.participants.count,
+                    items: session.customPaymentShares.count,
+                    totalAmount: session.totalAmount,
+                    durationSec: session.getSessionDuration(),
+                    success: true
+                )
+                completionLoggedOnce = true
+            }
         }
     }
     
@@ -143,7 +168,15 @@ struct CustomSplitView: View {
                     
                     let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount) }
                     
-                    ParticipantRow(name: participant.name, amount: participantAmount, onShare: onShare)
+                    ParticipantRow(name: participant.name,
+                                   amount: participantAmount, onShare: onShare)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        AnalyticsService.logShareResult(
+                            type: .participant,
+                            method: .custom,
+                            isFullyDistributed: remaining == 0 ? true : false
+                        )
+                    })
                 }
             }
         }
@@ -239,6 +272,7 @@ struct CustomSplitView: View {
     private var backButton: some View {
         Button {
             if billDataProcess {
+                AnalyticsService.logBackAttemptWithUnsavedData(screen: "custom_split_screen")
                 showAlert = true
             } else {
                 router.pop()

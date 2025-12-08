@@ -18,10 +18,15 @@ enum ShareType: String {
 }
 
 enum AnalyticsService {
+    
+    // MARK: App
+    
     static func setup(appVersion: String, buildNumber: String) {
         Crashlytics.crashlytics().setCustomValue(appVersion, forKey: "app_version")
         Crashlytics.crashlytics().setCustomValue(buildNumber, forKey: "build_number")
     }
+    
+    // MARK: Session
     
     static func logSessionStarted(entryPoint: String) {
         Analytics.logEvent("session_started", parameters: [
@@ -29,6 +34,17 @@ enum AnalyticsService {
         ])
         Crashlytics.crashlytics().log("session_started: \(entryPoint)")
     }
+    
+    // MARK: Split Method View
+    
+    static func logSplitMethodSelected(_ method: SplitMethod) {
+        Analytics.logEvent("split_method_selected", parameters: [
+            "method": method.rawValue as NSString
+        ])
+        Crashlytics.crashlytics().setCustomValue(method.rawValue, forKey: "current_method")
+    }
+    
+    // MARK: Participant View
     
     static func logParticipantAdded(total: Int) {
         Analytics.logEvent("participant_added", parameters: [
@@ -42,6 +58,8 @@ enum AnalyticsService {
         ])
     }
     
+    // MARK: Bill Amount View
+    
     static func logBillAmountEntered(amount: Double, tip: Double, total: Double, tipType: String) {
         Analytics.logEvent("bill_amount_entered", parameters: [
             "amount": amount as NSNumber,
@@ -51,30 +69,38 @@ enum AnalyticsService {
         ])
     }
     
-    static func logSplitMethodSelected(_ method: SplitMethod) {
-        Analytics.logEvent("split_method_selected", parameters: [
-            "method": method.rawValue as NSString
-        ])
-        Crashlytics.crashlytics().setCustomValue(method.rawValue, forKey: "current_method")
-    }
-    
-    static func logNewCalculation() {
-        Analytics.logEvent("new_calculation", parameters: nil)
-        
-        Crashlytics.crashlytics().log("new_calculation")
-    }
-    
+    // MARK: Itemized Split View
+
     static func logReceiptItemAdded(totalItems: Int) {
         Analytics.logEvent("receipt_item_added", parameters: [
             "items_total": NSNumber(value: totalItems)
         ])
     }
-    
+
     static func logReceiptItemRemoved(totalItems: Int) {
         Analytics.logEvent("receipt_item_removed", parameters: [
             "items_total": NSNumber(value: totalItems)
         ])
     }
+    
+    static func logItemizedSplitEqually(itemName: String, participants: Int) {
+        Analytics.logEvent("itemized_split_equally", parameters: [
+            "item_name": itemName as NSString,
+            "participants_count": NSNumber(value: participants)
+        ])
+        
+        Crashlytics.crashlytics().log("itemized_split_equally: \(itemName), participants=\(participants)")
+    }
+    
+    static func logItemizedSplitReset(itemName: String) {
+        Analytics.logEvent("itemized_split_reset", parameters: [
+            "item_name": itemName as NSString
+        ])
+        
+        Crashlytics.crashlytics().log("itemized_split_reset: \(itemName)")
+    }
+    
+    // MARK: Custom Split View
     
     static func logPaymentShareAdded(totalShares: Int) {
         Analytics.logEvent("payment_share_added", parameters: [
@@ -90,6 +116,14 @@ enum AnalyticsService {
         ])
         
         Crashlytics.crashlytics().log("payment_shares_reset: \(totalShares)")
+    }
+    
+    // MARK: Common
+    
+    static func logNewCalculation() {
+        Analytics.logEvent("new_calculation", parameters: nil)
+        
+        Crashlytics.crashlytics().log("new_calculation")
     }
     
     static func logBackAttemptWithUnsavedData(screen: String) {
@@ -134,7 +168,7 @@ enum AnalyticsService {
         Analytics.logEvent("share_result", parameters: [
             "share_type": type.rawValue as NSString,
             "method": method.rawValue as NSString,
-            "fullu_distributed": NSNumber(value: isFullyDistributed)
+            "fully_distributed": NSNumber(value: isFullyDistributed)
         ])
     }
     

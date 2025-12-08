@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseCrashlytics
 
 @main
 struct SplitBillApp: App {
@@ -16,6 +17,9 @@ struct SplitBillApp: App {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
         AnalyticsService.setup(appVersion: appVersion, buildNumber: buildNumber)
+        
+        let userID = UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+        Crashlytics.crashlytics().setUserID(userID)
     }
     
     var body: some Scene {

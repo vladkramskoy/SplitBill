@@ -58,6 +58,8 @@ final class ItemizedSplitViewModel: ObservableObject {
         }
         
         receiptItems.append(billItem)
+        
+        AnalyticsService.logReceiptItemAdded(totalItems: receiptItems.count)
     }
     
     func equalSplitPayers(for item: inout BillItem, participants: [Participant]) {
@@ -66,16 +68,22 @@ final class ItemizedSplitViewModel: ObservableObject {
                 contentsOf: participants.map { $0.id }.filter { !item.units[index].payers.contains($0) }
             )
         }
+        
+        AnalyticsService.logItemizedSplitEqually(itemName: item.name, participants: participants.count)
     }
     
     func resetPayers(for item: inout BillItem) {
         for index in item.units.indices {
             item.units[index].payers = []
         }
+        
+        AnalyticsService.logItemizedSplitReset(itemName: item.name)
     }
     
     func deleteItemCard(for item: BillItem, from items: inout [BillItem]) {
         items.removeAll { $0.id == item.id }
+        
+        AnalyticsService.logReceiptItemRemoved(totalItems: items.count)
     }
     
     func shareResult(totalAmount: Double, participants: [Participant], receiptItems: [BillItem]) -> String {
