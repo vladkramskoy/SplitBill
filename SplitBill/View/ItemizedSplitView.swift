@@ -62,12 +62,13 @@ struct ItemizedSplitView: View {
             AnalyticsService.logScreen(name: "itemized_split_screen")
         }
         .onChange(of: remaining) { oldValue, newValue in
-            if !completionLoggedOnce && oldValue != 0 && newValue == 0 {
+            if !completionLoggedOnce && oldValue != 0 && newValue == 0 && !session.receiptItems.isEmpty {
                 AnalyticsService.logBillSplitCompleted(
                     method: .itemized,
                     participants: session.participants.count,
                     items: session.receiptItems.count,
                     totalAmount: session.totalAmount,
+                    durationSec: session.getSessionDuration(),
                     success: true
                 )
                 completionLoggedOnce = true
@@ -191,6 +192,7 @@ struct ItemizedSplitView: View {
             Button("Сбросить чеки", role: .destructive) {
                 withAnimation {
                     session.reset()
+                    AnalyticsService.logCalculationCancelled(screen: "itemized_split_screen")
                     router.popToRoot()
                 }
             }

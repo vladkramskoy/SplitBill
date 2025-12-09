@@ -72,7 +72,7 @@ struct CustomSplitView: View {
             AnalyticsService.logScreen(name: "custom_split_screen")
         }
         .onChange(of: remaining) { oldValue, newValue in
-            if !completionLoggedOnce && oldValue != 0 && newValue == 0 {
+            if !completionLoggedOnce && oldValue != 0 && newValue == 0 && !session.customPaymentShares.isEmpty {
                 AnalyticsService.logBillSplitCompleted(
                     method: .custom,
                     participants: session.participants.count,
@@ -285,6 +285,7 @@ struct CustomSplitView: View {
             Button("Сбросить чеки", role: .destructive) {
                 withAnimation {
                     session.reset()
+                    AnalyticsService.logCalculationCancelled(screen: "custom_split_screen")
                     router.popToRoot()
                 }
             }

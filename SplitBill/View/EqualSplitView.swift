@@ -91,7 +91,27 @@ struct EqualSplitView: View {
                             ForEach(session.participants) { participant in
                                 let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: session.equalAmountPerPerson(), totalAmount: session.totalAmount) }
                                 
-                                ParticipantRow(name: participant.name, amount: session.equalAmountPerPerson(), onShare: onShare)
+                                ParticipantRow(name: participant.name,
+                                               amount: session.equalAmountPerPerson(), onShare: onShare)
+                                .simultaneousGesture(TapGesture().onEnded {
+                                    if !completionLoggedOnce {
+                                        AnalyticsService.logBillSplitCompleted(
+                                            method: .equal,
+                                            participants: session.participants.count,
+                                            items: 0,
+                                            totalAmount: session.totalAmount,
+                                            durationSec: session.getSessionDuration(),
+                                            success: true
+                                        )
+                                        completionLoggedOnce = true
+                                    }
+                                    
+                                    AnalyticsService.logShareResult(
+                                        type: .participant,
+                                        method: .equal,
+                                        isFullyDistributed: true
+                                    )
+                                })
                             }
                         }
                     }
@@ -120,13 +140,12 @@ struct EqualSplitView: View {
                                     participants: session.participants.count,
                                     items: 0,
                                     totalAmount: session.totalAmount,
+                                    durationSec: session.getSessionDuration(),
                                     success: true
                                 )
-                                
                                 completionLoggedOnce = true
                             }
-                            
-                            AnalyticsService.logShareResult(type: .participant, method: .equal, isFullyDistributed: true)
+                            AnalyticsService.logShareResult(type: .fullBill, method: .equal, isFullyDistributed: true)
                         })
                         
                         Button("Новый расчет") {

@@ -134,6 +134,14 @@ enum AnalyticsService {
         Crashlytics.crashlytics().log("back_attempt_with_unsaved_data: \(screen)")
     }
     
+    static func logCalculationCancelled(screen: String) {
+        Analytics.logEvent("calculation_cancelled", parameters: [
+            "screen": screen as NSString
+        ])
+
+        Crashlytics.crashlytics().log("calculation_cancelled: \(screen)")
+    }
+    
     static func logOnboardingOpened(source: String) { // auto or helpButton
         Analytics.logEvent("onboarding_opened", parameters: [
             "source": source as NSString
@@ -161,6 +169,7 @@ enum AnalyticsService {
         }
         
         Analytics.logEvent("bill_split_completed", parameters: params)
+        
         Crashlytics.crashlytics().log("bill_split_completed: method=\(method.rawValue), participants=\(participants), items=\(items), total=\(totalAmount), success=\(success)")
     }
     
