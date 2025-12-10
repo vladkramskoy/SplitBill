@@ -12,7 +12,7 @@ final class ParticipantViewModel: ObservableObject {
     @Published var nameInput: String = ""
     
     var canProceed: Bool {
-        !participants.isEmpty
+        participants.count >= 2
     }
     
     func addParticipant(for name: String) {

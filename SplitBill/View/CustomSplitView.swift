@@ -31,10 +31,13 @@ struct CustomSplitView: View {
                 .padding(.bottom, 80)
             }
             
-            floatingAddButton
+            AddButton(title: "Добавить долю", action: {
+                viewModel.amountPaymentInput = ""
+                viewModel.selectedPersonIndices = []
+                showInputModal = true
+            })
         }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("По деньгам")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -201,15 +204,31 @@ struct CustomSplitView: View {
                     viewModel.resetAll(from: &session.customPaymentShares)
                 }
                 .font(.subheadline)
-                .foregroundStyle(Color.red)
+                .foregroundStyle(distributed == 0 ? .gray : .red)
+                .disabled(distributed == 0)
             }
             
             if distributed == 0 {
-                Text("Здесь будут отображаться последние операции")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
+                HStack(spacing: 12) {
+                    Image(systemName: "banknote")
+                        .font(.system(size: 36))
+                        .foregroundStyle(.tertiary)
+                    
+                    VStack(spacing: 4) {
+                        Text("Нет долей оплаты")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("Добавьте первую, чтобы начать распределение")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 28)
             } else {
                 LazyVStack(spacing: 8) {
                     ForEach(session.customPaymentShares, id: \.id) { share in
@@ -291,37 +310,6 @@ struct CustomSplitView: View {
             }
         } message: {
             Text("Все введенные данные будут потеряны")
-        }
-    }
-    
-    // MARK: - Floating Add Button
-
-    private var floatingAddButton: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                Button(action: {
-                    viewModel.amountPaymentInput = ""
-                    viewModel.selectedPersonIndices = []
-                    showInputModal = true
-                }) {
-                    HStack {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .semibold))
-                        Text("Добавить")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(Color.green)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
-                }
-                .padding(.trailing, 16)
-                .padding(.bottom, 16)
-            }
         }
     }
     

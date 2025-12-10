@@ -15,6 +15,8 @@ struct ItemizedSplitView: View {
     @State private var showInputModal = false
     @State private var completionLoggedOnce = false
     
+    var showPopup: () -> Void
+    
     var body: some View {
         @Bindable var session = session
         
@@ -30,14 +32,27 @@ struct ItemizedSplitView: View {
                 .padding(.bottom, 80)
             }
             
-            floatingAddButton
+            AddButton(title: "Добавить блюдо", action: {
+                viewModel.amountPaymentInput = ""
+                viewModel.dishName = ""
+                viewModel.quantity = 1
+                showInputModal = true
+            })
         }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("По блюдам")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 backButton
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    AnalyticsService.logOnboardingOpened(source: "helpButton")
+                    showPopup()
+                } label: {
+                    Image(systemName: "info.circle")
+                }
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -201,38 +216,6 @@ struct ItemizedSplitView: View {
         }
     }
     
-    // MARK: - Floating Add Button
-    
-    private var floatingAddButton: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                Button(action: {
-                    viewModel.amountPaymentInput = ""
-                    viewModel.dishName = ""
-                    viewModel.quantity = 1
-                    showInputModal = true
-                }) {
-                    HStack {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .semibold))
-                        Text("Добавить")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(Color.green)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
-                }
-                .padding(.trailing, 16)
-                .padding(.bottom, 16)
-            }
-        }
-    }
-    
     // MARK: - Input Modal Window
     
     private var inputModal: some View {
@@ -315,19 +298,60 @@ struct ItemizedSplitView: View {
     
     @ViewBuilder
     private func billItemsSection(receiptItems: Binding<[BillItem]>, participants: [Participant]) -> some View {
-        VStack {
-            ForEach(receiptItems) { $billItem in
-                BillItemCard(item: $billItem,
-                             participants: participants,
-                             onSplitEqually: { viewModel.equalSplitPayers(for: &billItem, participants: session.participants) },
-                             onReset: { viewModel.resetPayers(for: &billItem) },
-                             onDelete: { viewModel.deleteItemCard(for: billItem, from: &session.receiptItems) })
+        VStack(spacing: 16) {
+            HStack {
+                Text("Позиции чека")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                Text("\(receiptItems.count) поз.")
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(receiptItems.isEmpty ? Color.gray.opacity(0.1) : Color.green.opacity(0.1))
+                    .foregroundStyle(receiptItems.isEmpty ? .gray : .green)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            
+            if receiptItems.isEmpty {
+                HStack(spacing: 12) {
+                    Image(systemName: "fork.knife")
+                        .font(.system(size: 36))
+                        .foregroundStyle(.tertiary)
+                    
+                    VStack(spacing: 4) {
+                        Text("Нет позиций чека")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("Добавьте блюдо, чтобы начать распределение")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 28)
+            } else {
+                LazyVStack(spacing: 12) {
+                    ForEach(receiptItems) { $billItem in
+                        BillItemCard(item: $billItem,
+                                     participants: participants,
+                                     onSplitEqually: { viewModel.equalSplitPayers(for: &billItem, participants: session.participants) },
+                                     onReset: { viewModel.resetPayers(for: &billItem) },
+                                     onDelete: { viewModel.deleteItemCard(for: billItem, from: &session.receiptItems) })
+                    }
+                }
+            }
         }
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     // MARK: - Computed Properties
@@ -373,7 +397,7 @@ struct ItemizedSplitView: View {
     session.totalAmount = 5000
     
     return NavigationStack() {
-        ItemizedSplitView()
+        ItemizedSplitView(showPopup: {})
             .environment(session)
             .withRouter()
     }
