@@ -41,7 +41,13 @@ struct CustomSplitView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                backButton
+                BackButton(
+                    screenName: "custom_split_screen",
+                    onReset: {},
+                    showAlert: $showAlert,
+                    router: router,
+                    session: session,
+                    billDataProcess: billDataProcess)
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -286,33 +292,6 @@ struct CustomSplitView: View {
         }
     }
     
-    // MARK: Back Button
-    
-    private var backButton: some View {
-        Button {
-            if billDataProcess {
-                AnalyticsService.logBackAttemptWithUnsavedData(screen: "custom_split_screen")
-                showAlert = true
-            } else {
-                router.pop()
-            }
-        } label: {
-            Image(systemName: "chevron.backward")
-        }
-        .alert("Вернуться?", isPresented: $showAlert) {
-            Button("Отмена", role: .cancel) {}
-            Button("Сбросить чеки", role: .destructive) {
-                withAnimation {
-                    session.reset()
-                    AnalyticsService.logCalculationCancelled(screen: "custom_split_screen")
-                    router.popToRoot()
-                }
-            }
-        } message: {
-            Text("Все введенные данные будут потеряны")
-        }
-    }
-    
     // MARK: - Input Modal Window
     
     private var inputModal: some View {
@@ -324,7 +303,7 @@ struct CustomSplitView: View {
                 .foregroundStyle(.secondary)
                 
                 Spacer()
-                
+             
                 Text("Новый платеж")
                     .font(.headline)
                     .fontWeight(.semibold)
@@ -403,14 +382,24 @@ struct CustomSplitView: View {
             viewModel.togglePersonSelection(at: index)
         }) {
             VStack(spacing: 8) {
-                Circle()
-                    .fill(viewModel.selectedPersonIndices.contains(index) ? Color.blue : Color(.systemGray5))
-                    .frame(width: 50, height: 50)
-                    .overlay {
-                        Text(String(session.participants[index].name.prefix(1)))
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(viewModel.selectedPersonIndices.contains(index) ? .white : .primary)
+                ZStack(alignment: .bottomTrailing) {
+                    Circle()
+                        .fill(viewModel.selectedPersonIndices.contains(index) ? Color.blue : Color(.systemGray5))
+                        .frame(width: 50, height: 50)
+                        .overlay {
+                            Text(String(session.participants[index].name.prefix(1)))
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(viewModel.selectedPersonIndices.contains(index) ? .white : .primary)
+                        }
+                    
+                    if viewModel.selectedPersonIndices.contains(index) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.white)
+                            .background(Circle().fill(Color.green))
+                            .font(.system(size: 14))
+                            .offset(x: 4, y: 4)
                     }
+                }
                 
                 Text(session.participants[index].name)
                     .font(.caption)

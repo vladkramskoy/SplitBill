@@ -19,14 +19,11 @@ struct ParticipantView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 24) {
-                Logo()
-                    .padding(.top, 20)
-                    .padding(.bottom, 8)
-                
                 VStack(spacing: 12) {
                     Image(systemName: "person.3.fill")
-                        .font(.system(size: 35))
+                        .font(.system(size: 50))
                         .foregroundStyle(Color.SplitBill.primaryGradient)
+                        .padding(.top, 50)
                     
                     Text("Кто участвует?")
                         .font(.title2)

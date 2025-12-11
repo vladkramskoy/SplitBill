@@ -63,14 +63,24 @@ struct UnitDistibutionRow: View {
             togglePersonSelection(participantID: participant.id)
         }) {
             VStack(spacing: 6) {
-                Circle()
-                    .fill(item.units[unitIndex].payers.contains(participant.id) ? Color.blue : Color(.systemGray5))
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Text(String(participant.name.prefix(1)))
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(item.units[unitIndex].payers.contains(participant.id) ? .white : .primary)
+                ZStack(alignment: .bottomTrailing) {
+                    Circle()
+                        .fill(item.units[unitIndex].payers.contains(participant.id) ? Color.blue : Color(.systemGray5))
+                        .frame(width: 40, height: 40)
+                        .overlay {
+                            Text(String(participant.name.prefix(1)))
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(item.units[unitIndex].payers.contains(participant.id) ? .white : .primary)
+                        }
+                    
+                    if item.units[unitIndex].payers.contains(participant.id) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.white)
+                            .background(Circle().fill(Color.green))
+                            .font(.system(size: 14))
+                            .offset(x: 4, y: 4)
                     }
+                }
                 
                 Text(participant.name)
                     .font(.caption2)

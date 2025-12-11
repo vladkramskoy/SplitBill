@@ -43,7 +43,13 @@ struct ItemizedSplitView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                backButton
+                BackButton(
+                    screenName: "itemized_split_screen",
+                    onReset: {},
+                    showAlert: $showAlert,
+                    router: router,
+                    session: session,
+                    billDataProcess: billDataProcess)
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -187,33 +193,6 @@ struct ItemizedSplitView: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-    }
-    
-    // MARK: Back Button
-    
-    private var backButton: some View {
-        Button {
-            if billDataProcess {
-                AnalyticsService.logBackAttemptWithUnsavedData(screen: "itemized_split_screen")
-                showAlert = true
-            } else {
-                router.pop()
-            }
-        } label: {
-            Image(systemName: "chevron.backward")
-        }
-        .alert("Вернуться?", isPresented: $showAlert) {
-            Button("Отмена", role: .cancel) {}
-            Button("Сбросить чеки", role: .destructive) {
-                withAnimation {
-                    session.reset()
-                    AnalyticsService.logCalculationCancelled(screen: "itemized_split_screen")
-                    router.popToRoot()
-                }
-            }
-        } message: {
-            Text("Все введенные данные будут потеряны")
-        }
     }
     
     // MARK: - Input Modal Window

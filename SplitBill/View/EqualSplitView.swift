@@ -10,6 +10,7 @@ import SwiftUI
 struct EqualSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @State private var showAlert = false
     @State private var completionLoggedOnce = false
     
     var body: some View {
@@ -133,7 +134,18 @@ struct EqualSplitView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                BackButton(
+                    screenName: "equal_split_screen",
+                    onReset: {},
+                    showAlert: $showAlert,
+                    router: router,
+                    session: session,
+                    billDataProcess: billDataProcess)
+            }
+            
             ToolbarItem(placement: .topBarTrailing) {
                 ShareLink(item: shareResult()) {
                     Image(systemName: "square.and.arrow.up")
@@ -157,6 +169,11 @@ struct EqualSplitView: View {
         .onAppear {
             AnalyticsService.logScreen(name: "equal_split_result")
         }
+    }
+    
+    private var billDataProcess: Bool {
+        !session.receiptItems.isEmpty ||
+        !session.customPaymentShares.isEmpty
     }
     
     private func shareResult() -> String {
