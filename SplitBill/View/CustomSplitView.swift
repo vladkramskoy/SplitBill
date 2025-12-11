@@ -143,7 +143,7 @@ struct CustomSplitView: View {
             }
             .frame(height: 4)
             
-            quickActionButtons
+            quickActions
         }
         .padding()
         .background(Color(.systemBackground))
@@ -249,47 +249,83 @@ struct CustomSplitView: View {
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
-    // MARK: Quick Action Buttons
+    // MARK: Quick Action
     
-    private var quickActionButtons: some View {
-        HStack(spacing: 12) {
-            Button(action: {
-                viewModel.distributeRemaining(total: session.totalAmount,
-                                              participants: session.participants,
-                                              paymentShares: &session.customPaymentShares)
-            }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "equal.circle")
-                        .font(.system(size: 14, weight: .medium))
+    private var quickActions: some View {
+        HStack(spacing: 8) {
+            Menu {
+                Button {
+                    viewModel.distributeRemaining(
+                        total: session.totalAmount,
+                        participants: session.participants,
+                        paymentShares: &session.customPaymentShares)
+                    
+                    AnalyticsService.logDistributeRemaining(
+                        participants: session.participants.count,
+                        totalAmount: session.totalAmount)
+                } label: {
+                    Label("Поровну между всеми", systemImage: "equal.circle")
+                }
+                
+                Button {
+                    viewModel.distributeRemainingToUnassigned(
+                        total: session.totalAmount,
+                        participants: session.participants,
+                        paymentShares: &session.customPaymentShares)
+                    
+                    AnalyticsService.logDistributeRemainingToUnassigned(
+                        participants: session.participants.count,
+                        totalAmount: session.totalAmount)
+                } label: {
+                    Label("На участников без долей", systemImage: "person.2.circle")
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "square.split.2x1")
+                        .font(.system(size: 16, weight: .medium))
+                    
                     Text("Распределить остаток")
                         .font(.caption)
                         .fontWeight(.medium)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 8)
                 .background(Color.blue.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .foregroundStyle(.blue)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
+            .disabled(session.customPaymentShares.isEmpty || remaining <= 0)
+            .opacity(session.customPaymentShares.isEmpty || remaining <= 0 ? 0.5 : 1)
             
             Button(action: {
                 viewModel.resetAll(from: &session.customPaymentShares)
             }) {
-                HStack(spacing: 6) {
+                HStack(spacing: 4) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 16, weight: .medium))
                     Text("Сбросить")
                         .font(.caption)
                         .fontWeight(.medium)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 8)
                 .background(Color.red.opacity(0.1))
                 .foregroundStyle(.red)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
-            
-            Spacer()
+            .disabled(distributed == 0)
+            .opacity(distributed == 0 ? 0.5 : 1)
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     // MARK: - Input Modal Window

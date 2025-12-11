@@ -56,6 +56,21 @@ final class CustomSplitViewModel: ObservableObject {
         AnalyticsService.logPaymentSharesReset(totalShares: paymentShares.count)
     }
     
+    func distributeRemainingToUnassigned(total: Double, participants: [Participant], paymentShares: inout [PaymentShare]) {
+        let assignedParticipantsIds = Set(paymentShares.map { $0.participantId })
+        let unassignedParticipants = participants.filter { !assignedParticipantsIds.contains($0.id) }
+        
+        guard !unassignedParticipants.isEmpty else { return }
+        
+        let remaining = remainingAmount(total: total, paymentShares: paymentShares)
+        let share = remaining / Double(unassignedParticipants.count)
+        
+        for participant in unassignedParticipants {
+            let paymentShare = PaymentShare(participantId: participant.id, name: participant.name, amount: share)
+            paymentShares.append(paymentShare)
+        }
+    }
+    
     func remainingAmount(total: Double, paymentShares: [PaymentShare]) -> Double {
         total - distributedAmount(from: paymentShares)
     }

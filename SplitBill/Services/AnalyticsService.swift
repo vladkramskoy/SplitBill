@@ -110,6 +110,20 @@ enum AnalyticsService {
         Crashlytics.crashlytics().log("payment_share_added: \(totalShares)")
     }
     
+    static func logDistributeRemaining(participants: Int, totalAmount: Double) {
+        Analytics.logEvent("distribute_remaining", parameters: [
+            "participants_count": NSNumber(value: participants),
+            "total_amount": totalAmount as NSNumber
+        ])
+    }
+    
+    static func logDistributeRemainingToUnassigned(participants: Int, totalAmount: Double) {
+        Analytics.logEvent("distribute_remaining_to_unassigned", parameters: [
+            "participants_count": NSNumber(value: participants),
+            "total_amount": totalAmount as NSNumber
+        ])
+    }
+    
     static func logPaymentSharesReset(totalShares: Int) {
         Analytics.logEvent("payment_shares_reset", parameters: [
             "total_shares": NSNumber(value: totalShares)
