@@ -17,19 +17,7 @@ struct EqualSplitView: View {
         ZStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    VStack(spacing: 20) {
-                        VStack(spacing: 12) {
-                            Image(systemName: "dollarsign.circle.fill")
-                                .font(.system(size: 50))
-                                .foregroundStyle(.blue)
-                            
-                            Text("Счет разделен!")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        }
-                        
-                        Divider()
-                        
+                    VStack(spacing: 20) {                        
                         VStack(spacing: 16) {
                             HStack {
                                 Text("На человека:")

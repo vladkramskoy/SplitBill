@@ -38,6 +38,7 @@ struct BackButton: View {
             }
         } message: {
             Text("Все введенные данные будут потеряны")
+                .multilineTextAlignment(.center)
         }
     }
 }

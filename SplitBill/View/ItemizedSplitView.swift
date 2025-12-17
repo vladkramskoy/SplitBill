@@ -295,26 +295,13 @@ struct ItemizedSplitView: View {
             }
             
             if receiptItems.isEmpty {
-                HStack(spacing: 12) {
-                    Image(systemName: "fork.knife")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.tertiary)
-                    
-                    VStack(spacing: 4) {
-                        Text("Нет позиций чека")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.secondary)
-                        
-                        Text("Добавьте блюдо, чтобы начать распределение")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 28)
+                EmptyStateView(
+                    icon: "fork.knife",
+                    title: "Нет позиций чека",
+                    description: "Добавьте блюда, чтобы начать распределение счёта",
+                    exampleText: "Добавьте все блюда из чека и отметьте, кто что ел",
+                    accentColor: .blue
+                )
             } else {
                 LazyVStack(spacing: 12) {
                     ForEach(receiptItems) { $billItem in

@@ -215,26 +215,13 @@ struct CustomSplitView: View {
             }
             
             if distributed == 0 {
-                HStack(spacing: 12) {
-                    Image(systemName: "banknote")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.tertiary)
-                    
-                    VStack(spacing: 4) {
-                        Text("Нет долей оплаты")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.secondary)
-                        
-                        Text("Добавьте первую, чтобы начать распределение")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 28)
+                EmptyStateView(
+                    icon: "banknote",
+                    title: "Нет долей оплаты",
+                    description: "Добавьте первую долю, чтобы начать распределение счёта",
+                    exampleText: "Например: Макс платит 800₽, остальное делим поровну",
+                    accentColor: .blue
+                )
             } else {
                 LazyVStack(spacing: 8) {
                     ForEach(session.customPaymentShares, id: \.id) { share in
