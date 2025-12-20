@@ -38,6 +38,8 @@ struct ItemizedSplitView: View {
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         .onAppear {
             AnalyticsService.logScreen(name: "itemized_split_screen")
@@ -174,6 +176,11 @@ struct ItemizedSplitView: View {
                 
                 Button("Добавить") {
                     viewModel.addDish(to: &session.receiptItems)
+                    viewModel.applyEqualSplitIfNeeded(
+                        participants: session.participants,
+                        receiptItems: &session.receiptItems
+                    )
+                    viewModel.splitEqually = false
                     showInputModal = false
                 }
                 .fontWeight(.semibold)
@@ -222,14 +229,18 @@ struct ItemizedSplitView: View {
                 Divider()
                 
                 Stepper("Количество: \(viewModel.quantity)", value: $viewModel.quantity, in: 1...100)
+                
+                Divider()
+                
+                Toggle(isOn: $viewModel.splitEqually) {
+                    Text("За это платят все")
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
             
             Spacer()
         }
-        .presentationDetents([.height(280)])
-        .presentationDragIndicator(.visible)
     }
     
     // MARK: - BillItems Section

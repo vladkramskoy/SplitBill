@@ -11,6 +11,7 @@ final class ItemizedSplitViewModel: ObservableObject {
     @Published var amountPaymentInput = ""
     @Published var dishName = ""
     @Published var quantity = 1
+    @Published var splitEqually: Bool = false
     
     private let formatter: DecimalFormatting
     
@@ -84,5 +85,10 @@ final class ItemizedSplitViewModel: ObservableObject {
         items.removeAll { $0.id == item.id }
         
         AnalyticsService.logReceiptItemRemoved(totalItems: items.count)
+    }
+    
+    func applyEqualSplitIfNeeded(participants: [Participant], receiptItems: inout [BillItem]) {
+        guard splitEqually, let lastIndex = receiptItems.indices.last else { return }
+        equalSplitPayers(for: &receiptItems[lastIndex], participants: participants)
     }
 }
