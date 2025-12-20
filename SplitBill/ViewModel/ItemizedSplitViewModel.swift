@@ -10,6 +10,7 @@ import Foundation
 final class ItemizedSplitViewModel: ObservableObject {
     @Published var amountPaymentInput = ""
     @Published var dishName = ""
+    @Published var emoji = "🍽️"
     @Published var quantity = 1
     @Published var splitEqually: Bool = false
     
@@ -51,7 +52,7 @@ final class ItemizedSplitViewModel: ObservableObject {
     func addDish(to receiptItems: inout [BillItem]) {
         guard let price = formatter.parse(amountPaymentInput) else { return }
         
-        var billItem = BillItem(id: UUID(), name: dishName, quantity: quantity, pricePerUnit: price, units: [])
+        var billItem = BillItem(id: UUID(), name: dishName, emoji: emoji, quantity: quantity, pricePerUnit: price, units: [])
         
         for _ in 0..<billItem.quantity {
             let billUnit = BillUnit(id: UUID(), payers: [])

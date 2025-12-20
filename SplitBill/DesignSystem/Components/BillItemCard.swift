@@ -46,7 +46,10 @@ struct BillItemCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
+            HStack(spacing: 12) {
+                Text(item.emoji)
+                    .font(.system(size: 32))
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
                         .font(.headline)

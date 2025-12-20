@@ -10,6 +10,7 @@ import Foundation
 struct BillItem: Identifiable {
     let id: UUID
     let name: String
+    var emoji = "🍽️"
     let quantity: Int
     let pricePerUnit: Double
     var units: [BillUnit]

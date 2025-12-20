@@ -14,6 +14,8 @@ struct ItemizedSplitView: View {
     @State private var showInputModal = false
     @State private var completionLoggedOnce = false
     
+    private let emojiOptions = ["🍕", "🍝", "🥗", "🍖", "🍗", "🍤", "🍣", "🍱", "🍜", "🍲", "🥘", "🍰", "🧁", "🍷", "🍺", "☕️", "🥤"]
+    
     var body: some View {
         @Bindable var session = session
         
@@ -22,7 +24,14 @@ struct ItemizedSplitView: View {
                 VStack(spacing: 16) {
                     progressSection
                     participantSection
-                    billItemsSection(receiptItems: $session.receiptItems, participants: session.participants)
+
+                    if session.receiptItems.isEmpty {
+                        emptyItemsCard
+                    } else {
+                        itemsCardList(
+                            receiptItems: $session.receiptItems,
+                            participants: session.participants)
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
@@ -180,6 +189,7 @@ struct ItemizedSplitView: View {
                         participants: session.participants,
                         receiptItems: &session.receiptItems
                     )
+                    viewModel.emoji = "🍽️"
                     viewModel.splitEqually = false
                     showInputModal = false
                 }
@@ -198,6 +208,23 @@ struct ItemizedSplitView: View {
             
             VStack(spacing: 20) {
                 VStack(spacing: 8) {
+                    HStack {
+                        Text("Эмодзи")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Menu {
+                            ForEach(emojiOptions, id: \.self) { emojiOption in
+                                Button(emojiOption) {
+                                    viewModel.emoji = emojiOption
+                                }
+                            }
+                        } label: {
+                            Text(viewModel.emoji)
+                                .font(.system(size: 32))
+                        }
+                    }
+                    
+                    Divider()
                     
                     TextField("Название", text: $viewModel.dishName)
                     
@@ -243,51 +270,68 @@ struct ItemizedSplitView: View {
         }
     }
     
-    // MARK: - BillItems Section
+    // MARK: - Items Section Header
     
-    @ViewBuilder
-    private func billItemsSection(receiptItems: Binding<[BillItem]>, participants: [Participant]) -> some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("Позиции чека")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                
-                Spacer()
-                
-                Text("\(receiptItems.count) поз.")
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(receiptItems.isEmpty ? Color.gray.opacity(0.1) : Color.green.opacity(0.1))
-                    .foregroundStyle(receiptItems.isEmpty ? .gray : .green)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
+    private var itemsSectionHeader: some View {
+        HStack {
+            Text("Позиции чека")
+                .font(.headline)
+                .fontWeight(.semibold)
             
-            if receiptItems.isEmpty {
-                EmptyStateView(
-                    icon: "fork.knife",
-                    title: "Нет позиций чека",
-                    description: "Добавьте блюда, чтобы начать распределение счёта",
-                    exampleText: "Добавьте все блюда из чека и отметьте, кто что ел",
-                    accentColor: .blue
-                )
-            } else {
-                LazyVStack(spacing: 12) {
-                    ForEach(receiptItems) { $billItem in
-                        BillItemCard(item: $billItem,
-                                     participants: participants,
-                                     onSplitEqually: { viewModel.equalSplitPayers(for: &billItem, participants: session.participants) },
-                                     onReset: { viewModel.resetPayers(for: &billItem) },
-                                     onDelete: { viewModel.deleteItemCard(for: billItem, from: &session.receiptItems) })
-                    }
-                }
-            }
+            Spacer()
+            
+            Text("\(session.receiptItems.count) поз.")
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(session.receiptItems.isEmpty ? Color.gray.opacity(0.1) : Color.green.opacity(0.1))
+                .foregroundStyle(session.receiptItems.isEmpty ? .gray : .green)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+    }
+    
+    // MARK: - Empty Items Card
+    
+    private var emptyItemsCard: some View {
+        VStack {
+            itemsSectionHeader
+            
+            EmptyStateView(
+                icon: "fork.knife",
+                title: "Нет позиций чека",
+                description: "Добавьте блюда, чтобы начать распределение счёта",
+                exampleText: "Добавьте все блюда из чека и отметьте, кто что ел",
+                accentColor: .blue
+            )
         }
         .padding()
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    // MARK: - Items Card List
+    
+    @ViewBuilder
+    private func itemsCardList(receiptItems: Binding<[BillItem]>, participants: [Participant]) -> some View {
+        itemsSectionHeader
+        
+        LazyVStack(spacing: 12) {
+            ForEach(receiptItems) { $billItem in
+                BillItemCard(item: $billItem,
+                             participants: participants,
+                             onSplitEqually: { viewModel.equalSplitPayers(
+                                for: &billItem,
+                                participants: session.participants) },
+                             onReset: { viewModel.resetPayers(for: &billItem) },
+                             onDelete: { viewModel.deleteItemCard(for: billItem, from: &session.receiptItems) }
+                )
+                .padding()
+                .background(Color(.systemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            }
+        }
     }
     
     // MARK: - Computed Properties
