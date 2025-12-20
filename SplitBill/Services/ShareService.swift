@@ -19,7 +19,7 @@ final class ShareService {
     }
     
     static func formatForParticipant(participantName: String, participantAmount: Double, totalAmount: Double) -> String {
-        let messageText = "Привет, \(participantName)! 👋\n\nТвоя часть за счет: \(participantAmount.currencyFormatted)\n\nОбщая сумма была: \(totalAmount.currencyFormatted)"
+        let messageText = "Привет, \(participantName)! 👋\n\nТвоя часть за счет: \(participantAmount.currencyFormatted)\n\nОбщая сумма была: \(totalAmount.currencyFormatted)\n\nСоздано в SplitBill"
         
         return messageText
     }

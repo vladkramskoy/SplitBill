@@ -36,7 +36,7 @@ struct ParticipantRow: View {
             
             Spacer()
             
-            Text("₽\(amount, specifier: "%.2f")")
+            Text("\(amount, specifier: "%.2f ₽")")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)

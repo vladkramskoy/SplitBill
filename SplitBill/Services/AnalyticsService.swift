@@ -187,11 +187,10 @@ enum AnalyticsService {
         Crashlytics.crashlytics().log("bill_split_completed: method=\(method.rawValue), participants=\(participants), items=\(items), total=\(totalAmount), success=\(success)")
     }
     
-    static func logShareResult(type: ShareType, method: SplitMethod, isFullyDistributed: Bool) {
+    static func logShareResult(type: ShareType, method: SplitMethod) {
         Analytics.logEvent("share_result", parameters: [
             "share_type": type.rawValue as NSString,
-            "method": method.rawValue as NSString,
-            "fully_distributed": NSNumber(value: isFullyDistributed)
+            "method": method.rawValue as NSString
         ])
     }
     

@@ -85,18 +85,4 @@ final class ItemizedSplitViewModel: ObservableObject {
         
         AnalyticsService.logReceiptItemRemoved(totalItems: items.count)
     }
-    
-    func shareResult(totalAmount: Double, participants: [Participant], receiptItems: [BillItem]) -> String {
-        guard !participants.isEmpty else {
-            return "Нет участников для разделения счета"
-        }
-        
-        let amounts: [UUID : Double] = participants.reduce(into: [:]) { dict, participant in
-            dict[participant.id] = amountFor(participantId: participant.id, receiptItems: receiptItems)
-        }
-        
-        let shareText = ShareService.formatFullBill(totalAmount: totalAmount, distributedAmount: distributedAmount(from: receiptItems), participants: participants, participantAmount: amounts)
-
-        return shareText
-    }
 }

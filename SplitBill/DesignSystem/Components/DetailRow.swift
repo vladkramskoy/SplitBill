@@ -19,7 +19,7 @@ struct DetailRow: View {
             
             Spacer()
             
-            Text("₽\(value, specifier: "%.2f")")
+            Text("\(value, specifier: "%.2f") ₽")
                 .fontWeight(isTotal ? .bold : .regular)
                 .foregroundStyle(isTotal ? .blue : .secondary)
         }

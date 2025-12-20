@@ -11,11 +11,8 @@ struct ItemizedSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = ItemizedSplitViewModel()
-    @State private var showAlert = false
     @State private var showInputModal = false
     @State private var completionLoggedOnce = false
-    
-    var showPopup: () -> Void
     
     var body: some View {
         @Bindable var session = session
@@ -38,43 +35,6 @@ struct ItemizedSplitView: View {
                 viewModel.quantity = 1
                 showInputModal = true
             })
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                BackButton(
-                    screenName: "itemized_split_screen",
-                    onReset: {},
-                    showAlert: $showAlert,
-                    router: router,
-                    session: session,
-                    billDataProcess: billDataProcess)
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    AnalyticsService.logOnboardingOpened(source: "helpButton")
-                    showPopup()
-                } label: {
-                    Image(systemName: "info.circle")
-                }
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: viewModel.shareResult(totalAmount: session.totalAmount, participants: session.participants, receiptItems: session.receiptItems)) {
-                    HStack {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-                .simultaneousGesture(TapGesture().onEnded {
-                    AnalyticsService.logShareResult(
-                        type: .fullBill,
-                        method: .itemized,
-                        isFullyDistributed: remaining == 0 ? true : false
-                    )
-                })
-            }
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
@@ -182,8 +142,7 @@ struct ItemizedSplitView: View {
                     .simultaneousGesture(TapGesture().onEnded {
                         AnalyticsService.logShareResult(
                             type: .participant,
-                            method: .itemized,
-                            isFullyDistributed: remaining == 0 ? true : false
+                            method: .itemized
                         )
                     })
                 }
@@ -333,11 +292,6 @@ struct ItemizedSplitView: View {
     private var progress: Double {
         viewModel.distributionProgress(total: session.totalAmount, items: session.receiptItems)
     }
-    
-    private var billDataProcess: Bool {
-        !session.receiptItems.isEmpty ||
-        !session.customPaymentShares.isEmpty
-    }
 }
 
 // MARK: - Preview
@@ -363,7 +317,7 @@ struct ItemizedSplitView: View {
     session.totalAmount = 5000
     
     return NavigationStack() {
-        ItemizedSplitView(showPopup: {})
+        ItemizedSplitView()
             .environment(session)
             .withRouter()
     }

@@ -10,7 +10,6 @@ import SwiftUI
 struct EqualSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
-    @State private var showAlert = false
     @State private var completionLoggedOnce = false
     
     var body: some View {
@@ -22,7 +21,7 @@ struct EqualSplitView: View {
                             HStack {
                                 Text("На человека:")
                                 Spacer()
-                                Text("₽\(session.equalAmountPerPerson(), specifier: "%.2f")")
+                                Text("\(session.equalAmountPerPerson(), specifier: "%.2f") ₽")
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(.blue)
@@ -97,8 +96,7 @@ struct EqualSplitView: View {
                                     
                                     AnalyticsService.logShareResult(
                                         type: .participant,
-                                        method: .equal,
-                                        isFullyDistributed: true
+                                        method: .equal
                                     )
                                 })
                             }
@@ -109,7 +107,7 @@ struct EqualSplitView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
                     
-                    VStack(spacing: 12) {                        
+                    VStack(spacing: 12) {
                         Button("Новый расчет") {
                             session.reset()
                             AnalyticsService.logNewCalculation()
@@ -121,57 +119,9 @@ struct EqualSplitView: View {
                 .padding(.vertical, 20)
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                BackButton(
-                    screenName: "equal_split_screen",
-                    onReset: {},
-                    showAlert: $showAlert,
-                    router: router,
-                    session: session,
-                    billDataProcess: billDataProcess)
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: shareResult()) {
-                    Image(systemName: "square.and.arrow.up")
-                }
-                .simultaneousGesture(TapGesture().onEnded {
-                    if !completionLoggedOnce {
-                        AnalyticsService.logBillSplitCompleted(
-                            method: .equal,
-                            participants: session.participants.count,
-                            items: 0,
-                            totalAmount: session.totalAmount,
-                            durationSec: session.getSessionDuration(),
-                            success: true
-                        )
-                        completionLoggedOnce = true
-                    }
-                    AnalyticsService.logShareResult(type: .fullBill, method: .equal, isFullyDistributed: true)
-                })
-            }
-        }
         .onAppear {
             AnalyticsService.logScreen(name: "equal_split_result")
         }
-    }
-    
-    private var billDataProcess: Bool {
-        !session.receiptItems.isEmpty ||
-        !session.customPaymentShares.isEmpty
-    }
-    
-    private func shareResult() -> String {
-        let amounts: [UUID : Double] = session.participants.reduce(into: [:]) { dict, participant in
-            dict[participant.id] = session.equalAmountPerPerson()
-        }
-        
-        let shareText = ShareService.formatFullBill(totalAmount: session.billAmount, distributedAmount: session.billAmount, participants: session.participants, participantAmount: amounts)
-        
-        return shareText
     }
 }
 

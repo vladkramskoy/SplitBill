@@ -11,12 +11,9 @@ struct CustomSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = CustomSplitViewModel()
-    @State private var showAlert = false
     @State private var showInputModal = false
     @FocusState private var isTextFieldFocused: Bool
     @State private var completionLoggedOnce = false
-    
-    var showPopup: () -> Void
     
     var body: some View {
         ZStack {
@@ -36,43 +33,6 @@ struct CustomSplitView: View {
                 viewModel.selectedPersonIndices = []
                 showInputModal = true
             })
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                BackButton(
-                    screenName: "custom_split_screen",
-                    onReset: {},
-                    showAlert: $showAlert,
-                    router: router,
-                    session: session,
-                    billDataProcess: billDataProcess)
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    AnalyticsService.logOnboardingOpened(source: "helpButton")
-                    showPopup()
-                } label: {
-                    Image(systemName: "info.circle")
-                }
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: viewModel.shareResult(totalAmount: session.totalAmount, participants: session.participants, paymentShares: session.customPaymentShares)) {
-                    HStack {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-                .simultaneousGesture(TapGesture().onEnded {
-                    AnalyticsService.logShareResult(
-                        type: .fullBill,
-                        method: .custom,
-                        isFullyDistributed: remaining == 0 ? true : false
-                    )
-                })
-            }
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
@@ -182,8 +142,7 @@ struct CustomSplitView: View {
                     .simultaneousGesture(TapGesture().onEnded {
                         AnalyticsService.logShareResult(
                             type: .participant,
-                            method: .custom,
-                            isFullyDistributed: remaining == 0 ? true : false
+                            method: .custom
                         )
                     })
                 }
@@ -445,11 +404,6 @@ struct CustomSplitView: View {
     private var progress: Double {
         viewModel.distributionProgress(total: session.totalAmount, paymentShares: session.customPaymentShares)
     }
-    
-    private var billDataProcess: Bool {
-        !session.receiptItems.isEmpty ||
-        !session.customPaymentShares.isEmpty
-    }
 }
 
 // MARK: - Preview
@@ -464,7 +418,7 @@ struct CustomSplitView: View {
     session.totalAmount = 5000
     
     return NavigationStack {
-        CustomSplitView(showPopup: {})
+        CustomSplitView()
             .environment(session)
             .withRouter()
     }
