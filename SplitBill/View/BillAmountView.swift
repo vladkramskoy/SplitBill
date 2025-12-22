@@ -11,7 +11,7 @@ struct BillAmountView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = BillAmountViewModel()
-    @State private var textColor: Color = .red
+    @State private var amountGradient: LinearGradient = Color.SplitBill.invalidAmounGtradient
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
     
@@ -20,35 +20,136 @@ struct BillAmountView: View {
             Color.SplitBill.backgroundLight
                 .ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Сумма чека")
-                        .font(.headline)
-                        .foregroundStyle(.gray)
-                    
-                    TextField("0 ₽", text: $viewModel.billAmount)
-                        .font(.system(size: 40, weight: .bold))
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.center)
-                        .focused($isAmountFocused)
-                        .foregroundStyle(textColor)
-                        .onChange(of: viewModel.billAmount) { oldValue, newValue in
-                            let formatted = InputValidator.formatCurrencyInput(newValue)
-                            if formatted != newValue {
-                                viewModel.billAmount = formatted
-                            }
-                            
-                            textColor = viewModel.isValidAmount ? .green : .red
-                        }
-                        .onAppear {
-                            textColor = viewModel.isValidAmount ? .green : .red
-                        }
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerCard
+                    amountInputCard
+                    tipToggleCard
+                    Spacer(minLength: 275)
                 }
-                .padding(.horizontal)
-                .padding(.top, 30)
+            }
+            
+            Spacer()
+            
+            NextButton(title: "Продолжить", action: {
+                session.billAmount = viewModel.billAmountValue
+                session.tipAmount = viewModel.calculatedTip
+                session.totalAmount = viewModel.totalAmount
                 
-                Toggle("Добавить чаевые", isOn: $viewModel.isTipEnable)
-                    .padding(.horizontal)
+                AnalyticsService.logBillAmountEntered(
+                    amount: viewModel.billAmountValue,
+                    tip: viewModel.calculatedTip,
+                    total: viewModel.totalAmount,
+                    tipType: viewModel.isTipEnable ? viewModel.tipCalculationType.rawValue : "none"
+                )
+                
+                router.navigateToSplitMethod()
+            }, isActive: viewModel.isValidAmount)
+        }
+        .ignoresSafeArea(.keyboard)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button {
+                    isAmountFocused = false
+                    isTipFocused = false
+                } label: {
+                    Image(systemName: "chevron.down")
+                }
+            }
+        }
+        .onAppear {
+            isAmountFocused = true
+            updateAmountGradient()
+            AnalyticsService.logScreen(name: "bill_amount_screen")
+        }
+    }
+    
+    // MARK: Header Card
+    
+    private var headerCard: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "receipt")
+                .font(.system(size: 50))
+                .foregroundStyle(Color.SplitBill.primaryGradient)
+                .padding(.top, 50)
+            
+            Text("Сумма счёта")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            Text("Введите общую сумму чека")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.bottom, 8)
+    }
+    
+    // MARK: Amount Input Card
+    
+    private var amountInputCard: some View {
+        VStack(spacing: 16) {
+            Text("Сумма чека")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            HStack {
+                TextField("0", text: $viewModel.billAmount)
+                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.center)
+                    .focused($isAmountFocused)
+                    .foregroundStyle(amountGradient)
+                    .onChange(of: viewModel.billAmount) { oldValue, newValue in
+                        let formatted = InputValidator.formatCurrencyInput(newValue)
+                        if formatted != newValue {
+                            viewModel.billAmount = formatted
+                        }
+                        updateAmountGradient()
+                    }
+                
+                Text("₽")
+                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .foregroundStyle(.secondary.opacity(0.5))
+            }
+            
+            HStack(spacing: 8) {
+                Image(systemName: viewModel.isValidAmount
+                      ? "checkmark.circle.fill"
+                      : "exclamationmark.circle.fill")
+                .foregroundStyle(viewModel.isValidAmount ? .green : .red)
+                
+                Text(viewModel.isValidAmount ? "Сумма введкна корректно" : "Введите сумму счёта")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(24)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
+        .padding(.horizontal)
+    }
+    
+    // MARK: Tip Toggle Card
+    
+    private var tipToggleCard: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Image(systemName: "heart.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color.SplitBill.secondaryGradient)
+                
+                Text("Добавить чаевые")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Toggle("", isOn: $viewModel.isTipEnable)
+                    .labelsHidden()
                     .onChange(of: viewModel.isTipEnable) { _, isOn in
                         if isOn {
                             if viewModel.tipCalculationType == .fixedAmount {
@@ -58,95 +159,143 @@ struct BillAmountView: View {
                             isAmountFocused = true
                         }
                     }
+            }
+            
+            if viewModel.isTipEnable {
+                Divider()
                 
-                if viewModel.isTipEnable {
-                    Picker("Способ расчета", selection: $viewModel.tipCalculationType) {
-                        ForEach(TipCalculationType.allCases, id: \.self) { type in
-                            Text(type.rawValue).tag(type)
-                        }
+                Picker("Способ расчета", selection: $viewModel.tipCalculationType) {
+                    ForEach(TipCalculationType.allCases, id: \.self) { type in
+                        Text(type.rawValue).tag(type)
                     }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding(.horizontal)
-                    .onChange(of: viewModel.tipCalculationType) { _, newValue in
-                        if newValue == .percentage {
-                            isAmountFocused = true
-                        } else {
-                            isTipFocused = true
-                        }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
+                .onChange(of: viewModel.tipCalculationType) { _, newValue in
+                    if newValue == .percentage {
+                        isAmountFocused = true
+                    } else {
+                        isTipFocused = true
+                    }
+                }
+                
+                if viewModel.tipCalculationType == .percentage {
+                    HStack {
+                        Text("Процент чаевых:")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("\(Int(viewModel.tipPercentage))%")
+                            .frame(width: 40, alignment: .trailing)
+                            .font(.headline)
+                            .foregroundStyle(.purple)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.purple.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     
-                    if viewModel.tipCalculationType == .percentage {
-                        HStack {
-                            Text("Процент:")
-                            Slider(value: $viewModel.tipPercentage, in: 0...30, step: 1)
-                                .onChange(of: viewModel.tipPercentage) { _, newValue in
-                                    viewModel.tipPercentage = round(newValue)
-                                }
-                            Text("\(Int(viewModel.tipPercentage))%")
-                                .frame(width: 40, alignment: .trailing)
+                    Slider(value: $viewModel.tipPercentage, in: 0...30, step: 1)
+                        .tint(.purple)
+                        .onChange(of: viewModel.tipPercentage) { _, newValue in
+                            viewModel.tipPercentage = round(newValue)
                         }
-                        .padding(.horizontal)
-                    } else {
+                    
+                    HStack(spacing: 12) {
+                        ForEach([5, 10, 15, 20], id: \.self) { percentage in
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    viewModel.tipPercentage = Double(percentage)
+                                }
+                            }) {
+                                Text("\(percentage)%")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(Int(viewModel.tipPercentage) == percentage ? .white : .purple)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Int(viewModel.tipPercentage) == percentage ? .purple : .purple.opacity(0.1))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                } else {
+                    VStack(spacing: 8) {
                         HStack {
-                            Text("Сумма:")
-                            TextField("0.00", text: $viewModel.tipAmount)
+                            Text("Сумма чаевых:")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            
+                            Spacer()
+                        }
+                        
+                        HStack {
+                            TextField("0", text: $viewModel.tipAmount)
+                                .font(.system(size: 28, weight: .semibold, design: .rounded))
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .focused($isTipFocused)
+                                .foregroundStyle(.purple)
                                 .onChange(of: viewModel.tipAmount) { oldValue, newValue in
                                     let formatted = InputValidator.formatCurrencyInput(newValue)
                                     if formatted != newValue {
                                         viewModel.tipAmount = formatted
                                     }
                                 }
+                            
+                            Text("₽")
+                                .font(.system(size: 28, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.secondary.opacity(0.5))
                         }
-                        .padding(.horizontal)
+                        .padding()
+                        .background(.purple.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    
-                    HStack {
-                        Text("Сумма с чаевыми:")
-                        Spacer()
-                        Text(viewModel.totalAmount, format: .currency(code: "RUB"))
-                    }
-                    .padding(.horizontal)
                 }
-
-                Spacer()
                 
-                NextButton(title: "Продолжить", action: {
-                    session.billAmount = viewModel.billAmountValue
-                    session.tipAmount = viewModel.calculatedTip
-                    session.totalAmount = viewModel.totalAmount
+                Divider()
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Итого с чаевыми:")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text(viewModel.totalAmount, format: .currency(code: "RUB"))
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color.SplitBill.validAmountGradient)
+                    }
                     
-                    AnalyticsService.logBillAmountEntered(
-                        amount: viewModel.billAmountValue,
-                        tip: viewModel.calculatedTip,
-                        total: viewModel.totalAmount,
-                        tipType: viewModel.isTipEnable ? viewModel.tipCalculationType.rawValue : "none"
-                    )
-                    
-                    router.navigateToSplitMethod()
-                }, isActive: viewModel.isValidAmount)
-            }
-            .navigationTitle("Введите сумму")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button {
-                        isAmountFocused = false
-                        isTipFocused = false
-                    } label: {
-                        Image(systemName: "chevron.down")
+                    
+                    if viewModel.calculatedTip > 0 {
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text("Чаевые")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            
+                            Text(viewModel.calculatedTip, format: .currency(code: "RUB"))
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.purple)
+                        }
                     }
                 }
-            }
-            .onAppear {
-                isAmountFocused = true
-                AnalyticsService.logScreen(name: "bill_amount_screen")
+                .padding(.vertical, 8)
             }
         }
-        .ignoresSafeArea(.keyboard)
+        .padding(20)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
+        .padding(.horizontal)
+    }
+    
+    private func updateAmountGradient() {
+        amountGradient = viewModel.isValidAmount
+        ? Color.SplitBill.validAmountGradient
+        : Color.SplitBill.invalidAmounGtradient
     }
 }
 

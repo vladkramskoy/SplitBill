@@ -24,6 +24,22 @@ extension Color {
             endPoint: .bottomTrailing
         )
         
+        static let secondaryGradient = LinearGradient(
+            colors: [.pink, .purple],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
+        static let validAmountGradient = LinearGradient(
+            colors: [.green, .mint],
+            startPoint: .leading, endPoint: .trailing
+        )
+        
+        static let invalidAmounGtradient = LinearGradient(
+            colors: [.red, .orange],
+            startPoint: .leading, endPoint: .trailing
+        )
+        
         static let backgroundLight = Color.blue.opacity(0.1)
         static let backgroundLighter = Color.cyan.opacity(0.05)
         

@@ -29,7 +29,7 @@ struct ParticipantView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text("Добавьте участников для разделения счета")
+                    Text("Добавьте участников для разделения счёта")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
