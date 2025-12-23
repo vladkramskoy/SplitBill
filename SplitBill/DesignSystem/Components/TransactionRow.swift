@@ -1,32 +1,30 @@
 //
-//  ParticipantRow.swift
+//  TransactionRow.swift
 //  SplitBill
 //
-//  Created by Vlad Kramskoy on 03.10.2025.
+//  Created by Vlad Kramskoy on 23.12.2025.
 //
 
 import SwiftUI
 
-struct ParticipantRow: View {
-    let participant: Participant
-    let amount: Double
-    let onShare: (() -> String)
+struct TransactionRow: View {
+    let paymentShare: PaymentShare
     
     var body: some View {
         HStack {
             ZStack {
                 Circle()
-                    .fill(participant.color.opacity(0.1))
+                    .fill(paymentShare.color.opacity(0.1))
                     .frame(width: 40, height: 40)
                 
-                Text(initials(for: participant.name))
+                Text(initials(for: paymentShare.name))
                     .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundStyle(participant.color)
+                    .foregroundStyle(paymentShare.color)
             }
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(participant.name)
+                Text(paymentShare.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
                 Text("Оплачивает")
@@ -36,17 +34,10 @@ struct ParticipantRow: View {
             
             Spacer()
             
-            Text("\(amount, specifier: "%.2f ₽")")
+            Text("\(paymentShare.amount, specifier: "%.2f ₽")")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
-            
-            ShareLink(item: onShare()) {
-                HStack {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundStyle(participant.color)
-                }
-            }
         }
         .padding(.horizontal, 8)
     }
@@ -60,13 +51,20 @@ struct ParticipantRow: View {
 
 #Preview {
     VStack(spacing: 12) {
-        ParticipantRow(
-            participant: Participant(name: "Петр Сидоров", color: Color.SplitBill.adaptiveParticipant1),
-            amount: 500,
-            onShare: { "" })
-        ParticipantRow(
-            participant: Participant(name: "Мария Петрова", color: Color.SplitBill.adaptiveParticipant2),
-            amount: 750,
-            onShare: { "" })
+        let shares = [
+            PaymentShare(
+                participantId: UUID(),
+                name: "Петр Сидоров",
+                amount: 500,
+                color: Color.SplitBill.adaptiveParticipant1),
+            PaymentShare(
+                participantId: UUID(),
+                name: "Мария Петрова",
+                amount: 750,
+                color: Color.SplitBill.adaptiveParticipant2)
+        ]
+        
+        TransactionRow(paymentShare: shares[0])
+        TransactionRow(paymentShare: shares[1])
     }
 }

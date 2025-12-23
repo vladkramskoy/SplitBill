@@ -79,7 +79,7 @@ struct EqualSplitView: View {
                             ForEach(session.participants) { participant in
                                 let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: session.equalAmountPerPerson(), totalAmount: session.totalAmount) }
                                 
-                                ParticipantRow(name: participant.name,
+                                ParticipantRow(participant: participant,
                                                amount: session.equalAmountPerPerson(), onShare: onShare)
                                 .simultaneousGesture(TapGesture().onEnded {
                                     if !completionLoggedOnce {
@@ -130,9 +130,9 @@ struct EqualSplitView: View {
 #Preview {
     @Previewable @State var session = BillSession()
     session.participants = [
-        Participant(name: "Оля"),
-        Participant(name: "Маша"),
-        Participant(name: "Даша")
+        Participant(name: "Оля", color: Color.SplitBill.adaptiveParticipant1),
+        Participant(name: "Маша", color: Color.SplitBill.adaptiveParticipant2),
+        Participant(name: "Даша", color: Color.SplitBill.adaptiveParticipant3)
     ]
     
     return EqualSplitView()

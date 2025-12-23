@@ -25,9 +25,13 @@ final class CustomSplitViewModel: ObservableObject {
         for index in selectedPersonIndices {
             guard index < participants.count else { continue }
             
-            let participantId = participants[index].id
-            let participantName = participants[index].name
-            let newPaymentShare = PaymentShare(participantId: participantId, name: participantName, amount: shareAmount)
+            let participant = participants[index]
+            let newPaymentShare = PaymentShare(
+                participantId: participant.id,
+                name: participant.name,
+                amount: shareAmount,
+                color: participant.color
+            )
             paymentShares.append(newPaymentShare)
         }
         
@@ -45,7 +49,12 @@ final class CustomSplitViewModel: ObservableObject {
         let share = remaining / Double(participants.count)
         
         for participant in participants {
-            let paymentShare = PaymentShare(participantId: participant.id, name: participant.name, amount: share)
+            let paymentShare = PaymentShare(
+                participantId: participant.id,
+                name: participant.name,
+                amount: share,
+                color: participant.color
+            )
             paymentShares.append(paymentShare)
         }
     }
@@ -66,7 +75,12 @@ final class CustomSplitViewModel: ObservableObject {
         let share = remaining / Double(unassignedParticipants.count)
         
         for participant in unassignedParticipants {
-            let paymentShare = PaymentShare(participantId: participant.id, name: participant.name, amount: share)
+            let paymentShare = PaymentShare(
+                participantId: participant.id,
+                name: participant.name,
+                amount: share,
+                color: participant.color
+            )
             paymentShares.append(paymentShare)
         }
     }

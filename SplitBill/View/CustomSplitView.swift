@@ -79,8 +79,7 @@ struct CustomSplitView: View {
                             .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
                         
                         Text(abs(remaining).currencyFormatted)
-                            .font(.title3)
-                            .fontWeight(.semibold)
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
                     }
                     
@@ -147,7 +146,7 @@ struct CustomSplitView: View {
                     
                     let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount) }
                     
-                    ParticipantRow(name: participant.name,
+                    ParticipantRow(participant: participant,
                                    amount: participantAmount, onShare: onShare)
                     .simultaneousGesture(TapGesture().onEnded {
                         AnalyticsService.logShareResult(
@@ -194,7 +193,7 @@ struct CustomSplitView: View {
             } else {
                 LazyVStack(spacing: 8) {
                     ForEach(session.customPaymentShares, id: \.id) { share in
-                        ParticipantRow(name: share.name, amount: share.amount, onShare: nil)
+                        TransactionRow(paymentShare: share)
                     }
                 }
             }
@@ -370,13 +369,15 @@ struct CustomSplitView: View {
     // MARK: Person Button
     
     private func personButton(for index: Int) -> some View {
-        Button(action: {
+        let participant = session.participants[index]
+        
+        return Button(action: {
             viewModel.togglePersonSelection(at: index)
         }) {
             VStack(spacing: 8) {
                 ZStack(alignment: .bottomTrailing) {
                     Circle()
-                        .fill(viewModel.selectedPersonIndices.contains(index) ? Color.blue : Color(.systemGray5))
+                        .fill(viewModel.selectedPersonIndices.contains(index) ? participant.color : Color(.systemGray5))
                         .frame(width: 50, height: 50)
                         .overlay {
                             Text(String(session.participants[index].name.prefix(1)))
@@ -396,7 +397,7 @@ struct CustomSplitView: View {
                 Text(session.participants[index].name)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(viewModel.selectedPersonIndices.contains(index) ? .blue : .primary)
+                    .foregroundStyle(viewModel.selectedPersonIndices.contains(index) ? participant.color : .primary)
             }
         }
     }
@@ -421,9 +422,9 @@ struct CustomSplitView: View {
 #Preview {
     @Previewable @State var session = BillSession()
     session.participants = [
-        Participant(name: "Оля"),
-        Participant(name: "Маша"),
-        Participant(name: "Даша")
+        Participant(name: "Оля", color: Color.SplitBill.adaptiveParticipant1),
+        Participant(name: "Маша", color: Color.SplitBill.adaptiveParticipant2),
+        Participant(name: "Даша", color: Color.SplitBill.adaptiveParticipant3)
     ]
     session.totalAmount = 5000
     

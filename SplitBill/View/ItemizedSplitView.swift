@@ -149,14 +149,15 @@ struct ItemizedSplitView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
-            LazyVStack(spacing: 12) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ForEach(session.participants) { participant in
                     let participantAmount = viewModel.amountFor(participantId: participant.id, receiptItems: session.receiptItems)
                     
                     let onShare = ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount)
                     
-                    ParticipantRow(name: participant.name,
-                                   amount: participantAmount, onShare: { onShare })
+                    ParticipantCell(participant: participant,
+                                    amount: participantAmount,
+                                    onShare: { onShare })
                     .simultaneousGesture(TapGesture().onEnded {
                         AnalyticsService.logShareResult(
                             type: .participant,
@@ -362,9 +363,9 @@ struct ItemizedSplitView: View {
     @Previewable @State var session = BillSession()
     
     session.participants = [
-        Participant(name: "Оля"),
-        Participant(name: "Маша"),
-        Participant(name: "Даша")
+        Participant(name: "Оля", color: Color.SplitBill.adaptiveParticipant1),
+        Participant(name: "Маша", color: Color.SplitBill.adaptiveParticipant2),
+        Participant(name: "Даша", color: Color.SplitBill.adaptiveParticipant3)
     ]
     
     let billUnits: [BillUnit] = [

@@ -65,7 +65,7 @@ struct UnitDistibutionRow: View {
             VStack(spacing: 6) {
                 ZStack(alignment: .bottomTrailing) {
                     Circle()
-                        .fill(item.units[unitIndex].payers.contains(participant.id) ? Color.blue : Color(.systemGray5))
+                        .fill(item.units[unitIndex].payers.contains(participant.id) ? participant.color : Color(.systemGray5))
                         .frame(width: 40, height: 40)
                         .overlay {
                             Text(String(participant.name.prefix(1)))
@@ -85,7 +85,7 @@ struct UnitDistibutionRow: View {
                 Text(participant.name)
                     .font(.caption2)
                     .fontWeight(.medium)
-                    .foregroundStyle(item.units[unitIndex].payers.contains(participant.id) ? .blue : .secondary)
+                    .foregroundStyle(item.units[unitIndex].payers.contains(participant.id) ? participant.color : .secondary)
                     .lineLimit(1)
             }
         }
@@ -114,9 +114,9 @@ struct UnitDistibutionRow: View {
             ]
         )
         let participants = [
-            Participant(name: "Оля"),
-            Participant(name: "Маша"),
-            Participant(name: "Даша")
+            Participant(name: "Оля", color: Color.SplitBill.adaptiveParticipant1),
+            Participant(name: "Маша", color: Color.SplitBill.adaptiveParticipant2),
+            Participant(name: "Даша", color: Color.SplitBill.adaptiveParticipant3)
         ]
         
         var body: some View {

@@ -5,7 +5,7 @@
 //  Created by Vlad Kramskoy on 29.10.2025.
 //
 
-import Foundation
+import SwiftUI
 
 final class ParticipantViewModel: ObservableObject {
     @Published var participants: [Participant] = []
@@ -19,7 +19,10 @@ final class ParticipantViewModel: ObservableObject {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else { return }
         
-        participants.append(Participant(name: trimmedName))
+        let colorIndex = participants.count
+        let color = Color.SplitBill.participantColor(at: colorIndex)
+        
+        participants.append(Participant(name: trimmedName, color: color))
         nameInput = ""
         
         AnalyticsService.logParticipantAdded(total: participants.count)
@@ -27,6 +30,13 @@ final class ParticipantViewModel: ObservableObject {
     
     func removeParticipant(at offsets: IndexSet) {
         participants.remove(atOffsets: offsets)
+        
+        for (index, participant) in participants.enumerated() {
+            participants[index] = Participant(
+                name: participant.name,
+                color: Color.SplitBill.participantColor(at: index)
+            )
+        }
         
         AnalyticsService.logParticipantRemoved(total: participants.count)
     }

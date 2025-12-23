@@ -131,9 +131,9 @@ struct BillItemCard: View {
             ]
         )
         let participants = [
-            Participant(name: "Оля"),
-            Participant(name: "Маша"),
-            Participant(name: "Даша")
+            Participant(name: "Оля", color: Color.SplitBill.adaptiveParticipant1),
+            Participant(name: "Маша", color: Color.SplitBill.adaptiveParticipant2),
+            Participant(name: "Даша", color: Color.SplitBill.adaptiveParticipant3)
         ]
         
         var body: some View {
