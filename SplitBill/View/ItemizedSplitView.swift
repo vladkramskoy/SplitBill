@@ -71,52 +71,59 @@ struct ItemizedSplitView: View {
     // MARK: - Progress Section
     
     private var progressSection: some View {
-        VStack(spacing: 12) {
-            HStack {
+        VStack(spacing: 0) {
+            HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
+                    Text(distributed.currencyFormatted)
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(.primary)
+                    
                     Text("Распределено")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    
-                    Text(distributed.currencyFormatted)
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
                 }
                 
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: remaining > 0 ? "chart.pie.fill" : remaining == 0 ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
+                        
+                        Text(abs(remaining).currencyFormatted)
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
+                    }
+                    
                     Text(remaining >= 0 ? "Осталось" : "Перебор")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    
-                    Text(abs(remaining).currencyFormatted)
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
                 }
             }
+            .padding(16)
             
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(Color(.systemGray5))
-                        .frame(height: 4)
+                    Capsule()
+                        .fill(Color(.systemGray6))
                     
-                    Rectangle()
+                    Capsule()
                         .fill(
-                            LinearGradient(
-                                colors: progress >= 1 ? (remaining < 0 ? [.red] : [.green]) : [.blue],
+                            progress >= 1
+                            ? LinearGradient(
+                                colors:  (remaining < 0 ? [.red] : [.green]),
                                 startPoint: .leading,
                                 endPoint: .trailing)
+                            : Color.SplitBill.primaryGradient
                         )
-                        .frame(width: geometry.size.width * min(1, progress), height: 4)
+                        .frame(width: geometry.size.width * min(1, progress))
                 }
             }
-            .frame(height: 4)
+            .frame(height: 6)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
         }
-        .padding()
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
