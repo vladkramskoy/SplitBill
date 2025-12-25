@@ -115,7 +115,7 @@ struct ItemizedSplitView: View {
                                 colors:  (remaining < 0 ? [.red] : [.green]),
                                 startPoint: .leading,
                                 endPoint: .trailing)
-                            : Color.SplitBill.primaryGradient
+                            : Color.SplitBill.blueCyanGradient
                         )
                         .frame(width: geometry.size.width * min(1, progress))
                 }
@@ -149,13 +149,13 @@ struct ItemizedSplitView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            LazyVStack(spacing: 12) {
                 ForEach(session.participants) { participant in
                     let participantAmount = viewModel.amountFor(participantId: participant.id, receiptItems: session.receiptItems)
                     
                     let onShare = ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount)
                     
-                    ParticipantCell(participant: participant,
+                    ParticipantRow(participant: participant,
                                     amount: participantAmount,
                                     onShare: { onShare })
                     .simultaneousGesture(TapGesture().onEnded {

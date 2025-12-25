@@ -25,7 +25,7 @@ struct NextButton: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(Color.SplitBill.primaryGradient)
+                .background(Color.SplitBill.blueCyanGradient)
                 .clipShape(Capsule())
                 .shadow(color: isActive ? Color.blue.opacity(0.4) : Color.clear,
                         radius: 12, x: 0, y: 6

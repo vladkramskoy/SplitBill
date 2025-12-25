@@ -11,7 +11,7 @@ struct BillAmountView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = BillAmountViewModel()
-    @State private var amountGradient: LinearGradient = Color.SplitBill.invalidAmounGtradient
+    @State private var amountGradient: LinearGradient = Color.SplitBill.redOrangeGradient
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
     
@@ -72,7 +72,7 @@ struct BillAmountView: View {
         VStack(spacing: 16) {
             Image(systemName: "receipt")
                 .font(.system(size: 50))
-                .foregroundStyle(Color.SplitBill.primaryGradient)
+                .foregroundStyle(Color.SplitBill.blueCyanGradient)
                 .padding(.top, 50)
             
             Text("Сумма счёта")
@@ -141,7 +141,7 @@ struct BillAmountView: View {
             HStack {
                 Image(systemName: "heart.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(Color.SplitBill.secondaryGradient)
+                    .foregroundStyle(Color.SplitBill.pinkPurpleGradientVertical)
                 
                 Text("Добавить чаевые")
                     .font(.headline)
@@ -264,7 +264,7 @@ struct BillAmountView: View {
                         Text(viewModel.totalAmount, format: .currency(code: "RUB"))
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundStyle(Color.SplitBill.validAmountGradient)
+                            .foregroundStyle(Color.SplitBill.greenMintGradient)
                     }
                     
                     Spacer()
@@ -294,8 +294,8 @@ struct BillAmountView: View {
     
     private func updateAmountGradient() {
         amountGradient = viewModel.isValidAmount
-        ? Color.SplitBill.validAmountGradient
-        : Color.SplitBill.invalidAmounGtradient
+        ? Color.SplitBill.greenMintGradient
+        : Color.SplitBill.redOrangeGradient
     }
 }
 

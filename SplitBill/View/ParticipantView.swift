@@ -22,7 +22,7 @@ struct ParticipantView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "person.3.fill")
                         .font(.system(size: 50))
-                        .foregroundStyle(Color.SplitBill.primaryGradient)
+                        .foregroundStyle(Color.SplitBill.blueCyanGradient)
                         .padding(.top, 50)
                     
                     Text("Кто участвует?")

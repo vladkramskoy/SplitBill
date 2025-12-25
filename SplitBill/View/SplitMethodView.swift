@@ -16,6 +16,7 @@ struct SplitMethodView: View {
     @State private var popupMessage = ""
     @State private var popupIcon = ""
     @State private var showAlert = false
+    @State private var showItemizedOnboarding = false
     
     var body: some View {
         ZStack {
@@ -94,6 +95,9 @@ struct SplitMethodView: View {
         .onAppear {
             AnalyticsService.logScreen(name: "split_method_screen")
         }
+        .sheet(isPresented: $showItemizedOnboarding) {
+            ItemizedSplitOnboardingView()
+        }
     }
     
     private var screenNameForCurrentTab: String {
@@ -126,10 +130,7 @@ struct SplitMethodView: View {
     private func showHelpForCurrentTab() {
         switch selectedTab {
         case 1:
-            popupTitle = "Режим «По блюдам»"
-            popupMessage = "Разделение по съеденным блюдам"
-            popupIcon = "fork.knife"
-            isPopupPresented = true
+            showItemizedOnboarding = true
         default:
             popupTitle = "Режим «По деньгам»"
             popupMessage = "Разделение по суммам (кто сколько платит)"

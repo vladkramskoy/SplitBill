@@ -24,7 +24,7 @@ struct AddButton: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
-                .background(Color.SplitBill.primaryGradient.opacity(0.8))
+                .background(Color.SplitBill.blueCyanGradient.opacity(0.8))
                 .clipShape(Capsule())
                 .shadow(color: Color.blue.opacity(0.4), radius: 12, x: 0, y: 6)
             }

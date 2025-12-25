@@ -102,7 +102,7 @@ struct CustomSplitView: View {
                                 colors:  (remaining < 0 ? [.red] : [.green]),
                                 startPoint: .leading,
                                 endPoint: .trailing)
-                            : Color.SplitBill.primaryGradient
+                            : Color.SplitBill.blueCyanGradient
                         )
                         .frame(width: geometry.size.width * min(1, progress))
                 }

@@ -20,7 +20,7 @@ struct Logo: View {
             
             Image(systemName: "receipt")
                 .font(.system(size: 34, weight: .bold, design: .rounded))
-                .foregroundStyle(Color.SplitBill.primaryGradient)
+                .foregroundStyle(Color.SplitBill.blueCyanGradient)
         }
         .shadow(color: .blue.opacity(0.2), radius: 8, y: 4)
     }

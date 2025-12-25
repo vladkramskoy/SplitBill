@@ -22,45 +22,42 @@ extension Color {
         })
     }
     
-    // MARK: Colors
-    
     struct SplitBill {
+        
+        // MARK: Colors
+        
         static let primaryBlue = Color.blue
         static let primaryCyan = Color.cyan
         
-        static let primaryGradient = LinearGradient(
+        static let backgroundLight = Color.blue.opacity(0.1)
+        static let backgroundLighter = Color.cyan.opacity(0.05)
+        
+        // MARK: Gradients
+        
+        static let blueCyanGradient = LinearGradient(
             colors: [primaryBlue, primaryCyan],
             startPoint: .leading,
             endPoint: .trailing
         )
         
-        static let primaryGradientVertical = LinearGradient(
-            colors: [primaryBlue, primaryCyan],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        
-        static let secondaryGradient = LinearGradient(
-            colors: [.pink, .purple],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        
-        static let validAmountGradient = LinearGradient(
+        static let greenMintGradient = LinearGradient(
             colors: [.green, .mint],
             startPoint: .leading, endPoint: .trailing
         )
         
-        static let invalidAmounGtradient = LinearGradient(
+        static let redOrangeGradient = LinearGradient(
             colors: [.red, .orange],
             startPoint: .leading, endPoint: .trailing
         )
         
-        static let backgroundLight = Color.blue.opacity(0.1)
-        static let backgroundLighter = Color.cyan.opacity(0.05)
-        
-        static let backgroundGradient = LinearGradient(
+        static let lightBlueCyanGradientVertical = LinearGradient(
             colors: [backgroundLight, backgroundLighter],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
+        static let pinkPurpleGradientVertical = LinearGradient(
+            colors: [.pink, .purple],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
