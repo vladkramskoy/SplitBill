@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var session = BillSession()
+    @State private var showWelcomeOnboarding = false
     
     var body: some View {
         ParticipantView()
@@ -16,6 +17,10 @@ struct ContentView: View {
             .environment(session)
             .onAppear {
                 AnalyticsService.logSessionStarted(entryPoint: "app_launch")
+                showWelcomeOnboarding = OnboardingManager.shouldShowOnboarding
+            }
+            .sheet(isPresented: $showWelcomeOnboarding) {
+                WelcomeOnboardingView()
             }
     }
 }

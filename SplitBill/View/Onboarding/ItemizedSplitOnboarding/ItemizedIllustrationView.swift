@@ -1,5 +1,5 @@
 //
-//  OnboardingIllustrationView.swift
+//  ItemizedIllustrationView.swift
 //  SplitBill
 //
 //  Created by Vlad Kramskoy on 25.12.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OnboardingIllustrationView: View {
+struct ItemizedIllustrationView: View {
     let type: ItemizedIllustrationType
     let gradient: [Color]
     let isVisible: Bool
@@ -25,5 +25,5 @@ struct OnboardingIllustrationView: View {
 }
 
 #Preview {
-    OnboardingIllustrationView(type: .addItems, gradient: [.blue, .cyan], isVisible: true)
+    ItemizedIllustrationView(type: .addItems, gradient: [.blue, .cyan], isVisible: true)
 }

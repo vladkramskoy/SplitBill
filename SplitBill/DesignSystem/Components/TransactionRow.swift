@@ -12,22 +12,14 @@ struct TransactionRow: View {
     
     var body: some View {
         HStack {
-            ZStack {
-                Circle()
-                    .fill(paymentShare.color.opacity(0.1))
-                    .frame(width: 40, height: 40)
-                
-                Text(initials(for: paymentShare.name))
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(paymentShare.color)
-            }
+            Text("💳")
+                .font(.system(size: 32))
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(paymentShare.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("Оплачивает")
+                Text("Платежная доля")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

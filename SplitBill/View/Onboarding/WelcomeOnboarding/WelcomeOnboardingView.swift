@@ -1,37 +1,37 @@
 //
-//  ItemizedSplitOnboardingView.swift
+//  WelcomeOnboardingView.swift
 //  SplitBill
 //
-//  Created by Vlad Kramskoy on 25.12.2025.
+//  Created by Vlad Kramskoy on 27.12.2025.
 //
 
 import SwiftUI
 
-struct ItemizedSplitOnboardingView: View {
+struct WelcomeOnboardingView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentStep = 0
     
-    private let steps: [ItemizedOnboardingStep] = [
-        ItemizedOnboardingStep(
-            title: "Добавьте блюда",
-            description: "Создайте список всех блюд из чека. Укажите название, цену и количество порций.",
+    private let steps: [WelcomeOnboardingStep] = [
+        WelcomeOnboardingStep(
+            title: "Любое деление — возможно",
+            description: "Поровну, по позициям или по суммам — вы не ограничены одним способом.",
             icon: "plus.circle.fill",
             gradient: [.blue, .cyan],
-            illustration: .addItems
+            illustration: .intro
         ),
-        ItemizedOnboardingStep(
-            title: "Распределите порции",
-            description: "Укажите кто что ел. Можно делить одну порцию на несколько человек!",
+        WelcomeOnboardingStep(
+            title: "Любые комбинации — поддерживаются",
+            description: "Можно смешивать подходы и учитывать любые договорённости между участниками.",
             icon: "chart.pie.fill",
             gradient: [.orange, .red],
-            illustration: .distributePortions
+            illustration: .features
         ),
-        ItemizedOnboardingStep(
-            title: "Готово!",
-            description: "Сумма для каждого рассчитается автоматически. Просто и справедливо.",
+        WelcomeOnboardingStep(
+            title: "Простой и честный результат",
+            description: "Приложение аккуратно сведёт всё в понятный итог для каждого.",
             icon: "checkmark.circle.fill",
             gradient: [.green, .mint],
-            illustration: .viewResults
+            illustration: .getStarted
         )
     ]
     
@@ -62,7 +62,7 @@ struct ItemizedSplitOnboardingView: View {
                     ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
                         OnboardingStepView(
                             step: step,
-                            illustrationContent: ItemizedIllustrationView(
+                            illustrationContent: WelcomeIllustrationView(
                                 type: step.illustration,
                                 gradient: step.gradient,
                                 isVisible: currentStep == index)
@@ -117,11 +117,12 @@ struct ItemizedSplitOnboardingView: View {
                 currentStep += 1
             }
         } else {
+            OnboardingManager.markOnboardingAsSeen()
             dismiss()
         }
     }
 }
 
 #Preview {
-    ItemizedSplitOnboardingView()
+    WelcomeOnboardingView()
 }

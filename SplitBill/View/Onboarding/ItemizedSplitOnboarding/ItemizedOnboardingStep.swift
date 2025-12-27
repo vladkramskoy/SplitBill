@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ItemizedOnboardingStep: Identifiable {
+struct ItemizedOnboardingStep: OnboardingStep, Identifiable {
     let id = UUID()
     let title: String
     let description: String

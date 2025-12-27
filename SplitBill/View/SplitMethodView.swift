@@ -11,12 +11,9 @@ struct SplitMethodView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @State private var selectedTab = 0
-    @State private var isPopupPresented = false
-    @State private var popupTitle = ""
-    @State private var popupMessage = ""
-    @State private var popupIcon = ""
     @State private var showAlert = false
     @State private var showItemizedOnboarding = false
+    @State private var showCustomOnboarding = false
     
     var body: some View {
         ZStack {
@@ -50,13 +47,6 @@ struct SplitMethodView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
             .ignoresSafeArea(.container, edges: .bottom)
-            .overlay {
-                Group {
-                    if isPopupPresented {
-                        PopupView(isShowingPopup: $isPopupPresented, popupTitle: popupTitle, popupMessage: popupMessage, popupIcon: popupIcon)
-                    }
-                }
-            }
             .navigationTitle("Как делить?")
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -98,6 +88,9 @@ struct SplitMethodView: View {
         .sheet(isPresented: $showItemizedOnboarding) {
             ItemizedSplitOnboardingView()
         }
+        .sheet(isPresented: $showCustomOnboarding) {
+            CustomSplitOnboardingView()
+        }
     }
     
     private var screenNameForCurrentTab: String {
@@ -131,11 +124,10 @@ struct SplitMethodView: View {
         switch selectedTab {
         case 1:
             showItemizedOnboarding = true
+        case 2:
+            showCustomOnboarding = true
         default:
-            popupTitle = "Режим «По деньгам»"
-            popupMessage = "Разделение по суммам (кто сколько платит)"
-            popupIcon = "banknote"
-            isPopupPresented = true
+            break
         }
     }
     

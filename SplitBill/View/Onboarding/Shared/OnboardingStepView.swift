@@ -7,20 +7,16 @@
 
 import SwiftUI
 
-struct OnboardingStepView: View {
-    let step: ItemizedOnboardingStep
-    let isVisible: Bool
+struct OnboardingStepView<Content: View>: View {
+    let step: any OnboardingStep
+    let illustrationContent: Content
     
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
             
-            OnboardingIllustrationView(
-                type: step.illustration,
-                gradient: step.gradient,
-                isVisible: isVisible
-            )
-            .frame(height: 280)
+            illustrationContent
+                .frame(height: 280)
             
             Spacer()
             
@@ -60,5 +56,5 @@ struct OnboardingStepView: View {
         gradient: [.green],
         illustration: .viewResults)
     
-    OnboardingStepView(step: step, isVisible: true)
+    OnboardingStepView(step: step, illustrationContent: Rectangle().fill(Color.green))
 }
