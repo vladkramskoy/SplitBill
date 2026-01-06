@@ -14,7 +14,7 @@ struct ItemizedSplitView: View {
     @State private var showInputModal = false
     @State private var completionLoggedOnce = false
     
-    private let emojiOptions = ["🍕", "🍝", "🥗", "🍖", "🍗", "🍤", "🍣", "🍱", "🍜", "🍲", "🥘", "🍰", "🧁", "🍷", "🍺", "☕️", "🥤"]
+    private let emojiOptions = ["🍕", "🍝", "🥗", "🥩", "🍖", "🍗", "🍤", "🍣", "🍱", "🍜", "🍲", "🥘", "🍰", "🧁", "🍷", "🍺", "☕️", "🥤"]
     
     var body: some View {
         @Bindable var session = session
