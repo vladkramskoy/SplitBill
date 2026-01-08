@@ -15,9 +15,9 @@ struct WelcomeIllustrationView: View {
     var body: some View {
         switch type {
         case .intro:
-            WelcomeIllustration1()
+            WelcomeSplitBillIllustration()
         case .features:
-            WelcomeIllustration2()
+            WelcomeParticipantsIllustration()
         case .getStarted:
             WelcomeIllustration3()
         }

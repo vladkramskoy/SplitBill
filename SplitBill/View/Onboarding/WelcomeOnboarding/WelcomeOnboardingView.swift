@@ -13,24 +13,24 @@ struct WelcomeOnboardingView: View {
     
     private let steps: [WelcomeOnboardingStep] = [
         WelcomeOnboardingStep(
-            title: "Любое деление — возможно",
-            description: "Поровну, по позициям или по суммам — вы не ограничены одним способом.",
-            icon: "plus.circle.fill",
+            title: "SplitBill",
+            description: "Разделите счёт при любом сценарии.",
+            icon: "chart.pie.fill",
             gradient: [.blue, .cyan],
             illustration: .intro
         ),
         WelcomeOnboardingStep(
-            title: "Любые комбинации — поддерживаются",
-            description: "Можно смешивать подходы и учитывать любые договорённости между участниками.",
-            icon: "chart.pie.fill",
-            gradient: [.orange, .red],
+            title: "Введите данные",
+            description: "Укажите участников и сумму чека.",
+            icon: "square.and.pencil",
+            gradient: [.blue, .cyan],
             illustration: .features
         ),
         WelcomeOnboardingStep(
-            title: "Простой и честный результат",
-            description: "Приложение аккуратно сведёт всё в понятный итог для каждого.",
-            icon: "checkmark.circle.fill",
-            gradient: [.green, .mint],
+            title: "Выберите режим",
+            description: "Точный ввод по блюдам или гибкое распределение по деньгам",
+            icon: "rectangle.on.rectangle.badge.gearshape",
+            gradient: [.blue, .cyan],
             illustration: .getStarted
         )
     ]
