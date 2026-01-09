@@ -28,7 +28,7 @@ struct WelcomeOnboardingView: View {
         ),
         WelcomeOnboardingStep(
             title: "Выберите режим",
-            description: "Точный ввод по блюдам или гибкое распределение по деньгам",
+            description: "Кто что ел или кто сколько платит.",
             icon: "rectangle.on.rectangle.badge.gearshape",
             gradient: [.blue, .cyan],
             illustration: .getStarted

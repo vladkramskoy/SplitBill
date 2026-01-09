@@ -19,7 +19,7 @@ struct WelcomeIllustrationView: View {
         case .features:
             WelcomeParticipantsIllustration()
         case .getStarted:
-            WelcomeIllustration3()
+            WelcomeSelectModeIllustration(isVisible: isVisible)
         }
     }
 }

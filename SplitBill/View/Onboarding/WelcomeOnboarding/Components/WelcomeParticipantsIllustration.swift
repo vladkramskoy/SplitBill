@@ -9,7 +9,6 @@ import SwiftUI
 
 struct WelcomeParticipantsIllustration: View {
     @State private var animate = false
-    @State private var animatedAmount:  Double = 0
     
     let colors = [Color.SplitBill.adaptiveParticipant1, Color.SplitBill.adaptiveParticipant2, Color.SplitBill.adaptiveParticipant3]
     
