@@ -14,21 +14,21 @@ struct CustomSplitOnboardingView: View {
     private let steps: [CustomOnboardingStep] = [
         CustomOnboardingStep(
             title: "Добавьте платежи",
-            description: "Вносите любые суммы и отмечайте, кто за них платит — один или несколько человек.",
+            description: "Кто-то платит меньше, больше или за других? Просто назначьте ему нужную сумму.",
             icon: "plus.circle.fill",
             gradient: [.blue, .cyan],
             illustration: .customIllustration1
         ),
         CustomOnboardingStep(
-            title: "Учтите договорённости",
-            description: "Кто-то платит меньше, больше или за других? Просто назначьте ему нужную сумму.",
-            icon: "chart.pie.fill",
+            title: "Распределите остаток",
+            description: "Между всеми или только теми, кто без долей.",
+            icon: "person.3.fill",
             gradient: [.orange, .red],
             illustration: .customIllustration2
         ),
         CustomOnboardingStep(
             title: "Разделим остальное",
-            description: "Остаток автоматически делится поровну. Быстро и справедливо.",
+            description: "Остаток автоматически распределится. Быстро и справедливо.",
             icon: "checkmark.circle.fill",
             gradient: [.green, .mint],
             illustration: .customIllustration3

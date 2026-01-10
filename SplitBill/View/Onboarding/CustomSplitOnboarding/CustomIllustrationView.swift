@@ -15,11 +15,11 @@ struct CustomIllustrationView: View {
     var body: some View {
         switch type {
         case .customIllustration1:
-            CustomIllustration1()
+            CustomPaymentSharesIllustration(gradient: [.gray, .secondary])
         case .customIllustration2:
-            CustomIllustration2()
+            CustomRemainsIllustration(gradient: [.orange, .red])
         case .customIllustration3:
-            CustomIllustration3()
+            CustomSummaryIllustration(gradient: [.green, .mint], isVisible: isVisible)
         }
     }
 }
