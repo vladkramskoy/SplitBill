@@ -46,7 +46,7 @@ struct SplitMethodView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .ignoresSafeArea(.container, edges: .bottom)
+            .ignoresSafeArea(edges: .bottom)
             .navigationTitle("Как делить?")
         }
         .navigationBarTitleDisplayMode(.inline)
