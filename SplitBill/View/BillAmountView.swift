@@ -11,7 +11,7 @@ struct BillAmountView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = BillAmountViewModel()
-    @State private var amountGradient: LinearGradient = Color.SplitBill.redOrangeGradient
+    @State private var amountColor: Color = .red
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
     
@@ -20,61 +20,59 @@ struct BillAmountView: View {
             Color.SplitBill.backgroundLight
                 .ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 24) {
+            VStack {
+                VStack(spacing: 16) {
                     headerCard
                     amountInputCard
                     tipToggleCard
-                    Spacer(minLength: 275)
+                }
+
+                Spacer()
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button {
+                        isAmountFocused = false
+                        isTipFocused = false
+                    } label: {
+                        Image(systemName: "chevron.down")
+                    }
                 }
             }
+            .onAppear {
+                isAmountFocused = true
+                updateAmountGradient()
+                AnalyticsService.logScreen(name: "bill_amount_screen")
+            }
             
-            Spacer()
-            
-            NextButton(title: "Продолжить", action: {
-                session.billAmount = viewModel.billAmountValue
-                session.tipAmount = viewModel.calculatedTip
-                session.totalAmount = viewModel.totalAmount
+            VStack {
+                Spacer()
                 
-                AnalyticsService.logBillAmountEntered(
-                    amount: viewModel.billAmountValue,
-                    tip: viewModel.calculatedTip,
-                    total: viewModel.totalAmount,
-                    tipType: viewModel.isTipEnable ? viewModel.tipCalculationType.rawValue : "none"
-                )
-                
-                router.navigateToSplitMethod()
-            }, isActive: viewModel.isValidAmount)
+                NextButton(title: "Продолжить", action: {
+                    session.billAmount = viewModel.billAmountValue
+                    session.tipAmount = viewModel.calculatedTip
+                    session.totalAmount = viewModel.totalAmount
+                    
+                    AnalyticsService.logBillAmountEntered(
+                        amount: viewModel.billAmountValue,
+                        tip: viewModel.calculatedTip,
+                        total: viewModel.totalAmount,
+                        tipType: viewModel.isTipEnable ? viewModel.tipCalculationType.rawValue : "none"
+                    )
+                    
+                    router.navigateToSplitMethod()
+                }, isActive: viewModel.isValidAmount)
+            }
         }
         .ignoresSafeArea(.keyboard)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button {
-                    isAmountFocused = false
-                    isTipFocused = false
-                } label: {
-                    Image(systemName: "chevron.down")
-                }
-            }
-        }
-        .onAppear {
-            isAmountFocused = true
-            updateAmountGradient()
-            AnalyticsService.logScreen(name: "bill_amount_screen")
-        }
     }
     
     // MARK: Header Card
     
     private var headerCard: some View {
         VStack(spacing: 16) {
-            Image(systemName: "receipt")
-                .font(.system(size: 50))
-                .foregroundStyle(Color.SplitBill.blueCyanGradient)
-                .padding(.top, 50)
-            
             Text("Сумма счёта")
                 .font(.title2)
                 .fontWeight(.bold)
@@ -101,7 +99,7 @@ struct BillAmountView: View {
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.center)
                     .focused($isAmountFocused)
-                    .foregroundStyle(amountGradient)
+                    .foregroundStyle(amountColor)
                     .onChange(of: viewModel.billAmount) { oldValue, newValue in
                         let formatted = InputValidator.formatCurrencyInput(newValue)
                         if formatted != newValue {
@@ -119,7 +117,7 @@ struct BillAmountView: View {
                 Image(systemName: viewModel.isValidAmount
                       ? "checkmark.circle.fill"
                       : "exclamationmark.circle.fill")
-                .foregroundStyle(viewModel.isValidAmount ? .green : .red)
+                .foregroundStyle(viewModel.isValidAmount ? .green.opacity(0.9) : .red.opacity(0.7))
                 
                 Text(viewModel.isValidAmount ? "Сумма введкна корректно" : "Введите сумму счёта")
                     .font(.caption)
@@ -127,7 +125,7 @@ struct BillAmountView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(24)
+        .padding(16)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
@@ -139,10 +137,6 @@ struct BillAmountView: View {
     private var tipToggleCard: some View {
         VStack(spacing: 16) {
             HStack {
-                Image(systemName: "heart.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(Color.SplitBill.pinkPurpleGradientVertical)
-                
                 Text("Добавить чаевые")
                     .font(.headline)
                 
@@ -188,20 +182,20 @@ struct BillAmountView: View {
                         Text("\(Int(viewModel.tipPercentage))%")
                             .frame(width: 40, alignment: .trailing)
                             .font(.headline)
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(.blue)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(.purple.opacity(0.1))
+                            .background(.blue.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     
                     Slider(value: $viewModel.tipPercentage, in: 0...30, step: 1)
-                        .tint(.purple)
+                        .tint(.blue)
                         .onChange(of: viewModel.tipPercentage) { _, newValue in
                             viewModel.tipPercentage = round(newValue)
                         }
                     
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
                         ForEach([5, 10, 15, 20], id: \.self) { percentage in
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -211,10 +205,10 @@ struct BillAmountView: View {
                                 Text("\(percentage)%")
                                     .font(.caption)
                                     .fontWeight(.semibold)
-                                    .foregroundStyle(Int(viewModel.tipPercentage) == percentage ? .white : .purple)
+                                    .foregroundStyle(Int(viewModel.tipPercentage) == percentage ? .white : .blue)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(Int(viewModel.tipPercentage) == percentage ? .purple : .purple.opacity(0.1))
+                                    .background(Int(viewModel.tipPercentage) == percentage ? .blue : .blue.opacity(0.1))
                                     .clipShape(Capsule())
                             }
                         }
@@ -235,7 +229,7 @@ struct BillAmountView: View {
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.trailing)
                                 .focused($isTipFocused)
-                                .foregroundStyle(.purple)
+                                .foregroundStyle(.blue)
                                 .onChange(of: viewModel.tipAmount) { oldValue, newValue in
                                     let formatted = InputValidator.formatCurrencyInput(newValue)
                                     if formatted != newValue {
@@ -248,13 +242,11 @@ struct BillAmountView: View {
                                 .foregroundStyle(.secondary.opacity(0.5))
                         }
                         .padding()
-                        .background(.purple.opacity(0.05))
+                        .background(.blue.opacity(0.05))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                 }
-                
-                Divider()
-                
+
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Итого с чаевыми:")
@@ -264,7 +256,6 @@ struct BillAmountView: View {
                         Text(viewModel.totalAmount, format: .currency(code: "RUB"))
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundStyle(Color.SplitBill.greenMintGradient)
                     }
                     
                     Spacer()
@@ -278,14 +269,14 @@ struct BillAmountView: View {
                             Text(viewModel.calculatedTip, format: .currency(code: "RUB"))
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(.purple)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
                 .padding(.vertical, 8)
             }
         }
-        .padding(20)
+        .padding(16)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
@@ -293,9 +284,9 @@ struct BillAmountView: View {
     }
     
     private func updateAmountGradient() {
-        amountGradient = viewModel.isValidAmount
-        ? Color.SplitBill.greenMintGradient
-        : Color.SplitBill.redOrangeGradient
+        amountColor = viewModel.isValidAmount
+        ? .green.opacity(0.9)
+        : .red.opacity(0.7)
     }
 }
 
