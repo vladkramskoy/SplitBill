@@ -149,7 +149,7 @@ struct ItemizedSplitView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
-            LazyVStack(spacing: 12) {
+            VStack(spacing: 12) {
                 ForEach(session.participants) { participant in
                     let participantAmount = viewModel.amountFor(participantId: participant.id, receiptItems: session.receiptItems)
                     
@@ -324,7 +324,7 @@ struct ItemizedSplitView: View {
     private func itemsCardList(receiptItems: Binding<[BillItem]>, participants: [Participant]) -> some View {
         itemsSectionHeader
         
-        LazyVStack(spacing: 12) {
+        VStack(spacing: 12) {
             ForEach(receiptItems) { $billItem in
                 BillItemCard(item: $billItem,
                              participants: participants,

@@ -140,7 +140,7 @@ struct CustomSplitView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
-            LazyVStack(spacing: 12) {
+            VStack(spacing: 12) {
                 ForEach(session.participants) { participant in
                     let participantAmount = viewModel.amountFor(participantId: participant.id, paymentShares: session.customPaymentShares)
                     
@@ -191,7 +191,7 @@ struct CustomSplitView: View {
                     accentColor: .blue
                 )
             } else {
-                LazyVStack(spacing: 8) {
+                VStack(spacing: 8) {
                     ForEach(session.customPaymentShares, id: \.id) { share in
                         TransactionRow(paymentShare: share)
                     }
