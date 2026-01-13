@@ -37,22 +37,40 @@ struct ParticipantView: View {
                 }
                 
                 VStack(spacing: 16) {
-                    HStack {
-                        TextField("Введите имя", text: $viewModel.nameInput)
-                            .focused($isTextFieldFocused)
-                        
-                        Button(action: {
-                            viewModel.addParticipant(for: viewModel.nameInput)
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(viewModel.nameInput.isEmpty ? .gray : .blue)
+                    VStack(spacing: 8) {
+                        HStack {
+                            TextField("Введите имя", text: $viewModel.nameInput)
+                                .focused($isTextFieldFocused)
+                                .onChange(of: viewModel.nameInput) { _, _ in
+                                    viewModel.validationError = nil
+                                }
+                            
+                            Button(action: {
+                                viewModel.addParticipant(for: viewModel.nameInput)
+                            }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundStyle(viewModel.nameInput.isEmpty ? .gray : .blue)
+                            }
+                            .disabled(viewModel.nameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
-                        .disabled(viewModel.nameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .clipShape(Capsule())
+                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                        .overlay {
+                            Capsule()
+                                .stroke(viewModel.validationError != nil ? Color.red.opacity(0.6) : Color.clear, lineWidth: 2)
+                        }
+                        
+                        if let error = viewModel.validationError{
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 20)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
                     }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .clipShape(Capsule())
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                     
                     GeometryReader { _ in
                         if viewModel.participants.isEmpty {
