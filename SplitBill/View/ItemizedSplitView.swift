@@ -14,6 +14,8 @@ struct ItemizedSplitView: View {
     @State private var showInputModal = false
     @State private var completionLoggedOnce = false
     
+    private let tolerance: Double = 0.001
+    
     private let emojiOptions = ["🍕", "🍝", "🥗", "🥩", "🍖", "🍗", "🍤", "🍣", "🍱", "🍜", "🍲", "🥘", "🍰", "🧁", "🍷", "🍺", "☕️", "🥤"]
     
     var body: some View {
@@ -87,13 +89,13 @@ struct ItemizedSplitView: View {
                 
                 VStack(alignment: .trailing, spacing: 4) {
                     HStack(spacing: 6) {
-                        Image(systemName: remaining > 0 ? "chart.pie.fill" : remaining == 0 ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
+                        Image(systemName: hasRemainingAmount ? "chart.pie.fill" : isDistributionComplete ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                             .font(.system(size: 14))
-                            .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
+                            .foregroundStyle(hasRemainingAmount ? .orange : isDistributionComplete ? .green : .red)
                         
                         Text(abs(remaining).currencyFormatted)
                             .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundStyle(remaining > 0 ? .orange : remaining == 0 ? .green : .red)
+                            .foregroundStyle(hasRemainingAmount ? .orange : isDistributionComplete ? .green : .red)
                     }
                     
                     Text(remaining >= 0 ? "Осталось" : "Перебор")
@@ -110,9 +112,9 @@ struct ItemizedSplitView: View {
                     
                     Capsule()
                         .fill(
-                            progress >= 1
+                            isProgressComplete
                             ? LinearGradient(
-                                colors:  (remaining < 0 ? [.red] : [.green]),
+                                colors:  (hasOverpayment ? [.red] : [.green]),
                                 startPoint: .leading,
                                 endPoint: .trailing)
                             : Color.SplitBill.blueCyanGradient
@@ -354,6 +356,22 @@ struct ItemizedSplitView: View {
     
     private var progress: Double {
         viewModel.distributionProgress(total: session.totalAmount, items: session.receiptItems)
+    }
+    
+    private var isDistributionComplete: Bool {
+        abs(remaining) <= tolerance
+    }
+    
+    private var hasRemainingAmount: Bool {
+        remaining > tolerance
+    }
+    
+    private var hasOverpayment: Bool {
+        remaining < -tolerance
+    }
+    
+    private var isProgressComplete: Bool {
+        progress > (1.0 - tolerance)
     }
 }
 
