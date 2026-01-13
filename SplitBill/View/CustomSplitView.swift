@@ -257,8 +257,8 @@ struct CustomSplitView: View {
                 .foregroundStyle(.blue)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
-            .disabled(session.customPaymentShares.isEmpty || remaining <= 0)
-            .opacity(session.customPaymentShares.isEmpty || remaining <= 0 ? 0.5 : 1)
+            .disabled(session.customPaymentShares.isEmpty || !hasRemainingAmount)
+            .opacity(session.customPaymentShares.isEmpty || !hasRemainingAmount ? 0.5 : 1)
             
             Button(action: {
                 viewModel.resetAll(from: &session.customPaymentShares)

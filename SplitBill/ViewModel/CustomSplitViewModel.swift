@@ -46,6 +46,9 @@ final class CustomSplitViewModel: ObservableObject {
         guard participants.count > 0 else { return }
         
         let remaining = remainingAmount(total: total, paymentShares: paymentShares)
+        
+        guard remaining > 0.01 else { return }
+        
         let share = remaining / Double(participants.count)
         
         for participant in participants {
@@ -72,6 +75,9 @@ final class CustomSplitViewModel: ObservableObject {
         guard !unassignedParticipants.isEmpty else { return }
         
         let remaining = remainingAmount(total: total, paymentShares: paymentShares)
+        
+        guard remaining > 0.01 else { return }
+        
         let share = remaining / Double(unassignedParticipants.count)
         
         for participant in unassignedParticipants {
