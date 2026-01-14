@@ -11,7 +11,7 @@ struct BillAmountView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = BillAmountViewModel()
-    @State private var amountColor: Color = .red
+    @State private var amountColor: Color = .secondary
     @FocusState private var isAmountFocused: Bool
     @FocusState private var isTipFocused: Bool
     
@@ -63,7 +63,7 @@ struct BillAmountView: View {
                     )
                     
                     router.navigateToSplitMethod()
-                }, isActive: viewModel.isValidAmount)
+                }, isActive: viewModel.isValidAmount && viewModel.isValidTipAmount)
             }
         }
         .ignoresSafeArea(.keyboard)
@@ -114,12 +114,12 @@ struct BillAmountView: View {
             }
             
             HStack(spacing: 8) {
-                Image(systemName: viewModel.isValidAmount
-                      ? "checkmark.circle.fill"
-                      : "exclamationmark.circle.fill")
-                .foregroundStyle(viewModel.isValidAmount ? .green.opacity(0.9) : .red.opacity(0.7))
+                let iconColor = viewModel.validationIconColor
                 
-                Text(viewModel.isValidAmount ? "Сумма введкна корректно" : "Введите сумму счёта")
+                Image(systemName: viewModel.validationIcon)
+                    .foregroundStyle(iconColor)
+
+                Text(viewModel.validationMessage)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -130,6 +130,11 @@ struct BillAmountView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
         .padding(.horizontal)
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(!viewModel.isValidAmount && viewModel.billAmountValue > 999_999.99 ? Color.red.opacity(0.6) : Color.clear, lineWidth: 2)
+                .padding(.horizontal)
+        }
     }
     
     // MARK: Tip Toggle Card
@@ -244,6 +249,18 @@ struct BillAmountView: View {
                         .padding()
                         .background(.blue.opacity(0.05))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(!viewModel.isValidTipAmount && viewModel.tipAmountValue > 999_999.99 ? Color.red.opacity(0.6) : Color.clear, lineWidth: 2)
+                        }
+                        
+                        if let errorMessage = viewModel.tipValidationMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
                     }
                 }
 
