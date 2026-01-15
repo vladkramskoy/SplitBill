@@ -49,7 +49,7 @@ struct ItemizedSplitView: View {
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
-                .presentationDetents([.large])
+                .presentationDetents([.height(380)])
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
@@ -214,12 +214,10 @@ struct ItemizedSplitView: View {
                           viewModel.quantity < 1)
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 16)
+            .padding(.top, 16)
             
-            Divider()
-            
-            VStack(spacing: 16) {
-                VStack(spacing: 16) {
+            Form {
+                Section {
                     HStack {
                         Text("Эмодзи")
                             .foregroundStyle(.secondary)
@@ -236,18 +234,10 @@ struct ItemizedSplitView: View {
                         }
                     }
                     
-                    Divider()
-                    
                     TextField("Название", text: $viewModel.dishName)
                         .onChange(of: viewModel.dishName) { _, _ in
                             viewModel.validationError = nil
                         }
-                    
-                    Divider()
-                    
-                    Text("Сумма")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
                     
                     HStack {
                         TextField("0", text: $viewModel.amountPaymentInput)
@@ -266,29 +256,20 @@ struct ItemizedSplitView: View {
                             .font(.system(size: 24, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
-                }
-                .padding(.top, 8)
-                
-                Divider()
-                
-                Stepper("Количество: \(viewModel.quantity)", value: $viewModel.quantity, in: 1...99)
-                    .onChange(of: viewModel.quantity) { oldValue, newValue in
-                        viewModel.validationError = nil
+                    
+                    Stepper("Количество: \(viewModel.quantity)", value: $viewModel.quantity, in: 1...99)
+                        .onChange(of: viewModel.quantity) { oldValue, newValue in
+                            viewModel.validationError = nil
+                        }
+                    
+                    Toggle(isOn: $viewModel.splitEqually) {
+                        Text("За это платят все")
                     }
-                
-                Divider()
-                
-                Toggle(isOn: $viewModel.splitEqually) {
-                    Text("За это платят все")
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
             
             if let error = viewModel.validationError {
                 VStack {
-                    Divider()
-                    
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(.red)
@@ -304,8 +285,6 @@ struct ItemizedSplitView: View {
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
-            
-            Spacer()
         }
     }
     
