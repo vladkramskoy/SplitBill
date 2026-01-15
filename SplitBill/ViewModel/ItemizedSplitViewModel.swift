@@ -13,6 +13,7 @@ final class ItemizedSplitViewModel: ObservableObject {
     @Published var emoji = "🍽️"
     @Published var quantity = 1
     @Published var splitEqually: Bool = false
+    @Published var validationError: String? = nil
     
     private let formatter: DecimalFormatting
     
@@ -49,8 +50,35 @@ final class ItemizedSplitViewModel: ObservableObject {
             .reduce(0, +)
     }
     
-    func addDish(to receiptItems: inout [BillItem]) {
-        guard let price = formatter.parse(amountPaymentInput) else { return }
+    func addDish(to receiptItems: inout [BillItem]) -> Bool {
+        let nameValidation = ValidationService.validateDishName(dishName)
+        guard nameValidation.isValid else {
+            validationError = nameValidation.errorMessage
+            return false
+        }
+        
+        guard quantity >= 1 && quantity <= 99 else {
+            validationError = "Количество порций от 1 до 99"
+            return false
+        }
+        
+        guard let price = formatter.parse(amountPaymentInput) else {
+            validationError = "Некорректная сумма"
+            return false
+        }
+        
+        let priceValidation = ValidationService.validateDishAmount(price)
+        guard priceValidation.isValid else {
+            validationError = priceValidation.errorMessage
+            return false
+        }
+        
+        let tempItem = BillItem(id: UUID(), name: dishName, emoji: emoji, quantity: quantity, pricePerUnit: price, units: [])
+        let itemsValidation = ValidationService.validateReceiptItems(receiptItems + [tempItem])
+        guard itemsValidation.isValid else {
+            validationError = itemsValidation.errorMessage
+            return false
+        }
         
         var billItem = BillItem(id: UUID(), name: dishName, emoji: emoji, quantity: quantity, pricePerUnit: price, units: [])
         
@@ -60,8 +88,10 @@ final class ItemizedSplitViewModel: ObservableObject {
         }
         
         receiptItems.append(billItem)
+        validationError = nil
         
         AnalyticsService.logReceiptItemAdded(totalItems: receiptItems.count)
+        return true
     }
     
     func equalSplitPayers(for item: inout BillItem, participants: [Participant]) {

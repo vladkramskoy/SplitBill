@@ -49,7 +49,7 @@ struct ItemizedSplitView: View {
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
-                .presentationDetents([.medium])
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
@@ -182,6 +182,7 @@ struct ItemizedSplitView: View {
             HStack {
                 Button("Отмена") {
                     showInputModal = false
+                    viewModel.validationError = nil
                 }
                 .foregroundStyle(.secondary)
                 
@@ -194,14 +195,15 @@ struct ItemizedSplitView: View {
                 Spacer()
                 
                 Button("Добавить") {
-                    viewModel.addDish(to: &session.receiptItems)
-                    viewModel.applyEqualSplitIfNeeded(
-                        participants: session.participants,
-                        receiptItems: &session.receiptItems
-                    )
-                    viewModel.emoji = "🍽️"
-                    viewModel.splitEqually = false
-                    showInputModal = false
+                    if viewModel.addDish(to: &session.receiptItems) {
+                        viewModel.applyEqualSplitIfNeeded(
+                            participants: session.participants,
+                            receiptItems: &session.receiptItems
+                        )
+                        viewModel.emoji = "🍽️"
+                        viewModel.splitEqually = false
+                        showInputModal = false
+                    }
                 }
                 .fontWeight(.semibold)
                 .foregroundStyle(viewModel.amountPaymentInput.isEmpty ||
@@ -216,8 +218,8 @@ struct ItemizedSplitView: View {
             
             Divider()
             
-            VStack(spacing: 20) {
-                VStack(spacing: 8) {
+            VStack(spacing: 16) {
+                VStack(spacing: 16) {
                     HStack {
                         Text("Эмодзи")
                             .foregroundStyle(.secondary)
@@ -237,6 +239,9 @@ struct ItemizedSplitView: View {
                     Divider()
                     
                     TextField("Название", text: $viewModel.dishName)
+                        .onChange(of: viewModel.dishName) { _, _ in
+                            viewModel.validationError = nil
+                        }
                     
                     Divider()
                     
@@ -254,6 +259,7 @@ struct ItemizedSplitView: View {
                                 if formatted != newValue {
                                     viewModel.amountPaymentInput = formatted
                                 }
+                                viewModel.validationError = nil
                             }
                             
                         Text("₽")
@@ -265,7 +271,10 @@ struct ItemizedSplitView: View {
                 
                 Divider()
                 
-                Stepper("Количество: \(viewModel.quantity)", value: $viewModel.quantity, in: 1...100)
+                Stepper("Количество: \(viewModel.quantity)", value: $viewModel.quantity, in: 1...99)
+                    .onChange(of: viewModel.quantity) { oldValue, newValue in
+                        viewModel.validationError = nil
+                    }
                 
                 Divider()
                 
@@ -275,6 +284,26 @@ struct ItemizedSplitView: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
+            
+            if let error = viewModel.validationError {
+                VStack {
+                    Divider()
+                    
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                        
+                        Text(error)
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
             
             Spacer()
         }

@@ -75,7 +75,7 @@ struct UnitDistibutionRow: View {
                     
                     if item.units[unitIndex].payers.contains(participant.id) {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color(.systemBackground))
                             .background(Circle().fill(Color.green))
                             .font(.system(size: 14))
                             .offset(x: 4, y: 4)
