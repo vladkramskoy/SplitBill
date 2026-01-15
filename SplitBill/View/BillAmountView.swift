@@ -67,6 +67,10 @@ struct BillAmountView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
+        .onTapGesture {
+            isAmountFocused = false
+            isTipFocused = false
+        }
     }
     
     // MARK: Header Card

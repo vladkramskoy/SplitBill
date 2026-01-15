@@ -16,7 +16,7 @@ struct ItemizedSplitView: View {
     
     private let tolerance: Double = 0.001
     
-    private let emojiOptions = ["🍕", "🍝", "🥗", "🥩", "🍖", "🍗", "🍤", "🍣", "🍱", "🍜", "🍲", "🥘", "🍰", "🧁", "🍷", "🍺", "☕️", "🥤"]
+    private let emojiOptions = ["🍕", "🍝", "🥗", "🥩", "🍗", "🍤", "🍱", "🍔", "🍲", "🥘", "🍰", "🧁", "🍷", "🍺", "🥃", "☕️", "🥤", "📦", "💸"]
     
     var body: some View {
         @Bindable var session = session
@@ -49,6 +49,7 @@ struct ItemizedSplitView: View {
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
+                .background(Color(.systemBackground))
                 .presentationDetents([.height(380)])
                 .presentationDragIndicator(.visible)
         }

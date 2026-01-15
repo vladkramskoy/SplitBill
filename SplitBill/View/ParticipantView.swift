@@ -44,6 +44,10 @@ struct ParticipantView: View {
                                 .onChange(of: viewModel.nameInput) { _, _ in
                                     viewModel.validationError = nil
                                 }
+                                .onSubmit {
+                                    viewModel.addParticipant(for: viewModel.nameInput)
+                                }
+                                .submitLabel(.done)
                             
                             Button(action: {
                                 viewModel.addParticipant(for: viewModel.nameInput)
@@ -104,6 +108,9 @@ struct ParticipantView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .ignoresSafeArea(.keyboard)
+        .onTapGesture {
+            isTextFieldFocused = false
+        }
     }
     
     // MARK: - Participants Section

@@ -318,10 +318,7 @@ struct CustomSplitView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
             
-            Divider()
-            
             VStack(spacing: 20) {
-                
                 VStack(spacing: 8) {
                     Text("Сумма")
                         .font(.subheadline)
@@ -361,29 +358,33 @@ struct CustomSplitView: View {
                         .padding(.horizontal, 4)
                     }
                 }
+                
+                if let error = viewModel.validationError {
+                    VStack {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.red)
+                                .font(.caption)
+                            
+                            Text(error)
+                                .foregroundStyle(.red)
+                                .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                } else {
+                    Text("")
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
             
-            if let error = viewModel.validationError {
-                VStack {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                        
-                        Text(error)
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            Spacer()
         }
-        .presentationDetents([.height(280)])
+        .presentationDetents([.height(300)])
         .presentationDragIndicator(.visible)
     }
     
@@ -408,6 +409,7 @@ struct CustomSplitView: View {
                     
                     if viewModel.selectedPersonIndices.contains(index) {
                         Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Color(.systemBackground))
                             .foregroundStyle(.white)
                             .background(Circle().fill(Color.green))
                             .font(.system(size: 14))

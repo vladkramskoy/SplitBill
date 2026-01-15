@@ -66,7 +66,7 @@ struct WelcomeSelectModeIllustration: View {
                 )
                 
                 VStack(spacing: 8) {
-                    Text("По договорённости")
+                    Text("По деньгам")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(.secondary)
                 }

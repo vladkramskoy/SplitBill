@@ -75,7 +75,7 @@ struct EqualSplitView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         
-                        LazyVStack(spacing: 12) {
+                        VStack(spacing: 12) {
                             ForEach(session.participants) { participant in
                                 let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: session.equalAmountPerPerson(), totalAmount: session.totalAmount) }
                                 
@@ -100,20 +100,26 @@ struct EqualSplitView: View {
                                     )
                                 })
                             }
+                            
+                            Divider()
+                            
+                            Button(action: {
+                                session.reset()
+                                AnalyticsService.logNewCalculation()
+                                router.popToRoot()
+                            }) {
+                                HStack {
+                                    Image(systemName: "text.pad.header.badge.plus")
+                                    Text("Новый расчёт")
+                                }
+                            }
+                            .padding(8)
                         }
                     }
                     .padding()
                     .background(Color(.systemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
-                    
-                    VStack(spacing: 12) {
-                        Button("Новый расчет") {
-                            session.reset()
-                            AnalyticsService.logNewCalculation()
-                            router.popToRoot()
-                        }
-                    }
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 20)
