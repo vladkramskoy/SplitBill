@@ -10,6 +10,7 @@ import Foundation
 final class CustomSplitViewModel: ObservableObject {
     @Published var amountPaymentInput = ""
     @Published var selectedPersonIndices: [Int] = []
+    @Published var validationError: String? = nil
     
     private let formatter: DecimalFormatting
     
@@ -17,8 +18,26 @@ final class CustomSplitViewModel: ObservableObject {
         self.formatter = formatter
     }
     
-    func addPaymentShare(to paymentShares: inout [PaymentShare], for participants: [Participant]) {
-        guard let amount = formatter.parse(amountPaymentInput), !selectedPersonIndices.isEmpty else { return }
+    func addPaymentShare(to paymentShares: inout [PaymentShare], for participants: [Participant]) -> Bool {
+        guard let amount = formatter.parse(amountPaymentInput), !selectedPersonIndices.isEmpty else {
+            validationError = "Укажите сумму и участников"
+            return false
+        }
+        
+        let amountValidation = ValidationService.validatePaymentShareAmount(amount)
+        guard amountValidation.isValid else {
+            validationError = amountValidation.errorMessage
+            return false
+        }
+        
+        let tempShares = selectedPersonIndices.map { _ in
+            PaymentShare(participantId: UUID(), name: "", amount: 0, color: .clear)
+        }
+        let sharesValidation = ValidationService.validatePaymentShares(paymentShares + tempShares)
+        guard sharesValidation.isValid else {
+            validationError = sharesValidation.errorMessage
+            return false
+        }
         
         let shareAmount = amount / Double(selectedPersonIndices.count)
         
@@ -35,7 +54,9 @@ final class CustomSplitViewModel: ObservableObject {
             paymentShares.append(newPaymentShare)
         }
         
+        validationError = nil
         AnalyticsService.logPaymentShareAdded(totalShares: paymentShares.count)
+        return true
     }
     
     func distributedAmount(from paymentShares: [PaymentShare]) -> Double {

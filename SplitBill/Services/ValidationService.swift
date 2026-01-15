@@ -39,6 +39,13 @@ struct ValidationService {
         return .success
     }
     
+    static func validatePaymentShareAmount(_ amount: Double) -> ValidationResult {
+        guard amount <= 99999.99 else {
+            return.failure("Максимальная сумма: 99999.99 ₽")
+        }
+        return .success
+    }
+    
     static func validateReceiptItems(_ items: [BillItem]) -> ValidationResult {
         guard items.count <= 50 else {
             return .failure("Максимум 50 позиций в чеке")

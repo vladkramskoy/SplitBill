@@ -292,6 +292,7 @@ struct CustomSplitView: View {
             HStack {
                 Button("Отмена") {
                     showInputModal = false
+                    viewModel.validationError = nil
                 }
                 .foregroundStyle(.secondary)
                 
@@ -304,8 +305,9 @@ struct CustomSplitView: View {
                 Spacer()
                 
                 Button("Готово") {
-                    viewModel.addPaymentShare(to: &session.customPaymentShares, for: session.participants)
-                    showInputModal = false
+                    if viewModel.addPaymentShare(to: &session.customPaymentShares, for: session.participants) {
+                        showInputModal = false
+                    }
                 }
                 .fontWeight(.semibold)
                 .foregroundStyle(viewModel.amountPaymentInput.isEmpty ||
@@ -335,6 +337,7 @@ struct CustomSplitView: View {
                                 if formatted != newValue {
                                     viewModel.amountPaymentInput = formatted
                                 }
+                                viewModel.validationError = nil
                             }
                             
                         Text("₽")
@@ -362,7 +365,23 @@ struct CustomSplitView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
             
-            Spacer()
+            if let error = viewModel.validationError {
+                VStack {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                        
+                        Text(error)
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
         .presentationDetents([.height(280)])
         .presentationDragIndicator(.visible)
