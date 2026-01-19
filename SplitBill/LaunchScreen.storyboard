@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="gGH-dl-5es">
+    <device id="retina6_3" orientation="portrait" appearance="dark"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="Khp-AV-EGP">
+            <objects>
+                <viewController id="gGH-dl-5es" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="RAc-1G-aSR">
+                        <rect key="frame" x="0.0" y="0.0" width="402" height="874"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchScreenImage" translatesAutoresizingMaskIntoConstraints="NO" id="YKB-DC-Yh2">
+                                <rect key="frame" x="0.0" y="0.0" width="402" height="874"/>
+                                <color key="backgroundColor" name="LaunchScreenBackground"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SplitBill" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hw2-Uh-E62">
+                                <rect key="frame" x="0.0" y="120" width="402" height="49"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="41"/>
+                                <color key="textColor" systemColor="systemTealColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="WZb-qG-dk7"/>
+                        <color key="backgroundColor" name="LaunchScreenBackground"/>
+                        <constraints>
+                            <constraint firstItem="hw2-Uh-E62" firstAttribute="leading" secondItem="WZb-qG-dk7" secondAttribute="leading" id="QBT-mB-sx3"/>
+                            <constraint firstItem="hw2-Uh-E62" firstAttribute="centerX" secondItem="WZb-qG-dk7" secondAttribute="centerX" id="RDT-jF-rx9"/>
+                            <constraint firstItem="hw2-Uh-E62" firstAttribute="trailing" secondItem="WZb-qG-dk7" secondAttribute="trailing" id="W0n-vW-6iJ"/>
+                            <constraint firstItem="YKB-DC-Yh2" firstAttribute="top" secondItem="RAc-1G-aSR" secondAttribute="top" id="ZwB-JE-Doh"/>
+                            <constraint firstItem="YKB-DC-Yh2" firstAttribute="leading" secondItem="WZb-qG-dk7" secondAttribute="leading" id="dCW-8e-cGw"/>
+                            <constraint firstAttribute="top" secondItem="hw2-Uh-E62" secondAttribute="top" constant="-120" id="dgM-WJ-mtJ"/>
+                            <constraint firstItem="YKB-DC-Yh2" firstAttribute="trailing" secondItem="WZb-qG-dk7" secondAttribute="trailing" id="ioJ-ds-XWs"/>
+                            <constraint firstAttribute="bottom" secondItem="YKB-DC-Yh2" secondAttribute="bottom" id="pDv-P1-uav"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jwK-6n-WGh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-386.56716417910445" y="-181.23569794050343"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="LaunchScreenImage" width="720" height="1125"/>
+        <namedColor name="LaunchScreenBackground">
+            <color red="0.90196078431372551" green="0.95294117647058818" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemTealColor">
+            <color red="0.18823529410000001" green="0.69019607839999997" blue="0.78039215689999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
