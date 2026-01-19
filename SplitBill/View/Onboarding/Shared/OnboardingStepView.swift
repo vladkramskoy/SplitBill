@@ -12,38 +12,40 @@ struct OnboardingStepView<Content: View>: View {
     let illustrationContent: Content
     
     var body: some View {
-        VStack(spacing: 30) {
-            Spacer()
-            
-            illustrationContent
-                .frame(height: 280)
-            
-            Spacer()
-            
-            VStack(spacing: 16) {
-                Image(systemName: step.icon)
-                    .font(.system(size: 50))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: step.gradient,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        ScrollView {
+            VStack(spacing: 30) {
+                Spacer()
+                
+                illustrationContent
+                    .frame(height: 280)
+                
+                Spacer()
+                
+                VStack(spacing: 16) {
+                    Image(systemName: step.icon)
+                        .font(.system(size: 50))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: step.gradient,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
+                    
+                    Text(step.title)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .multilineTextAlignment(.center)
+                    
+                    Text(step.description)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 
-                Text(step.title)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .multilineTextAlignment(.center)
-                
-                Text(step.description)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
             }
-            
-            Spacer()
         }
     }
 }

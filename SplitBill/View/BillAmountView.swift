@@ -20,14 +20,14 @@ struct BillAmountView: View {
             Color.SplitBill.backgroundLight
                 .ignoresSafeArea()
             
-            VStack {
+            ScrollView {
                 VStack(spacing: 16) {
                     headerCard
                     amountInputCard
                     tipToggleCard
                 }
 
-                Spacer()
+                Spacer(minLength: 80)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
