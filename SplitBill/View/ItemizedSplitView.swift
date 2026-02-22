@@ -12,6 +12,7 @@ struct ItemizedSplitView: View {
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = ItemizedSplitViewModel()
     @State private var showInputModal = false
+    @State private var shareParticipant: Participant?
     @State private var completionLoggedOnce = false
     
     private let tolerance: Double = 0.001
@@ -52,6 +53,25 @@ struct ItemizedSplitView: View {
                 .background(Color(.systemBackground))
                 .presentationDetents([.height(380)])
                 .presentationDragIndicator(.visible)
+        }
+        .sheet(item: $shareParticipant) { participant in 
+            SharingModalView(
+                shareText: ShareService.formatForParticipant(
+                    participantName: participant.name,
+                    participantAmount: viewModel.amountFor(
+                        participantId: participant.id,
+                        receiptItems: session.receiptItems),
+                    totalAmount: session.totalAmount),
+                onShare: {
+                    AnalyticsService.logShareResult(
+                        type: .participant,
+                        method: .itemized
+                    )
+                }
+            )
+            .background(Color(.systemBackground))
+            .presentationDetents([.height(700)])
+            .presentationDragIndicator(.visible)
         }
         .onAppear {
             AnalyticsService.logScreen(name: "itemized_split_screen")
@@ -156,16 +176,10 @@ struct ItemizedSplitView: View {
                 ForEach(session.participants) { participant in
                     let participantAmount = viewModel.amountFor(participantId: participant.id, receiptItems: session.receiptItems)
                     
-                    let onShare = ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount)
-                    
                     ParticipantRow(participant: participant,
-                                    amount: participantAmount,
-                                    onShare: { onShare })
-                    .simultaneousGesture(TapGesture().onEnded {
-                        AnalyticsService.logShareResult(
-                            type: .participant,
-                            method: .itemized
-                        )
+                                   amount: participantAmount,
+                                   shareButtonTap: {
+                        shareParticipant = participant
                     })
                 }
             }

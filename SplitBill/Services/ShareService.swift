@@ -11,15 +11,41 @@ final class ShareService {
     private init() {}
     
     static func formatFullBill(totalAmount: Double, distributedAmount: Double, participants: [Participant], participantAmount: [UUID: Double]) -> String {
-        let participantNames = participants.map { "\($0.name) - \(participantAmount[$0.id]?.currencyFormatted ?? "-")" }.joined(separator: "\n")
+        let participantNames = participants.map { "\($0.name) — \(participantAmount[$0.id]?.currencyFormatted ?? "-")" }.joined(separator: "\n")
         
-        let messageText = "📊 Разделение счета\n\nОбщая сумма: \(totalAmount.currencyFormatted)\nРаспределено: \(distributedAmount.currencyFormatted)\n\n👥 Участники:\n\(participantNames)\n\nСоздано в SplitBill"
+        let messageText = """
+        📊 Разделить счёт
+                        
+        Общая сумма: \(totalAmount.currencyFormatted)
+        Распределено: \(distributedAmount.currencyFormatted)
+                        
+        👥 Участники:
+        \(participantNames)
+                        
+        ✅ Рассчитано с помощью приложения «Раздели счёт»
+        
+        ⬇️Скачать в AppStore:
+        https://apps.apple.com/app/id6756733884
+        """
         
         return messageText
     }
     
     static func formatForParticipant(participantName: String, participantAmount: Double, totalAmount: Double) -> String {
-        let messageText = "Привет, \(participantName)! 👋\n\nТвоя часть за счет: \(participantAmount.currencyFormatted)\n\nОбщая сумма была: \(totalAmount.currencyFormatted)\n\nСоздано в SplitBill"
+        
+        let messageText = """
+        📊 Разделить счёт
+        
+        Общая сумма: \(totalAmount.currencyFormatted)
+        
+        👥 Сумма для участника:
+        \(participantName) — \(participantAmount.currencyFormatted)
+        
+        ✅ Рассчитано с помощью приложения «Раздели счёт»
+                
+        ⬇️Скачать в AppStore:
+        https://apps.apple.com/app/id6756733884
+        """
         
         return messageText
     }

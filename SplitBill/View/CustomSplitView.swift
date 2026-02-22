@@ -13,6 +13,7 @@ struct CustomSplitView: View {
     @StateObject private var viewModel = CustomSplitViewModel()
     @State private var showInputModal = false
     @FocusState private var isTextFieldFocused: Bool
+    @State private var shareParticipant: Participant?
     @State private var completionLoggedOnce = false
     
     private let tolerance: Double = 0.001
@@ -38,6 +39,25 @@ struct CustomSplitView: View {
         }
         .sheet(isPresented: $showInputModal) {
             inputModal
+        }
+        .sheet(item: $shareParticipant) { participant in 
+            SharingModalView(
+                shareText: ShareService.formatForParticipant(
+                    participantName: participant.name,
+                    participantAmount: viewModel.amountFor(
+                        participantId: participant.id,
+                        paymentShares: session.customPaymentShares),
+                    totalAmount: session.totalAmount),
+                onShare: {
+                    AnalyticsService.logShareResult(
+                        type: .participant,
+                        method: .custom
+                    )
+                }
+            )
+            .background(Color(.systemBackground))
+            .presentationDetents([.height(700)])
+            .presentationDragIndicator(.visible)
         }
         .onAppear {
             AnalyticsService.logScreen(name: "custom_split_screen")
@@ -146,15 +166,10 @@ struct CustomSplitView: View {
                 ForEach(session.participants) { participant in
                     let participantAmount = viewModel.amountFor(participantId: participant.id, paymentShares: session.customPaymentShares)
                     
-                    let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: participantAmount, totalAmount: session.totalAmount) }
-                    
                     ParticipantRow(participant: participant,
-                                   amount: participantAmount, onShare: onShare)
-                    .simultaneousGesture(TapGesture().onEnded {
-                        AnalyticsService.logShareResult(
-                            type: .participant,
-                            method: .custom
-                        )
+                                   amount: participantAmount,
+                                   shareButtonTap: {
+                        shareParticipant = participant
                     })
                 }
             }

@@ -14,6 +14,7 @@ struct SplitMethodView: View {
     @State private var showAlert = false
     @State private var showItemizedOnboarding = false
     @State private var showCustomOnboarding = false
+    @State private var showSharingModal = false
     
     var body: some View {
         ZStack {
@@ -74,12 +75,11 @@ struct SplitMethodView: View {
             }
             
             ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: shareTextForCurrentTab) {
+                Button {
+                    showSharingModal = true
+                } label: {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .simultaneousGesture(TapGesture().onEnded {
-                    logShareForCurrentTab()
-                })
             }
         }
         .onAppear {
@@ -91,7 +91,20 @@ struct SplitMethodView: View {
         .sheet(isPresented: $showCustomOnboarding) {
             CustomSplitOnboardingView()
         }
+        .sheet(isPresented: $showSharingModal) {
+            SharingModalView(
+                shareText: shareTextForCurrentTab,
+                onShare: {
+                    logShareForCurrentTab()
+                }
+            )
+            .background(Color(.systemBackground))
+            .presentationDetents([.height(700)])
+            .presentationDragIndicator(.visible)
+        }
     }
+        
+    // MARK: - Computed Properties
     
     private var screenNameForCurrentTab: String {
         switch selectedTab {
@@ -120,6 +133,8 @@ struct SplitMethodView: View {
         }
     }
     
+    // MARK: - Functions
+    
     private func showHelpForCurrentTab() {
         switch selectedTab {
         case 1:
@@ -147,6 +162,8 @@ struct SplitMethodView: View {
         )
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     @Previewable @State var session = BillSession()

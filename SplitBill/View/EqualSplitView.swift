@@ -10,6 +10,7 @@ import SwiftUI
 struct EqualSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @State private var shareParticipant: Participant?
     @State private var completionLoggedOnce = false
     
     var body: some View {
@@ -77,27 +78,10 @@ struct EqualSplitView: View {
                         
                         VStack(spacing: 12) {
                             ForEach(session.participants) { participant in
-                                let onShare = { ShareService.formatForParticipant(participantName: participant.name, participantAmount: session.equalAmountPerPerson(), totalAmount: session.totalAmount) }
-                                
                                 ParticipantRow(participant: participant,
-                                               amount: session.equalAmountPerPerson(), onShare: onShare)
-                                .simultaneousGesture(TapGesture().onEnded {
-                                    if !completionLoggedOnce {
-                                        AnalyticsService.logBillSplitCompleted(
-                                            method: .equal,
-                                            participants: session.participants.count,
-                                            items: 0,
-                                            totalAmount: session.totalAmount,
-                                            durationSec: session.getSessionDuration(),
-                                            success: true
-                                        )
-                                        completionLoggedOnce = true
-                                    }
-                                    
-                                    AnalyticsService.logShareResult(
-                                        type: .participant,
-                                        method: .equal
-                                    )
+                                               amount: session.equalAmountPerPerson(),
+                                               shareButtonTap: {
+                                    shareParticipant = participant
                                 })
                             }
                             
@@ -127,6 +111,36 @@ struct EqualSplitView: View {
         }
         .onAppear {
             AnalyticsService.logScreen(name: "equal_split_result")
+        }
+        .sheet(item: $shareParticipant) { participant in
+            SharingModalView(
+                shareText: ShareService.formatForParticipant(
+                    participantName: participant.name,
+                    participantAmount: session.equalAmountPerPerson(),
+                    totalAmount: session.totalAmount
+                ),
+                onShare: {
+                    if !completionLoggedOnce {
+                        AnalyticsService.logBillSplitCompleted(
+                            method: .equal,
+                            participants: session.participants.count,
+                            items: 0,
+                            totalAmount: session.totalAmount,
+                            durationSec: session.getSessionDuration(),
+                            success: true
+                        )
+                        completionLoggedOnce = true
+                    }
+                    
+                    AnalyticsService.logShareResult(
+                        type: .participant,
+                        method: .equal
+                    )
+                }
+            )
+            .background(Color(.systemBackground))
+            .presentationDetents([.height(700)])
+            .presentationDragIndicator(.visible)
         }
     }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 struct ParticipantRow: View {
     let participant: Participant
     let amount: Double
-    let onShare: (() -> String)
+    let shareButtonTap: () -> Void
     
     var body: some View {
         HStack {
@@ -41,11 +41,9 @@ struct ParticipantRow: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
             
-            ShareLink(item: onShare()) {
-                HStack {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundStyle(participant.color)
-                }
+            Button(action: shareButtonTap) {
+                Image(systemName: "square.and.arrow.up")
+                    .foregroundStyle(participant.color)
             }
         }
         .padding(.horizontal, 8)
@@ -63,10 +61,10 @@ struct ParticipantRow: View {
         ParticipantRow(
             participant: Participant(name: "Петр Сидоров", color: Color.SplitBill.adaptiveParticipant1),
             amount: 500,
-            onShare: { "" })
+            shareButtonTap: { print("Share tapped") })
         ParticipantRow(
             participant: Participant(name: "Мария Петрова", color: Color.SplitBill.adaptiveParticipant2),
             amount: 750,
-            onShare: { "" })
+            shareButtonTap: { print("Share tapped") })
     }
 }
