@@ -20,31 +20,41 @@ struct BillAmountView: View {
             Color.SplitBill.backgroundLight
                 .ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 16) {
-                    headerCard
-                    amountInputCard
-                    tipToggleCard
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 16) {
+                        headerCard
+                        amountInputCard
+                        tipToggleCard
+                    }
+                    
+                    Spacer(minLength: dynamicBottomSpacing)
                 }
-
-                Spacer(minLength: 80)
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button {
-                        isAmountFocused = false
-                        isTipFocused = false
-                    } label: {
-                        Image(systemName: "chevron.down")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button {
+                            isAmountFocused = false
+                            isTipFocused = false
+                        } label: {
+                            Image(systemName: "chevron.down")
+                        }
                     }
                 }
-            }
-            .onAppear {
-                isAmountFocused = true
-                updateAmountGradient()
-                AnalyticsService.logScreen(name: "bill_amount_screen")
+                .onAppear {
+                    isAmountFocused = true
+                    updateAmountGradient()
+                    AnalyticsService.logScreen(name: "bill_amount_screen")
+                }
+                .onChange(of: isTipFocused) { oldValue, newValue in
+                    if newValue && viewModel.tipCalculationType == .fixedAmount {
+
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            proxy.scrollTo("tipAmountField", anchor: .center)
+                        }
+                    }
+                }
             }
             
             VStack {
@@ -257,6 +267,7 @@ struct BillAmountView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(!viewModel.isValidTipAmount && viewModel.tipAmountValue > 999_999.99 ? Color.red.opacity(0.6) : Color.clear, lineWidth: 2)
                         }
+                        .id("tipAmountField")
                         
                         if let errorMessage = viewModel.tipValidationMessage {
                             Text(errorMessage)
@@ -302,6 +313,16 @@ struct BillAmountView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
         .padding(.horizontal)
+    }
+    
+    private var dynamicBottomSpacing: CGFloat {
+        if viewModel.isTipEnable &&
+            viewModel.tipCalculationType == .fixedAmount &&
+            isTipFocused {
+            return 300
+        } else {
+            return 80
+        }
     }
     
     private func updateAmountGradient() {

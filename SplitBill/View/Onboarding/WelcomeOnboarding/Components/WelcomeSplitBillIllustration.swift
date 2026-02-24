@@ -21,7 +21,7 @@ struct WelcomeSplitBillIllustration: View {
             HStack(spacing: 0) {
                 AnimatedIconView(
                     icon: "person.3.fill",
-                    color: .purple,
+                    color: .orange,
                     size: .small
                 )
                 Spacer()
