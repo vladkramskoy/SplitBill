@@ -10,13 +10,29 @@ import Foundation
 final class ShareService {
     private init() {}
     
-    static func formatFullBill(totalAmount: Double, distributedAmount: Double, participants: [Participant], participantAmount: [UUID: Double]) -> String {
+    static func formatFullBill(
+        totalAmount: Double,
+        distributedAmount: Double,
+        billAmount: Double,
+        tipAmount: Double,
+        participants: [Participant],
+        participantAmount: [UUID: Double]
+    ) -> String {
         let participantNames = participants.map { "\($0.name) — \(participantAmount[$0.id]?.currencyFormatted ?? "-")" }.joined(separator: "\n")
+        
+        let billBreakdown = tipAmount > 0 ? """
+        Сумма счёта: \(billAmount.currencyFormatted)
+        Чаевые: \(tipAmount.currencyFormatted)
+        —————————————
+        Итого: \(totalAmount.currencyFormatted)
+        """ : """
+        Общая сумма: \(totalAmount.currencyFormatted)
+        """
         
         let messageText = """
         📊 Разделить счёт
-                        
-        Общая сумма: \(totalAmount.currencyFormatted)
+        
+        \(billBreakdown)
         Распределено: \(distributedAmount.currencyFormatted)
                         
         👥 Участники:
@@ -31,12 +47,27 @@ final class ShareService {
         return messageText
     }
     
-    static func formatForParticipant(participantName: String, participantAmount: Double, totalAmount: Double) -> String {
+    static func formatForParticipant(
+        participantName: String,
+        participantAmount: Double,
+        totalAmount: Double,
+        billAmount: Double,
+        tipAmount: Double
+    ) -> String {
+        
+        let billBreakdown = tipAmount > 0 ? """
+        Сумма счёта: \(billAmount.currencyFormatted)
+        Чаевые: \(tipAmount.currencyFormatted)
+        —————————————
+        Итого: \(totalAmount.currencyFormatted)
+        """ : """
+        Общая сумма: \(totalAmount.currencyFormatted)
+        """
         
         let messageText = """
         📊 Разделить счёт
         
-        Общая сумма: \(totalAmount.currencyFormatted)
+        \(billBreakdown)
         
         👥 Сумма для участника:
         \(participantName) — \(participantAmount.currencyFormatted)

@@ -117,8 +117,9 @@ struct EqualSplitView: View {
                 shareText: ShareService.formatForParticipant(
                     participantName: participant.name,
                     participantAmount: session.equalAmountPerPerson(),
-                    totalAmount: session.totalAmount
-                ),
+                    totalAmount: session.totalAmount,
+                    billAmount: session.billAmount,
+                    tipAmount: session.tipAmount),
                 onShare: {
                     if !completionLoggedOnce {
                         AnalyticsService.logBillSplitCompleted(

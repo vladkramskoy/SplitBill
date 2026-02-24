@@ -20,8 +20,10 @@ extension BillSession {
         }
         
         return ShareService.formatFullBill(
-            totalAmount: billAmount,
+            totalAmount: totalAmount,
             distributedAmount: totalAmount,
+            billAmount: billAmount,
+            tipAmount: tipAmount,
             participants: participants,
             participantAmount: amounts)
     }
@@ -53,6 +55,8 @@ extension BillSession {
         return ShareService.formatFullBill(
             totalAmount: totalAmount,
             distributedAmount: distributedAmount,
+            billAmount: billAmount,
+            tipAmount: tipAmount,
             participants: participants,
             participantAmount: amounts)
     }
@@ -74,6 +78,8 @@ extension BillSession {
         return ShareService.formatFullBill(
             totalAmount: totalAmount,
             distributedAmount: distributedAmount,
+            billAmount: billAmount,
+            tipAmount: tipAmount,
             participants: participants,
             participantAmount: amounts)
     }

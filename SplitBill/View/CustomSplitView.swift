@@ -47,7 +47,9 @@ struct CustomSplitView: View {
                     participantAmount: viewModel.amountFor(
                         participantId: participant.id,
                         paymentShares: session.customPaymentShares),
-                    totalAmount: session.totalAmount),
+                    totalAmount: session.totalAmount,
+                    billAmount: session.billAmount,
+                    tipAmount: session.tipAmount),
                 onShare: {
                     AnalyticsService.logShareResult(
                         type: .participant,

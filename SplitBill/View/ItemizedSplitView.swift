@@ -61,7 +61,9 @@ struct ItemizedSplitView: View {
                     participantAmount: viewModel.amountFor(
                         participantId: participant.id,
                         receiptItems: session.receiptItems),
-                    totalAmount: session.totalAmount),
+                    totalAmount: session.totalAmount,
+                    billAmount: session.billAmount,
+                    tipAmount: session.tipAmount),
                 onShare: {
                     AnalyticsService.logShareResult(
                         type: .participant,
