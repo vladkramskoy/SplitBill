@@ -62,6 +62,7 @@ struct SharingModalView: View {
                 }
             }
         }
+        .background(Color(.systemBackground).ignoresSafeArea())
     }
 }
 

@@ -57,7 +57,6 @@ struct CustomSplitView: View {
                     )
                 }
             )
-            .background(Color(.systemBackground))
             .presentationDetents([.height(700)])
             .presentationDragIndicator(.visible)
         }
