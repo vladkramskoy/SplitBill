@@ -69,7 +69,7 @@ final class BillAmountViewModel: ObservableObject {
         if validation.isValid {
             return "Сумма введена корректно"
         } else {
-            return validation.errorMessage ?? "Введите сумму от 10 ₽"
+            return validation.errorMessage ?? "Введите сумму от 10"
         }
     }
     

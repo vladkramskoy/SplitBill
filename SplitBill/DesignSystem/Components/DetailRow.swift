@@ -11,6 +11,7 @@ struct DetailRow: View {
     let title: String
     let value: Double
     let isTotal: Bool
+    @Environment(\.decimalFormatter) private var formatter
     
     var body: some View {
         HStack {
@@ -19,7 +20,7 @@ struct DetailRow: View {
             
             Spacer()
             
-            Text("\(value, specifier: "%.2f") ₽")
+            Text(formatter.format(value))
                 .fontWeight(isTotal ? .bold : .regular)
                 .foregroundStyle(isTotal ? .blue : .secondary)
         }

@@ -20,7 +20,7 @@ struct CustomSummaryIllustration: View {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("2500 ₽")
+                        Text("2 500 ₽")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                             .foregroundStyle(.primary)
                         
@@ -106,7 +106,7 @@ struct CustomSummaryIllustration: View {
                         
                         Spacer()
                         
-                        Text([1250, 625, 625][index].currencyFormatted)
+                        Text([1250, 625, 625][index], format: .currency(code: "RUB"))
                             .font(.subheadline)
                             .fontWeight(.bold)
                             .foregroundStyle(gradient[0])

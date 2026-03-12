@@ -10,6 +10,7 @@ import SwiftUI
 struct EqualSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @Environment(\.decimalFormatter) private var formatter
     @State private var shareParticipant: Participant?
     @State private var completionLoggedOnce = false
     
@@ -22,7 +23,7 @@ struct EqualSplitView: View {
                             HStack {
                                 Text("На человека:")
                                 Spacer()
-                                Text("\(session.equalAmountPerPerson(), specifier: "%.2f") ₽")
+                                Text(formatter.format(session.equalAmountPerPerson()))
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(.blue)
@@ -119,7 +120,8 @@ struct EqualSplitView: View {
                     participantAmount: session.equalAmountPerPerson(),
                     totalAmount: session.totalAmount,
                     billAmount: session.billAmount,
-                    tipAmount: session.tipAmount),
+                    tipAmount: session.tipAmount,
+                    formatter: formatter),
                 onShare: {
                     if !completionLoggedOnce {
                         AnalyticsService.logBillSplitCompleted(

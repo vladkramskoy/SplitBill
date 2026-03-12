@@ -10,6 +10,7 @@ import SwiftUI
 struct BillAmountView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @Environment(\.decimalFormatter) private var formatter
     @StateObject private var viewModel = BillAmountViewModel()
     @State private var amountColor: Color = .secondary
     @FocusState private var isAmountFocused: Bool
@@ -122,7 +123,7 @@ struct BillAmountView: View {
                         updateAmountGradient()
                     }
                 
-                Text("₽")
+                Text(formatter.currencySymbol)
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundStyle(.secondary.opacity(0.5))
             }
@@ -256,7 +257,7 @@ struct BillAmountView: View {
                                     }
                                 }
                             
-                            Text("₽")
+                            Text(formatter.currencySymbol)
                                 .font(.system(size: 28, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.secondary.opacity(0.5))
                         }
@@ -285,7 +286,7 @@ struct BillAmountView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         
-                        Text(viewModel.totalAmount, format: .currency(code: "RUB"))
+                        Text(formatter.format(viewModel.totalAmount))
                             .font(.title2)
                             .fontWeight(.bold)
                     }
@@ -298,7 +299,7 @@ struct BillAmountView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             
-                            Text(viewModel.calculatedTip, format: .currency(code: "RUB"))
+                            Text(formatter.format(viewModel.calculatedTip))
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .foregroundStyle(.secondary)

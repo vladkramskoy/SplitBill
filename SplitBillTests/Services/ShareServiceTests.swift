@@ -10,15 +10,18 @@ import Testing
 @testable import SplitBill
 
 struct ShareServiceTests {
+    let formatter = DecimalFormatter()
+    
     @Test func formatForParticipantWithoutTip() async throws {
         let result = ShareService.formatForParticipant(
             participantName: "Vlad",
             participantAmount: 1500,
             totalAmount: 5000,
             billAmount: 5000,
-            tipAmount: 0)
+            tipAmount: 0,
+            formatter: formatter)
         #expect(result.contains("Vlad"))
-        #expect(result.contains("1\u{00A0}500 ₽"))
+        #expect(result.contains("1\u{00A0}500"))
         #expect(result.contains("Общая сумма:"))
         #expect(result.contains("📊"))
         #expect(result.contains("https://apps.apple.com/app/id6756733884"))
@@ -30,7 +33,8 @@ struct ShareServiceTests {
             participantAmount: 1500,
             totalAmount: 5000,
             billAmount: 5000,
-            tipAmount: 500)
+            tipAmount: 500,
+            formatter: formatter)
         #expect(result.contains("Сумма счёта:"))
         #expect(result.contains("Чаевые:"))
         #expect(result.contains("Итого:"))
@@ -43,10 +47,11 @@ struct ShareServiceTests {
             participantAmount: 0,
             totalAmount: 0,
             billAmount: 0,
-            tipAmount: 0)
+            tipAmount: 0,
+            formatter: formatter)
         #expect(result.isEmpty == false)
-        #expect(result.contains("Общая сумма: 0 ₽"))
-        #expect(result.contains("Vlad — 0 ₽"))
+        #expect(result.contains("Общая сумма: 0"))
+        #expect(result.contains("Vlad — 0"))
         #expect(!result.contains("Чаевые:"))
     }
     
@@ -56,7 +61,8 @@ struct ShareServiceTests {
             participantAmount: 1500,
             totalAmount: 5000,
             billAmount: 5000,
-            tipAmount: 0)
+            tipAmount: 0,
+            formatter: formatter)
         #expect(result.contains("Vlad 🎉"))
         #expect(result.contains("Общая сумма:"))
         #expect(result.contains("📊"))
@@ -78,10 +84,11 @@ struct ShareServiceTests {
             billAmount: 5000,
             tipAmount: 0,
             participants: participants,
-            participantAmount: participantAmount)
+            participantAmount: participantAmount,
+            formatter: formatter)
         
         #expect(result.contains("Общая сумма:"))
-        #expect(result.contains("5\u{00A0}000 ₽"))
+        #expect(result.contains("5\u{00A0}000"))
         #expect(result.contains("Dasha"))
         #expect(result.contains("👥"))
         #expect(result.contains("—"))
@@ -103,11 +110,12 @@ struct ShareServiceTests {
             billAmount: 5000,
             tipAmount: 500,
             participants: participants,
-            participantAmount: participantAmount)
+            participantAmount: participantAmount,
+            formatter: formatter)
         
-        #expect(result.contains("Сумма счёта: 5\u{00A0}000 ₽"))
-        #expect(result.contains("Чаевые: 500 ₽"))
-        #expect(result.contains("Итого: 5\u{00A0}500 ₽"))
+        #expect(result.contains("Сумма счёта: 5\u{00A0}000"))
+        #expect(result.contains("Чаевые: 500"))
+        #expect(result.contains("Итого: 5\u{00A0}500"))
         #expect(result.contains("—————————————"))
     }
     
@@ -121,7 +129,8 @@ struct ShareServiceTests {
             billAmount: 5000,
             tipAmount: 0,
             participants: participants,
-            participantAmount: participantAmount)
+            participantAmount: participantAmount,
+            formatter: formatter)
         
         #expect(result.contains("Общая сумма:"))
         #expect(result.isEmpty == false)
@@ -138,10 +147,11 @@ struct ShareServiceTests {
             billAmount: 1000,
             tipAmount: 0,
             participants: participants,
-            participantAmount: participantAmount)
+            participantAmount: participantAmount,
+            formatter: formatter)
         
         #expect(result.contains("Sasha"))
-        #expect(result.contains("1\u{00A0}000 ₽"))
+        #expect(result.contains("1\u{00A0}000"))
     }
     
     @Test func formatFullBillNoParticipantAmount() async throws {
@@ -155,7 +165,8 @@ struct ShareServiceTests {
             billAmount: 1000,
             tipAmount: 0,
             participants: participants,
-            participantAmount: participantAmount)
+            participantAmount: participantAmount,
+            formatter: formatter)
         
         #expect(result.contains("Dasha — -"))
     }

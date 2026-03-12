@@ -10,6 +10,7 @@ import SwiftUI
 struct SplitMethodView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @Environment(\.decimalFormatter) private var formatter
     @State private var selectedTab = 0
     @State private var showAlert = false
     @State private var showItemizedOnboarding = false
@@ -122,11 +123,11 @@ struct SplitMethodView: View {
     private var shareTextForCurrentTab: String {
         switch selectedTab {
         case 0:
-            return session.shareEqualResult()
+            return session.shareEqualResult(formatter: formatter)
         case 1:
-            return session.shareItemizedResult()
+            return session.shareItemizedResult(formatter: formatter)
         case 2:
-            return session.shareCustomResult()
+            return session.shareCustomResult(formatter: formatter)
         default:
             return ""
         }

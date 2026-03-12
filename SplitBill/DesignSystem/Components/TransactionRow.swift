@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TransactionRow: View {
     let paymentShare: PaymentShare
+    @Environment(\.decimalFormatter) private var formatter
     
     var body: some View {
         HStack {
@@ -26,7 +27,7 @@ struct TransactionRow: View {
             
             Spacer()
             
-            Text("\(paymentShare.amount, specifier: "%.2f ₽")")
+            Text(formatter.format(paymentShare.amount))
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)

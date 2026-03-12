@@ -10,6 +10,7 @@ import SwiftUI
 struct CustomSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @Environment(\.decimalFormatter) private var formatter
     @StateObject private var viewModel = CustomSplitViewModel()
     @State private var showInputModal = false
     @FocusState private var isTextFieldFocused: Bool
@@ -40,7 +41,7 @@ struct CustomSplitView: View {
         .sheet(isPresented: $showInputModal) {
             inputModal
         }
-        .sheet(item: $shareParticipant) { participant in 
+        .sheet(item: $shareParticipant) { participant in
             SharingModalView(
                 shareText: ShareService.formatForParticipant(
                     participantName: participant.name,
@@ -49,7 +50,8 @@ struct CustomSplitView: View {
                         paymentShares: session.customPaymentShares),
                     totalAmount: session.totalAmount,
                     billAmount: session.billAmount,
-                    tipAmount: session.tipAmount),
+                    tipAmount: session.tipAmount,
+                    formatter: formatter),
                 onShare: {
                     AnalyticsService.logShareResult(
                         type: .participant,
@@ -84,7 +86,7 @@ struct CustomSplitView: View {
         VStack(spacing: 0) {
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(distributed.currencyFormatted)
+                    Text(formatter.formatCompact(distributed))
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
                     
@@ -101,7 +103,7 @@ struct CustomSplitView: View {
                             .font(.system(size: 14))
                             .foregroundStyle(hasRemainingAmount ? .orange : isDistributionComplete ? .green : .red)
                         
-                        Text(abs(remaining).currencyFormatted)
+                        Text(formatter.formatCompact(abs(remaining)))
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(hasRemainingAmount ? .orange : isDistributionComplete ? .green : .red)
                     }
@@ -353,7 +355,7 @@ struct CustomSplitView: View {
                                 viewModel.validationError = nil
                             }
                             
-                        Text("₽")
+                        Text(formatter.currencySymbol)
                             .font(.system(size: 24, weight: .medium))
                             .foregroundStyle(.secondary)
                     }

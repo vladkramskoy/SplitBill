@@ -8,19 +8,11 @@
 import SwiftUI
 
 struct UnitDistibutionRow: View {
-    private let formatter: DecimalFormatting
+    @Environment(\.decimalFormatter) private var formatter
     @Binding var item: BillItem
     let participants: [Participant]
     let unitNumber: Int
     let unitIndex: Int
-    
-    init(formatter: DecimalFormatting = DecimalFormatter(), item: Binding<BillItem>, participants: [Participant], unitNumber: Int, unitIndex: Int) {
-        self.formatter = formatter
-        self._item = item
-        self.participants = participants
-        self.unitNumber = unitNumber
-        self.unitIndex = unitIndex
-    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -31,7 +23,7 @@ struct UnitDistibutionRow: View {
                 
                 Spacer()
                 
-                Text("\(formatter.format(item.pricePerUnit)) ₽")
+                Text(formatter.format(item.pricePerUnit))
             }
             
             ScrollView(.horizontal, showsIndicators: false) {

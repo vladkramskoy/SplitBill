@@ -26,7 +26,7 @@ struct ValidationServiceTests {
     @Test func validateTipAmountExceedsLimit() async throws {
         let result = ValidationService.validateTipAmount(1_000_000)
         #expect(result.isValid == false)
-        #expect(result.errorMessage == "Максимальная сумма: 999,999.99 ₽")
+        #expect(result.errorMessage == "Максимальная сумма: 999,999.99")
     }
     
     // MARK: Amount
@@ -44,7 +44,7 @@ struct ValidationServiceTests {
     @Test func validateAmountBelowMin() async throws {
         let result = ValidationService.validateAmount(9.99)
         #expect(result.isValid == false)
-        #expect(result.errorMessage == "Минимальная сумма: 10 ₽")
+        #expect(result.errorMessage == "Минимальная сумма: 10")
     }
     
     @Test func validateAmountMaxBoundary() async throws {
@@ -55,7 +55,7 @@ struct ValidationServiceTests {
     @Test func validateAmountExceedsLimit() async throws {
         let result = ValidationService.validateAmount(1_000_000)
         #expect(result.isValid == false)
-        #expect(result.errorMessage == "Максимальная сумма: 999,999.99 ₽")
+        #expect(result.errorMessage == "Максимальная сумма: 999,999.99")
     }
     
     // MARK: Participants
@@ -188,7 +188,7 @@ struct ValidationServiceTests {
     @Test func validateDishAmountExceedsLimit() async throws {
         let result = ValidationService.validateDishAmount(100000)
         #expect(result.isValid == false)
-        #expect(result.errorMessage == "Максимальная сумма: 99999.99 ₽")
+        #expect(result.errorMessage == "Максимальная сумма: 99999.99")
     }
     
     // MARK: Payment Share Amount
@@ -206,7 +206,7 @@ struct ValidationServiceTests {
     @Test func validatePaymentShareAmountExceedsLimit() async throws {
         let result = ValidationService.validatePaymentShareAmount(100000)
         #expect(result.isValid == false)
-        #expect(result.errorMessage == "Максимальная сумма: 99999.99 ₽")
+        #expect(result.errorMessage == "Максимальная сумма: 99999.99")
     }
     
     // MARK: Receipt Items

@@ -10,11 +10,17 @@ import SwiftUI
 struct ContentView: View {
     @State private var session = BillSession()
     @State private var showWelcomeOnboarding = false
+    @AppStorage("currencyCode") private var currencyCode: String = "RUB"
+    
+    private var formatter: DecimalFormatting {
+        DecimalFormatter(currencyCode: currencyCode)
+    }
     
     var body: some View {
         ParticipantView()
             .withRouter()
             .environment(session)
+            .environment(\.decimalFormatter, formatter)
             .onAppear {
                 AnalyticsService.logSessionStarted(entryPoint: "app_launch")
                 showWelcomeOnboarding = OnboardingManager.shouldShowOnboarding

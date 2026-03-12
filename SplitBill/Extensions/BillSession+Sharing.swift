@@ -8,7 +8,7 @@
 import Foundation
 
 extension BillSession {
-    func shareEqualResult() -> String {
+    func shareEqualResult(formatter: DecimalFormatting) -> String {
         guard !participants.isEmpty else {
             return "Нет участников для разделения счета"
         }
@@ -25,10 +25,11 @@ extension BillSession {
             billAmount: billAmount,
             tipAmount: tipAmount,
             participants: participants,
-            participantAmount: amounts)
+            participantAmount: amounts,
+            formatter: formatter)
     }
     
-    func shareItemizedResult() -> String {
+    func shareItemizedResult(formatter: DecimalFormatting) -> String {
         guard !participants.isEmpty else {
             return "Нет участников для разделения счета"
         }
@@ -58,10 +59,11 @@ extension BillSession {
             billAmount: billAmount,
             tipAmount: tipAmount,
             participants: participants,
-            participantAmount: amounts)
+            participantAmount: amounts,
+            formatter: formatter)
     }
     
-    func shareCustomResult() -> String {
+    func shareCustomResult(formatter: DecimalFormatting) -> String {
         guard !participants.isEmpty else {
             return "Нет участников для разделения счета"
         }
@@ -81,6 +83,7 @@ extension BillSession {
             billAmount: billAmount,
             tipAmount: tipAmount,
             participants: participants,
-            participantAmount: amounts)
+            participantAmount: amounts,
+            formatter: formatter)
     }
 }

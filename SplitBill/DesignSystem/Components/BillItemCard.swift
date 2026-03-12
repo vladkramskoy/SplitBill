@@ -8,26 +8,12 @@
 import SwiftUI
 
 struct BillItemCard: View {
-    private let formatter: DecimalFormatting
+    @Environment(\.decimalFormatter) private var formatter
     @Binding var item: BillItem
     let participants: [Participant]
     let onSplitEqually: () -> Void
     let onReset: () -> Void
     let onDelete: () -> Void
-    
-    init(item: Binding<BillItem>,
-         formatter: DecimalFormatting = DecimalFormatter(),
-         participants: [Participant],
-         onSplitEqually: @escaping () -> Void,
-         onReset: @escaping () -> Void,
-         onDelete: @escaping () -> Void) {
-        self._item = item
-        self.formatter = formatter
-        self.participants = participants
-        self.onSplitEqually = onSplitEqually
-        self.onReset = onReset
-        self.onDelete = onDelete
-    }
     
     private var distributedUnits: Int {
         var value = 0
@@ -40,7 +26,7 @@ struct BillItemCard: View {
         return value
     }
     
-    private var isFullyDistribuded: Bool {
+    private var isFullyDistributed: Bool {
         item.units.allSatisfy { !$0.payers.isEmpty }
     }
     
@@ -62,15 +48,15 @@ struct BillItemCard: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(formatter.format(item.totalPrice)) ₽")
+                    Text(formatter.format(item.totalPrice))
                         .font(.title3)
                         .fontWeight(.bold)
                     Text("\(distributedUnits)/\(item.units.count)")
                         .font(.caption)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(isFullyDistribuded ? Color.green.opacity(0.2) : Color.orange.opacity(0.2))
-                        .foregroundStyle(isFullyDistribuded ? .green : .orange)
+                        .background(isFullyDistributed ? Color.green.opacity(0.2) : Color.orange.opacity(0.2))
+                        .foregroundStyle(isFullyDistributed ? .green : .orange)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
             }

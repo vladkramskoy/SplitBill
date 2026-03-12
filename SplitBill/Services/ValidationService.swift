@@ -17,31 +17,31 @@ struct ValidationService {
     
     static func validateAmount(_ amount: Double) -> ValidationResult {
         guard amount >= 10 else {
-            return .failure("Минимальная сумма: 10 ₽")
+            return .failure("Минимальная сумма: 10")
         }
         guard amount <= 999_999.99 else {
-            return.failure("Максимальная сумма: 999,999.99 ₽")
+            return.failure("Максимальная сумма: 999,999.99")
         }
         return .success
     }
     
     static func validateTipAmount(_ amount: Double) -> ValidationResult {
         guard amount <= 999_999.99 else {
-            return.failure("Максимальная сумма: 999,999.99 ₽")
+            return.failure("Максимальная сумма: 999,999.99")
         }
         return .success
     }
     
     static func validateDishAmount(_ amount: Double) -> ValidationResult {
         guard amount <= 99999.99 else {
-            return.failure("Максимальная сумма: 99999.99 ₽")
+            return.failure("Максимальная сумма: 99999.99")
         }
         return .success
     }
     
     static func validatePaymentShareAmount(_ amount: Double) -> ValidationResult {
         guard amount <= 99999.99 else {
-            return.failure("Максимальная сумма: 99999.99 ₽")
+            return.failure("Максимальная сумма: 99999.99")
         }
         return .success
     }

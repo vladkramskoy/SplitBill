@@ -11,6 +11,7 @@ struct ParticipantRow: View {
     let participant: Participant
     let amount: Double
     let shareButtonTap: () -> Void
+    @Environment(\.decimalFormatter) private var formatter
     
     var body: some View {
         HStack {
@@ -36,7 +37,7 @@ struct ParticipantRow: View {
             
             Spacer()
             
-            Text("\(amount, specifier: "%.2f ₽")")
+            Text(formatter.format(amount))
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)

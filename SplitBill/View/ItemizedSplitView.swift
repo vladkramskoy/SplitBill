@@ -10,6 +10,7 @@ import SwiftUI
 struct ItemizedSplitView: View {
     @Environment(Router.self) private var router
     @Environment(BillSession.self) private var session
+    @Environment(\.decimalFormatter) private var formatter
     @StateObject private var viewModel = ItemizedSplitViewModel()
     @State private var showInputModal = false
     @State private var shareParticipant: Participant?
@@ -54,7 +55,7 @@ struct ItemizedSplitView: View {
                 .presentationDetents([.height(380)])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(item: $shareParticipant) { participant in 
+        .sheet(item: $shareParticipant) { participant in
             SharingModalView(
                 shareText: ShareService.formatForParticipant(
                     participantName: participant.name,
@@ -63,7 +64,8 @@ struct ItemizedSplitView: View {
                         receiptItems: session.receiptItems),
                     totalAmount: session.totalAmount,
                     billAmount: session.billAmount,
-                    tipAmount: session.tipAmount),
+                    tipAmount: session.tipAmount,
+                    formatter: formatter),
                 onShare: {
                     AnalyticsService.logShareResult(
                         type: .participant,
@@ -98,7 +100,7 @@ struct ItemizedSplitView: View {
         VStack(spacing: 0) {
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(distributed.currencyFormatted)
+                    Text(formatter.formatCompact(distributed))
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
                     
@@ -115,7 +117,7 @@ struct ItemizedSplitView: View {
                             .font(.system(size: 14))
                             .foregroundStyle(hasRemainingAmount ? .orange : isDistributionComplete ? .green : .red)
                         
-                        Text(abs(remaining).currencyFormatted)
+                        Text(formatter.formatCompact(abs(remaining)))
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(hasRemainingAmount ? .orange : isDistributionComplete ? .green : .red)
                     }
@@ -268,7 +270,7 @@ struct ItemizedSplitView: View {
                                 viewModel.validationError = nil
                             }
                             
-                        Text("₽")
+                        Text(formatter.currencySymbol)
                             .font(.system(size: 24, weight: .medium))
                             .foregroundStyle(.secondary)
                     }

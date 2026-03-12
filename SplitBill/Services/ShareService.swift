@@ -16,24 +16,25 @@ final class ShareService {
         billAmount: Double,
         tipAmount: Double,
         participants: [Participant],
-        participantAmount: [UUID: Double]
+        participantAmount: [UUID: Double],
+        formatter: DecimalFormatting
     ) -> String {
-        let participantNames = participants.map { "\($0.name) — \(participantAmount[$0.id]?.currencyFormatted ?? "-")" }.joined(separator: "\n")
+        let participantNames = participants.map { "\($0.name) — \(participantAmount[$0.id].map { formatter.formatCompact($0) } ?? "-")" }.joined(separator: "\n")
         
         let billBreakdown = tipAmount > 0 ? """
-        Сумма счёта: \(billAmount.currencyFormatted)
-        Чаевые: \(tipAmount.currencyFormatted)
+        Сумма счёта: \(formatter.formatCompact(billAmount))
+        Чаевые: \(formatter.formatCompact(tipAmount))
         —————————————
-        Итого: \(totalAmount.currencyFormatted)
+        Итого: \(formatter.formatCompact(totalAmount))
         """ : """
-        Общая сумма: \(totalAmount.currencyFormatted)
+        Общая сумма: \(formatter.formatCompact(totalAmount))
         """
         
         let messageText = """
         📊 Разделить счёт
         
         \(billBreakdown)
-        Распределено: \(distributedAmount.currencyFormatted)
+        Распределено: \(formatter.formatCompact(distributedAmount))
                         
         👥 Участники:
         \(participantNames)
@@ -52,16 +53,17 @@ final class ShareService {
         participantAmount: Double,
         totalAmount: Double,
         billAmount: Double,
-        tipAmount: Double
+        tipAmount: Double,
+        formatter: DecimalFormatting
     ) -> String {
         
         let billBreakdown = tipAmount > 0 ? """
-        Сумма счёта: \(billAmount.currencyFormatted)
-        Чаевые: \(tipAmount.currencyFormatted)
+        Сумма счёта: \(formatter.formatCompact(billAmount))
+        Чаевые: \(formatter.formatCompact(tipAmount))
         —————————————
-        Итого: \(totalAmount.currencyFormatted)
+        Итого: \(formatter.formatCompact(totalAmount))
         """ : """
-        Общая сумма: \(totalAmount.currencyFormatted)
+        Общая сумма: \(formatter.formatCompact(totalAmount))
         """
         
         let messageText = """
@@ -70,7 +72,7 @@ final class ShareService {
         \(billBreakdown)
         
         👥 Сумма для участника:
-        \(participantName) — \(participantAmount.currencyFormatted)
+        \(participantName) — \(formatter.formatCompact(participantAmount))
         
         ✅ Рассчитано с помощью приложения «Раздели счёт»
                 

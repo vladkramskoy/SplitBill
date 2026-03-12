@@ -9,25 +9,51 @@ import Foundation
 
 protocol DecimalFormatting {
     func format(_ amount: Double) -> String
+    func formatCompact(_ amount: Double) -> String
     func parse(_ string: String) -> Double?
+    var currencySymbol: String { get }
 }
 
 final class DecimalFormatter: DecimalFormatting {
     private let formatter: NumberFormatter
+    private let compactFormatter: NumberFormatter
+    private let inputFormatter: NumberFormatter
     
-    init(locale: Locale = .current) {
+    init(currencyCode: String = "RUB", locale: Locale = .current) {
         formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
         formatter.locale = locale
+        formatter.minimumFractionDigits = 2
         formatter.maximumFractionDigits = 2
-        formatter.minimum = 0
+        
+        compactFormatter = NumberFormatter()
+        compactFormatter.numberStyle = .currency
+        compactFormatter.currencyCode = currencyCode
+        compactFormatter.locale = locale
+        compactFormatter.minimumFractionDigits = 0
+        compactFormatter.maximumFractionDigits = 2
+        
+        inputFormatter = NumberFormatter()
+        inputFormatter.numberStyle = .decimal
+        inputFormatter.locale = locale
+        inputFormatter.maximumFractionDigits = 2
+        inputFormatter.minimum = 0
     }
     
     func format(_ amount: Double) -> String {
         formatter.string(from: NSNumber(value: amount)) ?? ""
     }
     
+    func formatCompact(_ amount: Double) -> String {
+        compactFormatter.string(from: NSNumber(value: amount)) ?? ""
+    }
+    
     func parse(_ string: String) -> Double? {
-        formatter.number(from: string)?.doubleValue
+        inputFormatter.number(from: string)?.doubleValue
+    }
+    
+    var currencySymbol: String {
+        formatter.currencySymbol ?? ""
     }
 }
