@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var session = BillSession()
     @State private var showWelcomeOnboarding = false
-    @AppStorage("currencyCode") private var currencyCode: String = "RUB"
+    @AppStorage("currencyCode") private var currencyCode: String = "RUS"
     
     private var formatter: DecimalFormatting {
         DecimalFormatter(currencyCode: currencyCode)

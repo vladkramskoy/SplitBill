@@ -12,6 +12,8 @@ struct ParticipantView: View {
     @Environment(BillSession.self) private var session
     @StateObject private var viewModel = ParticipantViewModel()
     @FocusState private var isTextFieldFocused: Bool
+    @State private var showCurrencyPicker = false
+    @AppStorage("currencyCode") private var currencyCode: String = "RUB"
     
     var body: some View {
         ZStack {
@@ -87,6 +89,15 @@ struct ParticipantView: View {
                 .padding(.horizontal)
             }
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showCurrencyPicker = true
+                    } label: {
+                        Image(systemName: "globe")
+                        Text("Валюта: \(currencyCode)")
+                    }
+                }
+                
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Button {
@@ -110,6 +121,11 @@ struct ParticipantView: View {
         .ignoresSafeArea(.keyboard)
         .onTapGesture {
             isTextFieldFocused = false
+        }
+        .sheet(isPresented: $showCurrencyPicker) {
+            CurrencyPickerView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
     
